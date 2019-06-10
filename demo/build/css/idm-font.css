@@ -1,0 +1,311 @@
+﻿@charset "UTF-8";
+
+/*
+ * (c) 2017 Intellectual Ventures
+ * Global Baseline Styles
+ *
+ * @author psylwester(at)intven(dot)com
+ * @version 2.1.0 2017/03/22
+ * @requires normalize.css (or equivalent)
+ * 
+ * THIS STYLESHEET RESERVED FOR RULES: 
+ * Generic font styling
+ * 
+ * These styles should change very rarely
+ * 
+ */
+
+@import url(//fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,700|Roboto+Condensed:400,700|Material+Icons);
+
+/* FONTS */
+
+@font-face {
+	font-family: "Roboto";
+	font-style: normal;
+	font-weight: normal;
+	/*
+	src: local("Roboto"),
+		local("Roboto-Regular"),
+		url(../font/Roboto/Roboto-regular.woff2) format("woff2"),
+		url(../font/Roboto/Roboto-regular.woff) format("woff"),
+		url(../font/Roboto/Roboto-regular.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto";
+	font-style: normal;
+	font-weight: bold;
+	/*
+	src: local("Roboto-Bold"),
+		url(../font/Roboto/Roboto-700.woff2) format("woff2"),
+		url(../font/Roboto/Roboto-700.woff) format("woff"),
+		url(../font/Roboto/Roboto-700.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto";
+	font-style: italic;
+	font-weight: normal;
+	/*
+	src: local("Roboto-Italic"),
+		url(../font/Roboto/Roboto-italic.woff2) format("woff2"),
+		url(../font/Roboto/Roboto-italic.woff) format("woff"),
+		url(../font/Roboto/Roboto-italic.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto";
+	font-style: italic;
+	font-weight: bold;
+	/*
+	src: local("Roboto-BoldItalic"),
+		url(../font/Roboto/Roboto-700italic.woff2) format("woff2"),
+		url(../font/Roboto/Roboto-700italic.woff) format("woff"),
+		url(../font/Roboto/Roboto-700italic.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto Condensed";
+	font-style: normal;
+	font-weight: normal;
+	/*
+	src: local("Roboto Condensed"),
+		local("Roboto-Condensed-Regular"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-regular.woff2) format("woff2"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-regular.woff) format("woff"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-regular.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto Condensed";
+	font-style: normal;
+	font-weight: bold;
+	/*
+	src: local("Roboto-Condensed-Bold"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-700.woff2) format("woff2"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-700.woff) format("woff"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-700.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto Condensed";
+	font-style: italic;
+	font-weight: normal;
+	/*
+	src: local("Roboto-Condensed-Italic"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-italic.woff2) format("woff2"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-italic.woff) format("woff"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-italic.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto Condensed";
+	font-style: italic;
+	font-weight: bold;
+	/*
+	src: local("Roboto-Condensed-BoldItalic"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-700italic.woff2) format("woff2"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-700italic.woff) format("woff"),
+		url(../font/Roboto_Condensed/Roboto-Condensed-700italic.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: normal;
+	/*
+  src: local("Roboto Mono"),
+    local("Roboto-Mono"),
+    local("Roboto-Mono-Regular"),
+    url(../font/Roboto_Mono/Roboto-Mono-regular.woff2) format("woff2"),
+    url(../font/Roboto_Mono/Roboto-Mono-regular.woff) format("woff"),
+    url(../font/Roboto_Mono/Roboto-Mono-regular.ttf) format("truetype");
+  */
+}
+
+@font-face {
+	font-family: "Roboto Mono";
+	font-style: normal;
+	font-weight: bold;
+	/*
+	src: local("Roboto-Mono-Bold"),
+		url(../font/Roboto_Mono/Roboto-Mono-700.woff2) format("woff2"),
+		url(../font/Roboto_Mono/Roboto-Mono-700.woff) format("woff"),
+		url(../font/Roboto_Mono/Roboto-Mono-700.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto Mono";
+	font-style: italic;
+	font-weight: normal;
+	/*
+	src: local("Roboto-Mono-Italic"),
+		url(../font/Roboto_Mono/Roboto-Mono-italic.woff2) format("woff2"),
+		url(../font/Roboto_Mono/Roboto-Mono-italic.woff) format("woff"),
+		url(../font/Roboto_Mono/Roboto-Mono-italic.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Roboto Mono";
+	font-style: italic;
+	font-weight: bold;
+	/*
+	src: local("Roboto-Mono-BoldItalic"),
+		url(../font/Roboto_Mono/Roboto-Mono-700italic.woff2) format("woff2"),
+		url(../font/Roboto_Mono/Roboto-Mono-700italic.woff) format("woff"),
+		url(../font/Roboto_Mono/Roboto-Mono-700italic.ttf) format("truetype");
+	*/
+}
+
+@font-face {
+	font-family: "Material Icons";
+	font-style: normal;
+	font-weight: normal;
+	/*
+	src: local("Material Icons"),
+		local("MaterialIcons-Regular"),
+		url(../font/Material_Icons/MaterialIcons-Regular.woff2) format("woff2"),
+		url(../font/Material_Icons/MaterialIcons-Regular.woff) format("woff"),
+		url(../font/Material_Icons/MaterialIcons-Regular.ttf) format("truetype");
+	*/
+}
+
+.material-icons {
+	font-family: "Material Icons";
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+	
+	/* Support for all WebKit browsers */
+	-webkit-font-smoothing: antialiased;
+	
+	/* Support for Safari and Chrome */
+	text-rendering: optimizeLegibility;
+	
+	/* Support for Firefox */
+	-moz-osx-font-smoothing: grayscale;
+	
+	/* Support for IE */
+	font-feature-settings: "liga";
+}
+
+/* STYLES */
+
+html,body,.sans
+{
+  font-family: "Roboto", "Calibri", sans-serif;
+  font-weight: normal;
+	font-size: 100%;
+	font-size: unset;
+
+	/* Support for all WebKit browsers */
+	-webkit-font-smoothing: antialiased;
+	
+	/* Support for Safari and Chrome */
+	text-rendering: optimizeLegibility;
+	
+	/* Support for Firefox */
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.serif
+{
+  font-family: Cambria, Georgia, Palatino, serif;
+}
+
+pre, .mono
+{
+  font-family: "Roboto Mono", Consolas, Menlo, "Lucida Console", mononspace;
+}
+
+::-webkit-input-placeholder
+{
+  color: #4d8bb8;
+  font-family: "Calibri", "Helvetica Neue", Arial, sans-serif;
+  font-style: italic;
+  font-size: 16px; 
+}
+
+:-moz-placeholder,
+::-moz-placeholder 
+{
+  color: #4d8bb8;
+  font-family: "Calibri", "Helvetica Neue", Arial, sans-serif;
+  font-style: italic;
+  font-size: 16px;
+  opacity: 1;
+}
+
+:-ms-input-placeholder
+{
+  color: #4d8bb8;
+  font-family: "Calibri", "Helvetica Neue", Arial, sans-serif !important;
+  font-style: italic;
+  font-size: 16px !important; 
+}
+
+button,
+input,
+optgroup,
+select,
+textarea 
+{
+	/* counteracts normalize 5.x */
+  font-family: "Roboto", "Calibri", sans-serif;
+}
+
+@media all and (max-width: 1500px) /* PRODUCTION 720px */
+{
+
+  /* -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+ *  SMALL DEVICES MEDIA QUERY
+ *  For this to work, it is essential that 
+ *  all font-size rules be in ems with overrides 
+ *  applied as reluctantly as possible. 
+ * -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~- */
+
+  html,body,.sans
+  {
+    font-family: "Roboto Condensed", "Calibri", sans-serif;
+  }
+	button,
+	input,
+	optgroup,
+	select,
+	textarea 
+	{
+		/* counteracts normalize 5.x */
+		font-family: "Roboto Condensed", "Calibri", sans-serif;
+	}
+}
+
+html[data-useragent*="Trident"], 
+html[data-useragent*="Trident"] body, 
+html[data-useragent*="Trident"] .sans,
+html[data-useragent*="Trident"] select, 
+html[data-useragent*="Trident"] option, 
+html[data-useragent*="Trident"] input[type="file"] 
+{
+	/*
+	To default IE to an intrinsic font to avert "fuzzy" rendering
+  font-family: "Calibri", sans-serif;
+  font-weight: normal;
+	*/
+}

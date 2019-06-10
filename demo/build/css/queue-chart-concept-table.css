@@ -1,0 +1,135 @@
+@charset "UTF-8";
+
+/*
+ * (c) 2019 Intellectual Ventures
+ * Module: Dashboard
+ * Sub-Module: queue-chart
+ *
+ * @author psylwester(at)intven(dot)com
+ * @version 0.1.0 2019/05/28
+ * @requires normalize.css, idm-dashboard.css
+ *
+ */
+
+/* UNDO idm-dashboard.css */
+
+#dashboard .chart:not(.no-data) figure:hover
+{
+  background: white;
+}
+
+/* PROTOTYPE */
+
+#dashboard [itemid=QueueChart].chart figure {
+  font-family: "Roboto Mono", Consolas, Menlo, "Lucida Console", mononspace;
+  background: white;
+  min-height: 4rem;
+}
+
+#dashboard [itemid=QueueChart].chart > button {
+  margin: 1em auto;
+  padding: 0.5em 1em;
+}
+
+@media only screen and (max-width: 1020px) {}
+
+@media only screen and (max-width: 900px) {}
+
+@media only screen and (max-width: 720px) {
+  [itemid=QueueChart] {
+    font-family: "Roboto Condensed", "Calibri", sans-serif;
+  }
+}
+
+/* CHARTING */
+
+td ul {
+  display: flex;
+  width: inherit;
+  height: inherit;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+td ul li {
+  flex-grow: 1;
+  line-height: 2;
+  padding: 0 1em;
+  margin-right: 1px;
+  transition-property: background-color;
+  transition-duration: 1s;
+  box-shadow: inset 0 0 28px rgba(0,0,0,0.1);
+}
+
+td ul li.Orphan
+{
+  background-color: deepskyblue;
+}
+
+td ul li.Created
+{
+  background-color: slategray;
+}
+
+td ul li.QueuedForCommission,
+td ul li.CommissionRequested,
+td ul li.Provisioning,
+td ul li.Commissioned {
+  background-color: lightseagreen;
+}
+
+td ul li.Validating,
+td ul li.Running
+{
+  background-color: orange;
+}
+
+td ul li.Waiting
+{
+  background-color: cornflowerblue;
+}
+
+td ul li.Retry,
+td ul li.QueuedForResume,
+td ul li.ResumeRequested,
+td ul li.Resumed {
+  background-color: springgreen;
+}
+
+td ul li.Succeeded
+{
+  background-color: seagreen;
+}
+
+td ul li.Failed
+{
+  background-color: red;
+}
+
+td ul li.CancelRequested,
+td ul li.Canceling,
+td ul li.Canceled
+{
+  background-color: hotpink;
+}
+
+
+/* WORK ITEMS */ 
+
+tbody[itemref=Work].active td[itemprop=detail] {
+  border-left: 3px solid #0072a2;
+}
+
+tbody[itemref=Work].active tr:nth-child(2) td[itemprop=detail] i {
+  transform: rotate(90deg);
+}
+
+tbody[itemref=Work] tr:nth-child(n+3) {
+  visibility: hidden;
+}
+
+tbody[itemref=Work].active tr:nth-child(n+3) {
+  visibility: visible;
+}

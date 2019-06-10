@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,user-scalable=yes">
+  <title>Dashboard: Demonstration</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/normalize.css?v=8.0.1">
+  <link rel="stylesheet" href="fa/css/all.css">
+  <link rel="stylesheet" href="css/idm-font.css">
+  <link rel="stylesheet" href="css/idm-global.css">
+  <link rel="stylesheet" href="css/idm-core.css">
+  <link rel="stylesheet" href="css/idm-dashboard.css">
+  <link rel="stylesheet" href="css/queue-chart.css">
+  <script src="bundle.js"></script>
+  <style>
+    /* TEMPORARY */
+    .chart form legend select {
+      margin: 2px 6px 2px 2px;
+      color: #0072a2;
+      background: whitesmoke;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body class="ready dashboard">
+  <main role="main" id="main">
+    <header id="header">
+      <aside class="truss"></aside>
+      <div>
+        <nav class="primary">
+          <menu class="local"></menu>
+          <menu class="global unselectable">
+            <li>
+              <a href="#void" class="ignore nav-log" data-method="comps.notifier.print" title="notifications">
+                <ins><i class="material-icons">priority_high</i></ins><b class="caret">&#9660;</b>
+              </a>
+            </li>
+            <li>
+              <a href="#void" class="nav-account" title="account">
+                <ins><i class="material-icons">person</i></ins><b class="caret">&#9660;</b>
+              </a>
+              <menu class="dropdown possessor">
+                <ul class="center force-right">
+                  <li><a data-action="session">Sign Out</a></li>
+                </ul>
+              </menu>
+            </li>
+          </menu>
+        </nav>
+        <nav class="secondary">
+          <menu><!-- expando items --></menu>
+          <button class="closer" title="close">&#10005;</button>
+        </nav>
+      </div>
+      <div id="minmax" class="omni ignore" title="show/hide toolbar"><span><!--&#9715;--></span></div>
+      <div id="tribar" class="omni" tabindex="0"><i class="material-icons">menu</i></div>
+    </header>
+    <article>
+      <div id="wrap">
+        <div id="content">
+          <section id="dashboard" class="active">
+            <div class="wrap">
+              <div class="truss">    
+                <div itemscope itemref="metric" itemid="{{ name }}" class="{{ css }}" hidden>
+                  <form class="{{ type }}">
+                    <figure>
+                      <figcaption>
+                        <dl>
+                          <dt itemprop="title" title="checkbox toggles showing or hiding this chart">
+                            <label><input type="checkbox" name="enabled" checked="{{ boolean:enabled }}" /><span>{{ title }}</span><dfn>hidden</dfn></label>
+                          </dt>
+                          <dd itemprop="description">{{ description }}</dd>
+                        </dl>
+                        <legend>
+                          <select name="source">
+                            <option value="0" disabled>API Simulations</option>
+                            <option value="1" disabled>API Work Items</option>
+                            <option value="2" selected>MOCK Simulations 1</option>
+                            <option value="3" disabled>MOCK Simulations 2</option>
+                            <option value="4" disabled>MOCK Work Items</option>
+                          </select>
+                          <button class="refresh" title="Get Latest"><i class="material-icons">refresh</i></button>
+                        </legend>
+                      </figcaption>
+                      <output title="{{ name }}" id="{{ name }}"></output>
+                    </figure>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="fail"><p class="delayed-fadein">Something may have gone wrong. Please reload the page.</p></section>
+        </div>
+      </div>
+      <ins id="dialog"></ins>
+    </article>
+    <footer id="footer">
+      <nav>
+        <figure class="ignore" title="Global Good"></figure>
+        <cite>Copyright &copy; 2019 Intellectual Ventures Property Holdings, LLC  All rights reserved.</cite>
+        <figure class="ignore" title="Institute for Disease Modeling"></figure>
+      </nav>
+    </footer>
+    <ins id="modal"></ins>
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="ignore">
+      <defs>
+        <!--USAGE:
+        <svg width="24" height="24">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon_Simulations"></use>
+        </svg>-->
+        <symbol id="icon_Simulations" viewBox="0 0 72 72">
+          <polygon points="36,0 4.8,54 36,72 67.2,54 36,0"/>
+          <polygon class="icon-fill" points="61.7,52.5 36,67.4 10.3,52.5 36,8"/>
+          <polygon class="icon-shade" points="36,67.4 10.3,52.5 36,8"/>
+        </symbol>
+        <symbol id="icon_Experiments" viewBox="0 0 72 72">
+          <polygon points="36,0 4.8,18 4.8,54 36,72 67.2,54 67.2,18 36,0"/>
+          <polygon class="icon-fill" points="63.2,20.3 63.2,51.7 36,67.4 8.8,51.7 8.8,20.3 36,4.6"/>
+          <polygon class="icon-shade" points="8.8,20.3 8.8,51.7 36,67.4 36,36"/>
+        </symbol>
+        <symbol id="icon_Suites" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="33"/>
+          <circle class="icon-shade" cx="36" cy="36" r="29"/>
+          <circle class="icon-fill" cx="40" cy="32" r="22"/>
+        </symbol>
+        <symbol id="icon_WorkItems" viewBox="0 0 72 72">
+          <path d="M66,70H18V14h32c8.8,0,16,7.2,16,16V70z"/>
+          <path class="icon-shade" d="M62,66H22V18h28c6.6,0,12,5.4,12,12V66z"/>
+          <path d="M6,2h48v56H22c-8.8,0-16-7.2-16-16V2z"/>
+          <path class="icon-fill" d="M10,6h40v48H22c-6.6,0-12-5.4-12-12V6z"/>
+          <rect x="20" y="16" width="20" height="3"/>
+          <rect x="20" y="27" width="20" height="3"/>
+          <rect x="20" y="38" width="20" height="3"/>
+        </symbol>
+        <symbol id="icon_AssetCollections" viewBox="0 0 72 72">
+          <polygon points="47.3,9 48.4,3 23.7,3 22.6,9 0,9 11.3,69 60.7,69 72,9 "/>
+          <polyline class="icon-fill" points="43.6,7 42.5,13 67.2,13 57.4,65 16.1,65 27,7 43.6,7 "/>
+          <polygon class="icon-shade" points="21.8,13 4.8,13 13.3,58.2 "/>
+        </symbol>
+      </defs>
+    </svg>
+  </main>
+</body>
+</html>

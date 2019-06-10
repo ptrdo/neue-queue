@@ -1,0 +1,1061 @@
+﻿@charset "UTF-8";
+
+/*
+ * (c) 2015 Intellectual Ventures
+ * Module: Dashboard
+ *
+ * @author psylwester(at)intven(dot)com
+ * @version 1.2.3 2015/06/18
+ * @requires normalize.css (or equivalent)
+ *
+ * THIS STYLESHEET RESERVED FOR RULES:
+ * Dashboard layout, charts, and visualizations
+ *
+ */
+
+body.dashboard #content section#dashboard
+{
+  display: block;
+}
+
+#content section#dashboard > div
+{
+  /* padding: 15px 15px 40px 15px; */
+  margin-bottom: 40px;
+}
+
+/* VISUALIZATIONS */
+
+#wrap.dashboard
+{
+  background: whitesmoke;
+}
+
+#dashboard .truss
+{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+
+  -webkit-align-content: center;
+  -ms-flex-line-pack: center;
+
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+}
+
+#dashboard .truss > .chart
+{
+  display: inline-block;
+  position: relative;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#dashboard .truss > .chart.fullwidth
+{
+  width: auto;
+  -webkit-box-flex: 4;
+  -webkit-flex: 4 1 100%;
+  -ms-flex: 4 1 100%;
+  flex: 4 1 100%;
+}
+
+#dashboard .truss > .chart.halfwidth
+{
+  margin: 0;
+  box-sizing: border-box;
+
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+
+  -webkit-flex-shrink: 1;
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
+
+  -webkit-flex-basis: 49%;
+/*-ms-flex-preferred-size: 49%;*/
+  flex-basis: 49%;
+
+  width: 49%;
+}
+
+html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
+{
+  flex-basis: 40%;
+}
+
+#dashboard .chart figure
+{
+  background: none;
+  transition-property: background;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in;
+}
+
+#dashboard .chart:not(.no-data) figure:hover
+{
+  background: whitesmoke;
+}
+
+#dashboard .chart figcaption
+{
+  text-align: left;
+}
+
+#dashboard .chart figcaption dl
+{
+  display: inline-block;
+  position: relative;
+  margin: 10px 0 20px 30px;
+  text-align: left;
+  color: #21374c;
+  cursor: default;
+}
+
+#dashboard .chart figcaption dl dt
+{
+  padding: 0 2px;
+  font-weight: bold;
+  font-size: larger;
+  border-bottom: 1px dotted orangered;
+}
+
+#dashboard .chart figcaption dl dd
+{
+  line-height: 1.7;
+  cursor: pointer;
+}
+
+#dashboard .chart figcaption dl dt em
+{
+  padding-right: 0.3em;
+  color: orangered;
+}
+
+#dashboard .chart figcaption dl dt label
+{
+  cursor: pointer;
+}
+
+#dashboard .chart figcaption dl dt label > span
+{
+  display: inline;
+}
+
+#dashboard .chart figcaption dl dt label > input
+{
+  /* checkbox */
+  margin: 0 8px 0 -1.3em !important;
+}
+
+#dashboard .chart figcaption label dfn
+{
+  display: none;
+  position: absolute;
+  margin-left: 0.5em;
+  padding: 3px;
+  font-weight: normal;
+  font-size: smaller;
+  font-style: italic;
+  color: silver;
+  white-space: nowrap;
+}
+
+#dashboard .chart figcaption legend
+{
+	width: auto;
+  float: right;
+  display: inline-block;
+  margin: 6px;
+	font-size: 100%;
+	font-size: unset;
+	border: none;
+}
+
+#dashboard .chart figure output
+{
+  display: inline-block;
+  width: 100%;
+  min-height: 300px;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+
+#dashboard .chart.no-data figure output
+{
+  background: whitesmoke;
+}
+
+#dashboard .chart figure output.process
+{
+  background: gainsboro;
+}
+
+/* CHART HACK IE 10 */
+/* IE 10 renders SVG within %-sized containers to default 300x150 */
+
+html[data-useragent*="MSIE 10"]
+#dashboard .chart.halfwidth figure output
+{
+  width: inherit;
+}
+
+html[data-useragent*="MSIE 10"]
+.highcharts-legend-head
+{
+  left: 20%;
+}
+
+/* RESPONSIVE MEDIA-QUERY */
+
+@media (max-width: 1400px)
+{
+  #dashboard .truss > .chart.halfwidth
+  {
+    -webkit-flex-basis: 100%;
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
+  {
+    flex-basis: 100% !important;
+    width: 100% !important;
+  }
+
+  html[data-useragent*="MSIE 10"] #dashboard .chart.halfwidth figure output
+  {
+    width: 100%;
+  }
+}
+
+/* CHART TYPE OPTIONS */
+
+#dashboard .chart form > div
+{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px 0 60px;
+}
+
+#dashboard .chart form legend select
+{
+  margin: 2px 6px 2px 2px;
+  color: #0072a2;
+  background: whitesmoke;
+  vertical-align: top;
+}
+
+#dashboard .chart form > button.refresh
+{
+  float: right;
+  margin: 10px 10px 0 0;
+}
+
+#dashboard .chart form > fieldset > label
+{
+  color: #0072a2;
+  cursor: pointer;
+}
+
+#dashboard .chart.no-data form > fieldset
+{
+  visibility: hidden;
+}
+
+#dashboard .chart figure ins.truncation
+{
+  display: inline-block;
+  margin-top: -1.1em;
+  margin-right: 20px;
+  padding: 0 1em;
+  position: relative;
+  background: #9cb8c6;
+  color: white;
+  font-size: 13px;
+  line-height: 2;
+  border-radius: 1em;
+  float: right;
+  z-index: 1;
+  cursor: pointer;
+}
+
+#dashboard .chart figure ins.truncation:hover
+{
+  background: #004766;
+}
+
+#dashboard .chart figure ins.truncation:active
+{
+  background: #82A4B5;
+}
+
+#dashboard .chart figure.truncated ins.truncation > span.enable,
+#dashboard .chart figure ins.truncation > span.disable
+{
+  display: none;
+}
+
+#dashboard .chart figure ins.truncation > span.enable,
+#dashboard .chart figure.truncated ins.truncation > span.disable
+{
+  display: inline;
+}
+
+#dashboard .chart.no-data .highcharts-legend-head
+{
+  visibility: hidden;
+}
+
+/* HIGHCHARTS LEGEND CUSTOMIZATIONS */
+
+#dashboard .highcharts-legend-head
+{
+  position: absolute;
+  width: auto;
+  top: 100px;
+  left: 110px;
+  margin: 0;
+  padding: 0;
+  background: whitesmoke;
+  border: 1px solid lightgray;
+  border-bottom-color: #0072a2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  text-align: left;
+}
+
+#dashboard .highcharts-legend-head:active
+{
+  box-shadow: none;
+}
+
+#dashboard .highcharts-legend-head a
+{
+  display: inline-block;
+  width: auto;
+  padding: 4px 18px 4px 7px;
+  font-size: 0.8em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#dashboard .highcharts-legend-head a:before
+{
+  content: "\25BC";
+  color: black;
+  font-size: 10px;
+  vertical-align: text-top;
+  padding: 0 5px;
+}
+
+#dashboard .minimized .highcharts-legend-head a:before
+{
+  content: "\25B6";
+  font-size: 12px;
+}
+
+#dashboard .highcharts-legend-head a:hover
+{
+  background: lightgoldenrodyellow;
+}
+
+#dashboard .highcharts-legend-head a:active
+{
+  background: #004766;
+  color: white;
+}
+
+#dashboard .highcharts-legend-head button {
+  display: inline-block;
+  font-size: 10px;
+  margin: 2px;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+  #dashboard .highcharts-legend-head button:hover {
+    color: #0072a2;
+  }
+
+#dashboard .minimized .highcharts-legend-head button {
+  display: none;
+}
+
+#dashboard .minimized .highcharts-legend > div:last-of-type
+{
+  visibility: hidden;
+}
+
+#dashboard .minimized g.highcharts-legend
+{
+  display: none;
+}
+
+#dashboard .highcharts-legend > .highcharts-legend-item 
+{
+  width: 110px;
+  height: 25px;
+  margin-top: -23px;
+  box-sizing: border-box;
+  background: white;
+  padding: 7px 12px;
+  border: 1px solid silver;
+  font-size: 11px;
+  color: black;
+  cursor: pointer;
+}
+
+
+/* VISUALIZATION-QUEUE */
+#dashboard .queue {
+  margin-bottom: 50px;
+}
+
+#dashboard .queue.chart figcaption dl dd
+{
+  color: #21374c;
+}
+
+#dashboard .queue.chart legend span
+{
+  margin: 0 0 0 3px;
+  padding: 4px;
+  line-height: 2;
+  font-weight: normal;
+  cursor: default;
+}
+
+#dashboard .queue.chart legend span.Orphaned { color: deepskyblue; }
+
+#dashboard .queue.chart legend span.QueuedForCommission,
+#dashboard .queue.chart legend span.CommissionRequested,
+#dashboard .queue.chart legend span.Commissioned,
+#dashboard .queue.chart legend span.Commissioning {
+   color: lightseagreen;
+}
+#dashboard .queue.chart legend span.Running { color: orange; }
+#dashboard .queue.chart legend span.Waiting { color: cornflowerblue; }
+
+#dashboard .queue.chart legend span.Retry,
+#dashboard .queue.chart legend span.QueuedForResume,
+#dashboard .queue.chart legend span.ResumeRequested,
+#dashboard .queue.chart legend span.Resumed,
+#dashboard .queue.chart legend span.Resuming {
+   color: springgreen;
+}
+#dashboard .queue.chart legend span.Succeeded { color: seagreen; }
+#dashboard .queue.chart legend span.Failed { color: red; }
+#dashboard .queue.chart legend span.Canceled { color: hotpink; }
+#dashboard .queue.chart legend span.Yours {
+  padding: 4px 6px;
+  border-bottom: 2px solid black;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  color: #004766;
+}
+
+#dashboard .queue.chart button.refresh
+{
+  float: right;
+  margin: 0 0 0 1em;
+}
+
+#dashboard .queue.chart figure output
+{
+  /* TODO: more/less */
+  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 300px;
+  border-top: 1px dotted silver;
+	font-size: 100%;
+	font-size: unset;
+}
+
+#dashboard .queue.chart figure output {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  border-bottom: 2px solid #004766;
+  min-height: 200px;
+  max-width: calc(100vw - 80px);
+}
+
+#dashboard .queue.chart figure.untruncated output
+{
+  min-height: 400px;
+  max-height: 600px;
+}
+
+#dashboard .queue.chart figure output > div
+{
+  /* queue-bucket */
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -ms-flex-positive: 1;
+
+  flex-grow: 1;
+  border-right: 1px dotted #004766;
+  padding: 1em 0;
+}
+
+#dashboard .queue.chart figure.untruncated output > div
+{
+  /* tolerance for confined tooltips */
+  padding-bottom: 120px;
+}
+
+#dashboard .queue.chart figure output > div:not(.empty)
+{
+  min-width: 190px;
+}
+
+#dashboard .queue.chart figure output > div.empty
+{
+  min-width: 60px;
+  width: 8%;
+}
+
+#dashboard .queue.chart figure output > div:last-of-type
+{
+  border: none;
+}
+
+#dashboard .queue.chart figure output > div > label
+{
+  position: relative;
+  display: inline-block;
+  line-height: 1.5;
+  padding: 0 1em;
+  white-space: nowrap;
+  color: #0072a2;
+}
+
+#dashboard .queue.chart figure output ol
+{
+  /* allows for arrow head */
+  margin-right: 40px;
+}
+
+#dashboard .queue.chart figure output ol > li:nth-child(even)
+{
+  /* staggers arrow heads */
+  margin-right: 10px;
+}
+
+#dashboard .queue.chart figure output > div.empty > ol
+{
+  margin: 10px;
+  background: #e4e1c0; /* palegoldenrod; */
+}
+
+#dashboard .queue.chart figure output > div.empty > ol > li
+{
+  width: 100%;
+  margin: 0;
+  background: #e4e1c0; /* palegoldenrod; */
+  text-align: center;
+  line-height: 2;
+  font-variant: small-caps;
+  color: darkolivegreen;
+  cursor: default;
+}
+
+#dashboard .queue.chart figure output > div.empty > label
+{
+  white-space: normal;
+}
+
+#dashboard .queue.chart figure output ol > li
+{
+  /* each arrow is stepped offset per row (inline) */
+  margin-right: 0;
+  text-align: left;
+}
+
+#dashboard .queue.chart figure output ul
+{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px;
+  width: 100%;
+	min-width: 2em; /* for when a bucket has very many items */
+  opacity: 1;
+
+  margin-left: 10px;
+
+  -webkit-transition-property: all;
+  -webkit-transition-duration: 300ms;
+  -webkit-transition-timing-function: ease-out;
+
+  transition-property: all;
+  transition-duration: 300ms;
+  transition-timing-function: ease-out;
+}
+
+#dashboard .queue.chart figure output div:nth-child(2) ul
+{
+  -webkit-transition-delay: 50ms;
+  -webkit-transition-duration: 200ms;
+
+  transition-delay: 50ms;
+  transition-duration: 200ms;
+}
+
+#dashboard .queue.chart figure output div:nth-child(3) ul
+{
+  -webkit-transition-delay: 100ms;
+  -webkit-transition-duration: 300ms;
+
+  transition-delay: 100ms;
+  transition-duration: 300ms;
+}
+
+#dashboard .queue.chart figure output div:nth-child(4) ul
+{
+  -webkit-transition-delay: 200ms;
+  -webkit-transition-duration: 400ms;
+
+  transition-delay: 200ms;
+  transition-duration: 400ms;
+}
+
+#dashboard .queue.chart figure output div:nth-child(5) ul
+{
+  -webkit-transition-delay: 400ms;
+  -webkit-transition-duration: 500ms;
+
+  transition-delay: 400ms;
+  transition-duration: 500ms;
+}
+
+#dashboard .queue.chart figure output.entre ul
+{
+  opacity: 0;
+  width: 10%;
+  margin-left: -500px;
+}
+
+#dashboard .queue.chart figure output ul > li
+{
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -ms-flex-positive: 1;
+
+  flex-grow: 1;
+  min-width: 1em;
+  text-align: left;
+  height: 2em;
+  border-left: 3px solid white;
+  cursor: pointer;
+}
+
+#dashboard .queue.chart figure output ul > li.block
+{
+  -webkit-box-flex: 0;
+  -webkit-flex-grow: 0;
+  -ms-flex-positive: 0;
+
+  flex-grow: 0;
+  min-width: 0;
+  border: none;
+  text-align: right;
+}
+
+#dashboard .queue.chart figure output ul > li.flex-faux
+{
+  /* IE10 overrides flex-grow with inline width */
+  -ms-flex-positive: 0;
+}
+
+#dashboard .queue.chart figure output ul.elsewhere > li.block,
+#dashboard .queue.chart figure output ul.elsewhere > li.flex-faux
+{
+/* Work Item Queue: unauthorized Environments */
+  flex-grow: 0 !important;
+  width: 0 !important;
+}
+
+#dashboard .queue.chart figure output ul > li ins.arrow
+{
+  /*
+  background: white;
+  border: solid transparent;
+  height: 0;
+  width: 0;
+  pointer-events: none;
+  border-left-color: hotpink;
+  border-width: 1em;
+  border-right-width: 0;
+  */
+  /*
+  display: inline-block;
+  width: 100%;
+  min-width: 30px;
+  height: inherit;
+  background: transparent;
+  background:
+      linear-gradient(45deg,  transparent 0.65em, transparent 0.65em),
+      linear-gradient(135deg, transparent 0.65em, transparent 0.65em),
+      linear-gradient(225deg, white 0.65em, transparent 0.65em),
+      linear-gradient(315deg, white 0.65em, transparent 0.65em);
+  background-position:
+      bottom left,
+      top left,
+      top right,
+      bottom right;
+  background-size:50% 50%;
+  background-repeat:no-repeat;
+  */
+
+  display: inline-block;
+  float: right;
+  width: 1em;
+  height: 2em;
+  margin-right: -1em;
+  overflow: hidden;
+
+  /* serifed */
+  width: 2em;
+  height: 3em;
+  margin-right: -2em;
+  margin-top: -0.6em;
+}
+
+ins.arrow b {
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  background: black;
+ -webkit-transform: rotate(45deg) translate(-1em, 1em);
+  transform: rotate(45deg) translate(-1em, 1em);
+
+  /* serifed */
+  width: 3em;
+  height: 3em;
+  -webkit-transform: rotate(45deg) translate(-1.5em, 1.7em);
+  transform: rotate(45deg) translate(-1.5em, 1.7em);
+}
+
+#dashboard .queue.chart ul > li > a
+{
+	display: inline-block;
+	width: 100%;
+	height: inherit;
+}
+
+#dashboard .queue.chart ul > li > a > var
+{
+  position: relative;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  line-height: 2;
+  color: white;
+  font-weight: bold;
+  z-index: 1;
+  cursor: pointer;
+}
+
+#dashboard .queue.chart ul > li var
+{
+  /* allows for arrowhead */
+  margin-right: -0.5em;
+}
+
+#dashboard .queue.chart ul > li.segment span
+{
+  font-size: smaller;
+  color: white;
+}
+
+#dashboard .queue.chart figure output .Orphan,
+#dashboard .queue.chart figure output .Orphan .arrow b
+{
+  cursor: pointer;
+}
+
+#dashboard .queue.chart figure output .Orphan,
+#dashboard .queue.chart figure output .Orphan .arrow b
+{
+  background-color: deepskyblue;
+}
+
+#dashboard .queue.chart figure output .Created,
+#dashboard .queue.chart figure output .Created .arrow b
+{
+  background-color: slategray;
+}
+
+#dashboard .queue.chart figure output .QueuedForCommission,
+#dashboard .queue.chart figure output .CommissionRequested,
+#dashboard .queue.chart figure output .Provisioning,
+#dashboard .queue.chart figure output .Commissioned,
+#dashboard .queue.chart figure output .QueuedForCommission .arrow b,
+#dashboard .queue.chart figure output .CommissionRequested .arrow b,
+#dashboard .queue.chart figure output .Provisioning .arrow b,
+#dashboard .queue.chart figure output .Commissioned .arrow b {
+  background-color: lightseagreen;
+}
+
+#dashboard .queue.chart figure output ul.owner > li:not(.block)
+{
+  border-bottom: 2px solid black;
+  box-shadow: 2px 3px 9px rgba(0, 0, 0, 0.3);
+}
+
+#dashboard .queue.chart figure output ul.owner ins.arrow b
+{
+  border-right: 1px solid black;
+  box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.3);
+}
+
+#dashboard .queue.chart figure output .Validating,
+#dashboard .queue.chart figure output .Validating .arrow b,
+#dashboard .queue.chart figure output .Running,
+#dashboard .queue.chart figure output .Running .arrow b
+{
+  background-color: orange;
+}
+
+#dashboard .queue.chart figure output .Waiting,
+#dashboard .queue.chart figure output .Waiting .arrow b
+{
+  background-color: cornflowerblue;
+}
+
+#dashboard .queue.chart figure output .Retry,
+#dashboard .queue.chart figure output .Retry .arrow b,
+#dashboard .queue.chart figure output .QueuedForResume,
+#dashboard .queue.chart figure output .QueuedForResume .arrow b,
+#dashboard .queue.chart figure output .ResumeRequested,
+#dashboard .queue.chart figure output .ResumeRequested .arrow b,
+#dashboard .queue.chart figure output .Resumed,
+#dashboard .queue.chart figure output .Resumed .arrow b {
+  background-color: springgreen;
+}
+
+#dashboard .queue.chart figure output .Succeeded,
+#dashboard .queue.chart figure output .Succeeded .arrow b
+{
+  background-color: seagreen;
+}
+
+#dashboard .queue.chart figure output .Failed,
+#dashboard .queue.chart figure output .Failed .arrow b
+{
+  background-color: red;
+}
+
+#dashboard .queue.chart figure output .CancelRequested,
+#dashboard .queue.chart figure output .Canceling,
+#dashboard .queue.chart figure output .Canceled,
+#dashboard .queue.chart figure output .CancelRequested .arrow b,
+#dashboard .queue.chart figure output .Canceling .arrow b,
+#dashboard .queue.chart figure output .Canceled .arrow b
+{
+  background-color: hotpink;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip
+{
+/*float: right;*/
+  position: absolute;
+  display: inline-block;
+  height: 0;
+  width: 0;
+  margin: 0;
+  overflow: hidden;
+  z-index: 999;
+
+  opacity: 0;
+  transition: all 50ms ease-out;
+
+	font-size: 100%;
+	font-size: unset;
+}
+
+#dashboard .queue.chart .untruncated ol > li dfn.tooltip
+{
+  position: absolute;
+}
+
+#dashboard .queue.chart ol > li:hover var
+{
+  color: black !important;
+}
+
+#dashboard .queue.chart ol > li:hover dfn.tooltip
+{
+  overflow: visible;
+  opacity: 1;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip  dl
+{
+  position: absolute;
+  display: inline-block;
+  margin-top: 24px;
+  margin-left: -10px;
+  padding: 0.5em 1em;
+  background: white;
+  border: 1px solid orange;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  text-align: left;
+  font-size: smaller;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl dt
+{
+  margin: -3px -9px 6px -9px;
+  padding: 6px 6px 7px 9px;
+  white-space: normal;
+  word-break: break-all;
+  font-weight: bold;
+  color: black;
+  background: #CBE2EC;
+  border-bottom: 1px solid #A5CDDE;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl dt:empty
+{
+  display: none;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip var
+{
+  color: gray;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip var:after
+{
+  content: ":";
+  padding-right: 4px;
+	margin-right: 6px;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip data
+{
+  font-weight: bold;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip data i
+{
+  font-weight: normal;
+  font-style: italic;
+  font-size: smaller;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip hr
+{
+  border: none;
+  border-top: 1px solid silver;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip sup
+{
+  font-size: 100%;
+  top: -0.15em;
+}
+
+/* DISABLED */
+
+#dashboard .truss > .chart.disabled
+{
+  -webkit-order: 100;
+  -ms-flex-order: 100;
+  order: 100;
+  -webkit-flex-basis: 100%;
+/*-ms-flex-preferred-size: 100%;*/
+  flex-basis: 100%;
+  width: 100%;
+  margin: -5px -15px;
+  padding: 0 40px;
+  background: whitesmoke;
+}
+
+#dashboard .truss > .chart.disabled label:hover span
+{
+  color: orangered;
+}
+
+#dashboard .truss > .chart.disabled label:active span
+{
+  color: black;
+}
+
+html[data-useragent*="Trident"] #dashboard .truss > .chart.disabled
+{
+  /* TODO: Re-evaluate time-to-time */
+  flex-basis: 100%;
+}
+
+#dashboard .truss > .chart.disabled.first
+{
+  margin-top: 20px;
+  border-top: 1px dotted #004766;
+  padding-top: 20px;
+}
+
+#dashboard .truss > .chart.disabled.last
+{
+  padding-bottom: 40px;
+}
+
+#dashboard .truss > .chart.disabled figcaption label dfn
+{
+  display: inline-block;
+}
+
+#dashboard .truss > .chart.disabled dd[itemprop=description],
+#dashboard .truss > .chart.disabled output,
+#dashboard .truss > .chart.disabled legend,
+#dashboard .truss > .chart.disabled fieldset,
+#dashboard .truss > .chart.disabled .truncation
+{
+  display: none;
+}
+
+/* HOVEROVER */
+
+ins.hoverover
+{
+  display: inline-block;
+  position: absolute;
+  min-width: 6em;
+  margin-top: -80px;
+  margin-left: -80px;
+  padding: 1em;
+  background-color: #f3f3c3;
+  border: 2px solid white;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+}

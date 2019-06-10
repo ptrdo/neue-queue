@@ -1,0 +1,76 @@
+{
+  "QueueState": {
+    "Lowest": [
+      {
+        "ExperimentId": "84ec8dc5-ae33-e911-a2c5-c4346bcb7273",
+        "Owner": "wwong",
+        "SimulationCount": 2400,
+        "FirstCreateTime": "2019-02-18T18:55:52.9330000Z",
+        "LastCreateTime": "2019-02-18T19:04:16.4300000Z",
+        "NodeGroup": "emod_abcd"
+      }
+    ],
+    "BelowNormal": [
+      {
+        "ExperimentId": "c57a5c2c-4b33-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 100,
+        "FirstCreateTime": "2019-02-18T07:02:55.9330000Z",
+        "LastCreateTime": "2019-02-18T07:03:03.0170000Z",
+        "NodeGroup": "emod_abcd"
+      },
+      {
+        "ExperimentId": "a2dc8621-5733-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 100,
+        "FirstCreateTime": "2019-02-18T08:28:32.3500000Z",
+        "LastCreateTime": "2019-02-18T08:28:39.6370000Z",
+        "NodeGroup": "emod_abcd"
+      },
+      {
+        "ExperimentId": "2c602375-5733-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 100,
+        "FirstCreateTime": "2019-02-18T08:31:13.6200000Z",
+        "LastCreateTime": "2019-02-18T08:31:23.7300000Z",
+        "NodeGroup": "emod_abcd"
+      },
+      {
+        "ExperimentId": "931ef943-5833-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 100,
+        "FirstCreateTime": "2019-02-18T08:36:46.3000000Z",
+        "LastCreateTime": "2019-02-18T08:36:55.1730000Z",
+        "NodeGroup": "emod_abcd"
+      }
+    ],
+    "Normal": [
+      {
+        "ExperimentId": "105937d9-0f33-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 100,
+        "FirstCreateTime": "2019-02-17T23:58:14.8900000Z",
+        "LastCreateTime": "2019-02-17T23:58:22.5800000Z",
+        "NodeGroup": "emod_abcd"
+      },
+      {
+        "ExperimentId": "3b266924-3633-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 100,
+        "FirstCreateTime": "2019-02-18T04:32:31.6900000Z",
+        "LastCreateTime": "2019-02-18T04:32:39.2700000Z",
+        "NodeGroup": "emod_abcd"
+      }
+    ],
+    "AboveNormal": [
+      {
+        "ExperimentId": "970d658d-682f-e911-a2c5-c4346bcb7273",
+        "Owner": "allee",
+        "SimulationCount": 50,
+        "FirstCreateTime": "2019-02-13T08:23:08.4300000Z",
+        "LastCreateTime": "2019-02-13T08:23:12.0230000Z",
+        "NodeGroup": "emod_abcd"
+      }
+    ]
+  }
+}

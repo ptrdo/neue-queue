@@ -1,0 +1,78 @@
+{
+  "QueueState": {
+  "Normal": [{
+    "ExperimentId": "8115b4cb-432a-e911-a2bf-c4346bcb1554",
+    "Owner": "allee",
+    "SimulationCount": 100,
+    "FirstCreateTime": "2019-02-06T19:17:27.8070000Z",
+    "LastCreateTime": "2019-02-06T19:17:36.6970000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
+    "ExperimentId": "45fa4250-6f2a-e911-a2bf-c4346bcb1554",
+    "Owner": "allee",
+    "SimulationCount": 100,
+    "FirstCreateTime": "2019-02-07T00:29:01.2430000Z",
+    "LastCreateTime": "2019-02-07T00:29:10.1030000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
+    "ExperimentId": "7ba65616-282b-e911-a2c5-c4346bcb7273",
+    "Owner": "allee",
+    "SimulationCount": 16,
+    "FirstCreateTime": "2019-02-07T22:31:36.9600000Z",
+    "LastCreateTime": "2019-02-07T22:31:40.5700000Z",
+    "NodeGroup": "emod_abcd"
+  }],
+    "AboveNormal": [{
+    "ExperimentId": "efad87e3-7529-e911-a2bf-c4346bcb1554",
+    "Owner": "allee",
+    "SimulationCount": 100,
+    "FirstCreateTime": "2019-02-05T18:43:37.5200000Z",
+    "LastCreateTime": "2019-02-05T18:43:44.9100000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
+    "ExperimentId": "e45265d7-b029-e911-a2bf-c4346bcb1554",
+    "Owner": "allee",
+    "SimulationCount": 100,
+    "FirstCreateTime": "2019-02-06T01:45:36.8000000Z",
+    "LastCreateTime": "2019-02-06T01:45:46.5030000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
+    "ExperimentId": "99b7796b-4d2b-e911-a2c5-c4346bcb7273",
+    "Owner": "pselvaraj",
+    "SimulationCount": 17600,
+    "FirstCreateTime": "2019-02-08T02:58:51.7900000Z",
+    "LastCreateTime": "2019-02-08T04:26:38.0570000Z",
+    "NodeGroup": "emod_32cores"
+  }],
+    "Highest": [{
+    "ExperimentId": "1fdf335d-c72b-e911-a2c5-c4346bcb7273",
+    "Owner": "pselvaraj",
+    "SimulationCount": 500,
+    "FirstCreateTime": "2019-02-08T17:32:27.4130000Z",
+    "LastCreateTime": "2019-02-08T17:34:09.7370000Z",
+    "NodeGroup": "emod_abcd"
+  }],
+    "Work": [{
+    "ExperimentId": "cd72c708-f90f-4dce-8780-0218365e25f0",
+    "Owner": "schen",
+    "SimulationCount": 100,
+    "FirstCreateTime": "2019-02-08T10:19:27.8070000Z",
+    "LastCreateTime": "2019-02-08T10:19:36.6970000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
+    "ExperimentId": "21fe2e8f-745b-4a94-b933-ca008c3775fe",
+    "Owner": "schen",
+    "SimulationCount": 100,
+    "FirstCreateTime": "2019-02-08T11:31:01.2430000Z",
+    "LastCreateTime": "2019-02-08T11:31:10.1030000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
+    "ExperimentId": "a89cac4d-534f-40ca-bfec-65fffb0e78e2",
+    "Owner": "schen",
+    "SimulationCount": 16,
+    "FirstCreateTime": "2019-02-08T12:45:36.9600000Z",
+    "LastCreateTime": "2019-02-08T12:45:40.5700000Z",
+    "NodeGroup": "emod_abcd"
+  }]
+  }
+}

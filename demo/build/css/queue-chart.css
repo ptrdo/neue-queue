@@ -1,0 +1,311 @@
+@charset "UTF-8";
+
+/*
+ * (c) 2019 Intellectual Ventures
+ * Module: Dashboard
+ * Sub-Module: queue-chart
+ *
+ * @author psylwester(at)intven(dot)com
+ * @version 0.1.0 2019/02/28
+ * @requires normalize.css, idm-dashboard.css
+ *
+ */
+
+/* UNDO idm-dashboard.css */
+
+#dashboard .chart:not(.no-data) figure:hover
+{
+  background: white;
+}
+
+/* PROTOTYPE */
+
+#dashboard [itemid=QueueChart].chart figure {
+  font-family: "Roboto Mono", Consolas, Menlo, "Lucida Console", mononspace;
+  background: white;
+  min-height: 4rem;
+}
+
+#dashboard [itemid=QueueChart].chart > button {
+  margin: 1em auto;
+  padding: 0.5em 1em;
+}
+
+[itemid=QueueChart] table {
+  width: 90%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 8px solid white;
+}
+
+@media only screen and (max-width: 1020px) {
+  [itemid=QueueChart] table tr th:first-child {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  [itemid=QueueChart] table tr th:nth-child(9),
+  [itemid=QueueChart] table tr td:nth-child(9) {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 720px) {
+  [itemid=QueueChart] table {
+    font-family: "Roboto Condensed", "Calibri", sans-serif;
+  }
+  [itemid=QueueChart] table td {
+    padding: 0 1em !important;
+  }
+}
+
+[itemid=QueueChart] table tbody {
+  border-top: 1em solid white;
+}
+
+[itemid=QueueChart] table thead th:last-child {
+  white-space: nowrap;
+}
+
+[itemid=QueueChart] table thead th:last-child button.refresh {
+  float: none !important;
+  margin: 0 -3em 0 1em !important;
+}
+
+@media only screen and (max-width: 1020px) {
+  [itemid=QueueChart] table thead th:last-child span {
+    display: none;
+  }
+  [itemid=QueueChart] table thead th:last-child button.refresh {
+    margin: 0 !important;
+  }
+}
+
+[itemid=QueueChart] table th,
+[itemid=QueueChart] table td {
+  height: 2em;
+  padding: 0 1em;
+  vertical-align: middle;
+  color: #0072a2;
+  border-bottom: 3px solid white;
+}
+
+[itemid=QueueChart] table th {
+  padding: 0;
+}
+
+[itemid=QueueChart] table tr {
+  background: #f7f5d0;
+}
+
+[itemid=QueueChart] table tr:hover {
+  background: palegoldenrod;
+}
+
+[itemid=QueueChart] table th {
+  background: white;
+}
+
+[itemid=QueueChart] table th.min,
+[itemid=QueueChart] table td.min {
+  width: 1em;
+  padding: 0 0.5em;
+}
+
+[itemid=QueueChart] table td.toggle,
+[itemid=QueueChart] table td.goto {
+  cursor: pointer;
+}
+
+[itemid=QueueChart] table tbody:not([itemref=Work]) td.toggle i {
+  color: silver;
+}
+
+[itemid=QueueChart] table tbody[itemref=Work] tr:nth-child(n+3) td.toggle i {
+  color: transparent;
+}
+
+[itemid=QueueChart] table td.cancel {
+  color: hotpink;
+  cursor: pointer;
+  border-left: 3px solid burlywood;
+}
+
+[itemid=QueueChart] table td.cancel i {
+  font-size: 1.3em;
+}
+
+[itemid=QueueChart] table td i.fas {
+  display: none;
+}
+
+[itemid=QueueChart] table td:hover i.fas {
+  display: inline;
+}
+
+[itemid=QueueChart] table td:hover i.fal,
+[itemid=QueueChart] table td:hover i.far {
+  display: none;
+}
+
+[itemid=QueueChart] table td:active {
+  color: black;
+}
+
+[itemid=QueueChart] table td[itemprop=PreActive] {
+  padding: 0 !important;
+  font-weight: bold;
+  background: #daf4f8;
+  color: white;
+  border-left: 3px solid white;
+  text-align: left;
+}
+
+[itemid=QueueChart] table tr:hover td[itemprop=PreActive] {
+  background: #c3e9ef;
+  color: black;
+}
+
+[itemid=QueueChart] table td[itemprop=Active] {
+  padding: 0 !important;
+  font-weight: bold;
+  background: #daf4f8;
+  color: white;
+  border-left: 3px solid white;
+  border-right: 3px solid white;
+}
+
+[itemid=QueueChart] table tr:hover td[itemprop=Active] {
+  background: #c3e9ef;
+  color: black;
+}
+
+[itemid=QueueChart] table td[itemprop=PostActive] {
+  padding: 0 !important;
+  font-weight: bold;
+  background: #daf4f8;
+  color: white;
+  border-left: 3px solid white;
+  text-align: right;
+}
+
+[itemid=QueueChart] table tr:hover td[itemprop=PostActive] {
+  background: #c3e9ef;
+  color: black;
+}
+
+[itemid=QueueChart] table th:first-child {
+  background: white;
+  text-align: right;
+  color: #cc0000;
+}
+
+[itemid=QueueChart] table tbody tr:not(:nth-child(2)) th[itemprop=Priority] {
+  color: transparent;
+}
+
+[itemid=QueueChart] table tbody tr td:last-child {
+  border-left: 3px solid white;
+}
+
+[itemid=QueueChart] table time {
+  min-width: 7em;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+/* CHARTING */
+
+td ul {
+  display: flex;
+  width: inherit;
+  height: inherit;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+td ul li {
+  flex-grow: 1;
+  line-height: 2;
+  padding: 0 1em;
+  margin-right: 1px;
+  transition-property: background-color;
+  transition-duration: 1s;
+  box-shadow: inset 0 0 28px rgba(0,0,0,0.1);
+}
+
+td ul li.Orphan
+{
+  background-color: deepskyblue;
+}
+
+td ul li.Created
+{
+  background-color: slategray;
+}
+
+td ul li.QueuedForCommission,
+td ul li.CommissionRequested,
+td ul li.Provisioning,
+td ul li.Commissioned {
+  background-color: lightseagreen;
+}
+
+td ul li.Validating,
+td ul li.Running
+{
+  background-color: orange;
+}
+
+td ul li.Waiting
+{
+  background-color: cornflowerblue;
+}
+
+td ul li.Retry,
+td ul li.QueuedForResume,
+td ul li.ResumeRequested,
+td ul li.Resumed {
+  background-color: springgreen;
+}
+
+td ul li.Succeeded
+{
+  background-color: seagreen;
+}
+
+td ul li.Failed
+{
+  background-color: red;
+}
+
+td ul li.CancelRequested,
+td ul li.Canceling,
+td ul li.Canceled
+{
+  background-color: hotpink;
+}
+
+
+/* WORK ITEMS */ 
+
+tbody[itemref=Work].active td[itemprop=detail] {
+  border-left: 3px solid #0072a2;
+}
+
+tbody[itemref=Work].active tr:nth-child(2) td[itemprop=detail] i {
+  transform: rotate(90deg);
+}
+
+tbody[itemref=Work] tr:nth-child(n+3) {
+  visibility: hidden;
+}
+
+tbody[itemref=Work].active tr:nth-child(n+3) {
+  visibility: visible;
+}

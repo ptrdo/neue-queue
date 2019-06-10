@@ -1,0 +1,484 @@
+﻿@charset "UTF-8";
+
+/*
+ * (c) 2017 Intellectual Ventures
+ * Global Baseline Styles
+ *
+ * @author psylwester(at)intven(dot)com
+ * @version 2.0.9 2017/01/23
+ * @requires normalize.css (or equivalent)
+ * 
+ * THIS STYLESHEET RESERVED FOR RULES: 
+ * Generic text and element styling
+ * Default for color and theme baselines
+ * Convenience classes
+ * 
+ * These styles should change very rarely
+ * 
+ */
+
+html,body
+{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+* 
+{
+  /* Bootstrap default */
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.bold, strong, em, b, h1, h2, h3
+{
+  font-weight: bold !important;
+  font-style: normal;
+}
+
+.normal, th
+{
+  font-weight: normal;
+  font-style: normal;
+}
+
+.italic { font-style: italic; }
+.caps   { text-transform: uppercase; }
+
+.smaller { font-size: smaller; }
+.larger  { font-size: larger; }
+
+.em-larger   { font-size: 1.1em; }
+.em-default  { font-size: 1.0em; }
+.em-smaller  { font-size: 0.8em; }
+.em-smallest { font-size: 0.6em; }
+
+
+/*-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  CONVENIENCE RULES
+-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~ */
+
+.left    { text-align: left !important; }
+.right   { text-align: right !important; }
+.center  { text-align: center !important; }
+.normal  { font-weight: normal !important; }
+
+.clear   { clear: both; }
+.ignore  { display: none !important; }
+.visible { visibility: visible; }
+.hidden  { visibility: hidden; }
+
+.small-caps 
+{
+  text-transform: uppercase;
+  font-size: smaller;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.force-right
+{
+  position: absolute !important;
+  right: 0;
+  left: auto;
+}
+
+.float-right
+{
+  float: right !important;
+}
+
+.force-left
+{
+  position: absolute !important;
+  left: 0;
+  right: auto;
+}
+
+.float-left
+{
+  float: left !important;
+}
+
+.clickable
+{
+  cursor: pointer;
+}
+
+.unselectable
+{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.nobr,a.tel
+{
+  white-space: nowrap;
+}
+
+.break-word 
+{
+  -ms-word-break: break-all;
+  word-break: break-all;
+
+  /* Non standard for webkit */
+  word-break: break-word;
+
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}
+
+.comment 
+{
+  font-size: smaller;
+  font-style: italic;
+  color: deeppink;
+}
+
+/*-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  DEFAULTS
+-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~ */
+
+template, [hidden]
+{
+  display: none !important;
+}
+
+br, hr
+{
+  clear: both;
+}
+
+h1, h2, h3, h4, h5
+{
+  line-height: 1;
+  font-weight: normal;
+}
+
+strong, em, b
+{
+  font-weight: bold;
+}
+
+var, dfn, em, address, cite
+{
+  font-style: normal;
+}
+
+mark 
+{
+  color: inherit;
+  background: inherit;
+}
+
+ins 
+{
+  text-decoration: none;
+}
+
+figure, figcaption 
+{
+  margin: 0;
+  padding: 0;
+}
+
+table 
+{
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/*-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  ANCHORS
+-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~ */
+
+a
+{
+  cursor: pointer;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:link
+{
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited
+{
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover
+{
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:active
+{
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:focus
+{
+  -moz-outline-style: none;
+}
+
+a img
+{
+  border: none;
+}
+
+/*-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  LISTS 
+  style lists as menu elements by default 
+-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~ */
+
+ul,ol,dl,dt,dd,menu
+{
+  margin: 0;
+  padding: 0;
+}
+
+ul,ol
+{
+  list-style: none;
+  list-style-position: inside;
+}
+
+li > a
+{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+}
+
+ul.bulleted li,
+ol.bulleted li
+{
+  list-style-type: disc;
+  margin-left: 1em;
+}
+
+ul.numbered li,
+ol.numbered li
+{
+  list-style-type: decimal;
+  margin-left: 1em;
+}
+
+
+/*-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  CLEARFIX
+  apply to any parent of floated children
+-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~ */
+
+.clearfix::after
+{
+  content: ".";
+  display: block;
+  height: 0;
+  width: 100%;
+  clear: both;
+  float: none;
+  visibility: hidden;
+}
+
+
+/* -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+ *  FORM INPUT ELEMENTS
+ * -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~- */
+
+select
+{
+  height: 30px;
+}
+
+select, option, input[type="file"] 
+{
+  font-family: sans-serif;
+  font-weight: normal;
+	font-size: medium;
+	padding-left: 4px;
+}
+
+select[disabled] {
+  cursor: default;
+  opacity: 0.5; 
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus
+{
+  outline: none;
+}
+
+fieldset,label
+{
+  margin: 0;
+  padding: 0;
+  border: none;
+	font-weight: normal;
+	font-size: 100%;
+	font-weight: unset;
+	font-size: unset;
+}
+
+label[for]
+{
+  cursor: pointer;
+}
+
+label > input,
+input[type="radio"]
+{
+  margin: 0 8px !important;
+	vertical-align: middle;
+}
+
+span.error
+{
+  color: red;
+  visibility: hidden;
+}
+
+.error span.error
+{
+  /*  IF ERROR, ADD "error" CLASS TO <body>
+      OR ANY PARENT OF AN INPUT IN ERROR */
+  visibility: visible;
+}
+
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input
+{
+  padding: 4px 8px;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.5); /* #cccccc; */
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border linear 100ms, box-shadow linear 100ms;
+     -moz-transition: border linear 100ms, box-shadow linear 100ms;
+       -o-transition: border linear 100ms, box-shadow linear 100ms;
+          transition: border linear 100ms, box-shadow linear 100ms;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus
+{
+  background-color: #fbfbdb;
+  border-color: rgba(82, 168, 236, 0.8);
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
+
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+
+input:-webkit-autofill
+{
+  background-color: white !important;
+}
+
+/* -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+ *  MOZ-DEFEATS
+ * -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~- */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner 
+{
+  /* Remove button padding in FF */
+  border: 0;
+  padding: 0;
+}
+
+td 
+{
+ -moz-user-select: none;
+}
+
+input:invalid
+{
+  box-shadow: none;
+  /* eliminates auto-validation of input[required] fields
+   * until such a time that auto-validation is accommodated.
+   * Currently an issue with FF validation of placeholder.
+   */
+}
+
+/*-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  MOBILE-FRIENDLY
+  rules for narrow browser client
+-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~ */
+
+@media all and (max-width: 720px)
+{
+  /* "mobile-friendly" rules go here */
+
+  /* -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+   *  MOBILE: SELECTION DEFAULTS
+   * -~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~- */
+
+  html
+  {
+    -webkit-tap-highlight-color: rgba(0,0,0,0.2);
+    -moz-tap-highlight-color: rgba(0,0,0,0.2);
+    -ms-tap-highlight-color: rgba(0,0,0,0.2);
+    -o-tap-highlight-color: rgba(0,0,0,0.2);
+  }
+
+  ::selection { background: yellow; }
+  ::-moz-selection { background: yellow; }
+
+  #some-selector
+  {
+
+  }
+}
