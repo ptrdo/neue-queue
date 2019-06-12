@@ -2,20 +2,21 @@
   "name": "COMPS-UI-Dashboard",
   "version": "v0.1.0",
   "description": "A client view for visualizing the progress of work processing on a high performance computing cluster.",
-  "homepage": "https://github.com/InstituteforDiseaseModeling/COMPS-UI-Dashboard#readme",
+  "homepage": "https://github.com/ptrdo/neue-queue#readme",
   "main": "queue-chart.js",
   "files": [
-    "/queue-chart.js"
+    "/queue-chart.js",
+    "/mock/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/InstituteforDiseaseModeling/COMPS-UI-Dashboard.git"
+    "url": "git+https://github.com/ptrdo/neue-queue.git"
   },
   "bugs": {
-    "url": "https://github.com/InstituteforDiseaseModeling/COMPS-UI-Dashboard/issues"
+    "url": "https://github.com/ptrdo/neue-queue/issues"
   },
   "authors": [
     "Peter Sylwester <psylwester@idmod.org>"
