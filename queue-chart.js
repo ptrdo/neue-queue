@@ -6,12 +6,25 @@ import _ from "lodash";
  * Means to Monitor Progress of Work Processing on HPC Cluster
  *
  * @author psylwester(at)idmod(dot)org
- * @version 0.1.0, 2019/05/30
+ * @version 0.1.0, 2019/06/12
  * @requires ES6, microdata-template, lodash
  *
  */
 
 /* CONFIG */
+
+let config = {
+  name: "queue-chart",
+  type: "arrow",
+  selector: "output[title=NeueQueue]",
+  chartContainer:"NeueQueue",
+  queue: [], // _.has(this.data, "QueueState") ? this.data["QueueState"] : [],
+  stats: {}, // _.has(this.detailData, "Stats") ? this.detailData["Stats"] : {},
+  useMockData: true,
+  shuffle: false
+};
+
+/* STATIC */
 
 const PRIORITY = {
   1: {
@@ -72,7 +85,7 @@ const path = {
     dev: "https://comps-dev.idmod.org/api",
     staging: "https://comps2.idmod.org/api",
     product: "https://comps.idmod.org/api",
-    local: "mock"
+    local: "./data"
   },
   entity: {
     Simulations: "Simulations",
@@ -264,7 +277,7 @@ const redraw = function (rootElement=document) {
  */
 const render = function (rootElement=document, callback) {
 
-  let templated = true;
+  let templated = false;
   let source = rootElement.querySelector("[itemscope]");
   let config = {
     name: "NeueQueue",
@@ -337,8 +350,7 @@ const render = function (rootElement=document, callback) {
   };
 
   if (!!view.element) {
-    alert("already rendered?");
-    console.error("already rendered", element);
+    console.error(`${config.name} is already rendered!`, view.element);
   } else if (!!source) {
     if (templated) {
       templater.render(source, config);
@@ -356,8 +368,7 @@ const render = function (rootElement=document, callback) {
       }
     }, 0);
   } else {
-    alert("failed to render!");
-    console.error("failed to render", collection.latest);
+    console.error(`${config.name} failed to render!`, collection.latest);
     if (!!callback && callback instanceof Function) {
       callback(null);
     }
@@ -389,7 +400,7 @@ const getData = function () {
 };
 
 const configure = function (options) {
-  console.log("configure:", options);
+  Object.assign(config, (options || {}));
   return this;
 };
 
@@ -399,6 +410,7 @@ const configure = function (options) {
  * @param {Function} callback
  */
 const draw = function (overrides, callback) {
+  Object.assign(config, (overrides || {}));
   render(document.getElementById("dashboard"), callback);
 }
 
