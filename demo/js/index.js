@@ -1,18 +1,19 @@
 import Config from "./config";
 import Auth from "comps-ui-auth";
-import Notifier from "../node_modules/comps-ui/notifier/idmorg-notifier.js";
-import Queue from "../../queue-chart.js";
+import Postette from "../node_modules/postette/postette.js";
+import templater from "microdata-template";
+import Queue from "../../queueView.js";
 
 class Index {
 
   constructor() {
     console.log("The Index module has been constructed!");
-    Notifier.init({
+    Postette.init({
       echo: true,
       prefix: false
     });
-    if (!("idmnotifier" in window)) {
-      window["idmnotifier"] = Notifier;
+    if (!("postette" in window)) {
+      window["postette"] = Postette;
     }
     if (!("queue" in window)) {
       window["queue"] = Queue;
@@ -20,16 +21,41 @@ class Index {
   };
 
   render(rootElement=document) {
+
+    templater.render(
+      rootElement.querySelector("#dashboard [itemscope]"),
+      {
+        name: "QueueView",
+        type: "arrow",
+        title: "A Neue Queue!",
+        description: "On the Belegost Environment",
+        css: "chart queue fullwidth",
+        enabled: true
+      }
+    );
+
+    let queue = new Queue({
+      type: "arrow",
+      selector: "[itemid=QueueView]",
+      chartContainer:"#QueueView",
+      useMockData: true
+    });
+
+    let refresh = rootElement.querySelector("[itemid=QueueView] button.refresh");
+    refresh.addEventListener("click", function(event) {
+      event.preventDefault();
+      queue.draw();
+    });
     
     let button = document.createElement("BUTTON");
     button.appendChild(document.createTextNode("Do It!"));
     button.setAttribute("style", "display:block;margin:0 auto;padding: 0.5em 1em;")
     button.addEventListener("click", function (event) {
       event.preventDefault();
-      if (Queue.status()) {
+      if (queue.status()) {
         window.location.reload();
       } else {
-        Queue.refresh();
+        queue.draw();
         this.innerText = "Reset";
       }
     });
@@ -48,14 +74,14 @@ class Index {
     authToggle.addEventListener("click", function (event) {
       let menu = event.target;
       while (!menu.classList.contains("active")) {
-        menu = menu.parentElement;
+        menu = menu.parentElement;s
       }
       menu.classList.remove("active");
       Auth.signout(Config.appName);
     });
 
     setTimeout(function () {
-      Notifier.alert("Ready!");
+      Postette.alert("Ready!");
       document.documentElement.setAttribute("data-useragent", navigator.userAgent);
       window.addEventListener("touchstart", function onFirstTouch() {
         document.body.classList.add("touch");

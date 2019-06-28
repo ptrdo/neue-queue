@@ -1,12 +1,13 @@
 ﻿@charset "UTF-8";
 
 /*
- * (c) 2015 Intellectual Ventures
+ * (c) 2019 Intellectual Ventures
  * Module: Dashboard
  *
  * @author psylwester(at)intven(dot)com
- * @version 1.2.3 2015/06/18
+ * @version 2.5.6 2019/06/26
  * @requires normalize.css (or equivalent)
+ * @assumes http://github.com/google/material-design-icons/
  *
  * THIS STYLESHEET RESERVED FOR RULES:
  * Dashboard layout, charts, and visualizations
@@ -20,8 +21,7 @@ body.dashboard #content section#dashboard
 
 #content section#dashboard > div
 {
-  /* padding: 15px 15px 40px 15px; */
-  margin-bottom: 40px;
+  padding: 15px 15px 40px 15px;
 }
 
 /* VISUALIZATIONS */
@@ -95,15 +95,17 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
 
 #dashboard .chart figure
 {
-  background: none;
-  transition-property: background;
+  background: white;
+  border: 1px solid white;
+  transition-property: border;
   transition-duration: 300ms;
   transition-timing-function: ease-in;
 }
 
 #dashboard .chart:not(.no-data) figure:hover
 {
-  background: whitesmoke;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 16px 4px #eee;
 }
 
 #dashboard .chart figcaption
@@ -115,7 +117,7 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
 {
   display: inline-block;
   position: relative;
-  margin: 10px 0 20px 30px;
+  margin: 10px 0 20px 40px;
   text-align: left;
   color: #21374c;
   cursor: default;
@@ -176,7 +178,6 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
   float: right;
   display: inline-block;
   margin: 6px;
-	font-size: 100%;
 	font-size: unset;
 	border: none;
 }
@@ -197,7 +198,7 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
 
 #dashboard .chart figure output.process
 {
-  background: gainsboro;
+  background: palegoldenrod;
 }
 
 /* CHART HACK IE 10 */
@@ -439,6 +440,8 @@ html[data-useragent*="MSIE 10"]
   padding: 4px;
   line-height: 2;
   font-weight: normal;
+  vertical-align: middle;
+  vertical-align: -webkit-baseline-middle;
   cursor: default;
 }
 
@@ -554,12 +557,6 @@ html[data-useragent*="MSIE 10"]
   margin-right: 40px;
 }
 
-#dashboard .queue.chart figure output ol > li:nth-child(even)
-{
-  /* staggers arrow heads */
-  margin-right: 10px;
-}
-
 #dashboard .queue.chart figure output > div.empty > ol
 {
   margin: 10px;
@@ -570,7 +567,7 @@ html[data-useragent*="MSIE 10"]
 {
   width: 100%;
   margin: 0;
-  background: #e4e1c0; /* palegoldenrod; */
+  background: beige; /* #e4e1c0; */
   text-align: center;
   line-height: 2;
   font-variant: small-caps;
@@ -671,7 +668,7 @@ html[data-useragent*="MSIE 10"]
   min-width: 1em;
   text-align: left;
   height: 2em;
-  border-left: 3px solid white;
+  border-left: 1px solid white;
   cursor: pointer;
 }
 
@@ -773,7 +770,7 @@ ins.arrow b {
 {
   position: relative;
   margin-left: 0.5em;
-  margin-right: 0.5em;
+  margin-right: 4px;
   line-height: 2;
   color: white;
   font-weight: bold;
@@ -899,12 +896,16 @@ ins.arrow b {
 	font-size: unset;
 }
 
+#dashboard .queue.chart ol > li dfn.tooltip:hover {
+  z-index: 1000;
+}
+
 #dashboard .queue.chart .untruncated ol > li dfn.tooltip
 {
   position: absolute;
 }
 
-#dashboard .queue.chart ol > li:hover var
+#dashboard .queue.chart ol > li:hover a var
 {
   color: black !important;
 }
@@ -943,9 +944,20 @@ ins.arrow b {
   border-bottom: 1px solid #A5CDDE;
 }
 
+
+#dashboard .queue.chart ol > li dfn.tooltip  dl:hover dt {
+  background: aliceblue;
+}
+
 #dashboard .queue.chart ol > li dfn.tooltip dl dt:empty
 {
   display: none;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl dd {
+  max-width: 16em;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip var
@@ -1044,7 +1056,7 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.disabled
   display: none;
 }
 
-/* HOVEROVER */
+/* HOVER-OVER */
 
 ins.hoverover
 {
@@ -1058,4 +1070,157 @@ ins.hoverover
   border: 2px solid white;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   text-decoration: none;
+}
+
+/* NEUE-QUEUE */
+
+.chart form legend select {
+  margin: 2px 6px 2px 2px;
+  color: #0072a2;
+  background: whitesmoke;
+  vertical-align: top;
+}
+
+#dashboard .queue.chart figure output ol > li:nth-child(even) {
+  /* staggers each row, @see line 579 */
+  margin-right: 8px;
+}
+
+#dashboard .queue.chart figure output > div:not(.empty) {
+  /* deprioritizes empty buckets, @see line 524 */
+  flex-grow: 1500;
+}
+
+#dashboard .chart figcaption legend time:not(.empty) {
+  padding: 0 0 0 8px;
+  vertical-align: middle;
+  vertical-align: -webkit-baseline-middle;
+  border-left: 1px solid silver;
+  color: #0072a2;
+}
+#dashboard .chart:not(.queue) legend time,
+#dashboard [itemid=QueueWorkItems].chart legend time {
+  display: none;
+}
+
+#dashboard .queue.chart ul > li > time.median {
+  display: none;
+  position: absolute;
+  margin-left: -33px;
+  line-height: 2;
+  color: lime;
+  z-index: 1;
+}
+
+#dashboard .queue.chart legend span,
+#dashboard .chart figcaption legend time {
+  white-space: nowrap;
+}
+
+.chart form legend select,
+.chart form legend select option {
+  font-size: medium;
+}
+
+#dashboard .queue.chart figure output ul > li.more {
+  flex-grow: 0;
+  width: 20px;
+  min-width: 20px;
+  max-width: 20px;
+  height: 2em;
+  background: darkcyan;
+  color: lightblue;
+}
+
+#dashboard .queue.chart figure output ul > li.more i.material-icons 
+{
+  vertical-align: middle;
+  line-height: 1.3;
+  margin: 0 0 0 -3px;
+  padding: 0;
+}
+
+#dashboard .queue.chart figure output ul > li.more:hover,
+#dashboard .queue.chart figure output li.active ul > li.more 
+{
+  background: cyan;
+  color: darkcyan;
+}
+
+#dashboard .queue.chart figure output li.active ul > li.more:hover 
+{  background: darkcyan;
+  color: lightblue;
+}
+
+#dashboard .queue.chart figure output ul > li.more:active,
+#dashboard .queue.chart figure output li.active ul > li.more:active
+{
+  background: #006666;
+  color: cyan;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li:hover dfn.tooltip
+{
+  overflow: hidden;
+  opacity: 0;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip
+{
+  overflow: visible;
+  opacity: 1;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip  dl {
+  margin-left: 16px;
+}
+
+
+
+/* RESPONSIVE-QUEUE */
+
+@media all and (max-width: 1000px)
+{
+  #dashboard .queue.chart figure output {
+    flex-direction: column-reverse;
+    max-height: unset;
+    border-top: 1px solid black;
+    max-width: 100%;
+  }
+  #dashboard .queue.chart figure output > div:last-of-type {
+    border-bottom: 1px solid black;
+  }
+  #dashboard .queue.chart figure output > div.empty {
+    width: auto;
+  }
+  #dashboard .queue.chart figure output > div > label {
+    float: left;
+    margin: 1em 0;
+  }
+  #dashboard .queue.chart figure output > div > label:before {
+    content: "\25bc";
+    padding-right: 4px;
+  }
+  #dashboard .queue.chart figure output > div:not(.empty) {
+    padding-bottom: 1em;
+  }
+  #dashboard .queue.chart figure output > div.empty > label:before {
+    content: "\25b6";
+    padding-right: 4px;
+  }
+  #dashboard .queue.chart figure output > div {
+    border-bottom: 1px solid black;
+    border-right: none;
+  }
+  #dashboard .chart figcaption dl dt label > span {
+    font-size: larger;
+  }
+  #dashboard .chart figcaption legend {
+    float: none;
+    text-align: right;
+    margin: 0;
+  }
+  #dashboard .chart figcaption legend button {
+    float: none;
+  }
 }

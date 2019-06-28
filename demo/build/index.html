@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="css/idm-global.css">
   <link rel="stylesheet" href="css/idm-core.css">
   <link rel="stylesheet" href="css/idm-dashboard.css">
-  <link rel="stylesheet" href="css/queue-chart.css">
   <script src="bundle.js"></script>
   <style>
     /* TEMPORARY */
@@ -74,13 +73,6 @@
                           <dd itemprop="description">{{ description }}</dd>
                         </dl>
                         <legend>
-                          <select name="source">
-                            <option value="0" disabled>API Simulations</option>
-                            <option value="1" disabled>API Work Items</option>
-                            <option value="2" selected>MOCK Simulations 1</option>
-                            <option value="3" disabled>MOCK Simulations 2</option>
-                            <option value="4" disabled>MOCK Work Items</option>
-                          </select>
                           <button class="refresh" title="Get Latest"><i class="material-icons">refresh</i></button>
                         </legend>
                       </figcaption>
