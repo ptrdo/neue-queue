@@ -1,0 +1,38 @@
+{
+  "URL": "https://comps-dev.idmod.org/api/WorkItems/a85b6c51-6598-e911-a2bb-f0921c167866/Related?format=json",
+  "Id": "a85b6c51-6598-e911-a2bb-f0921c167866",
+  "Ancestors": [],
+  "Related": [{
+    "Id": "9a39c259-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "ce2d1d67-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "29391a6d-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "2d391a6d-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "cdc392a3-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "d1c392a3-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "d5c392a3-6598-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "WorkItem"
+  }, {
+    "Id": "8d6dd2aa-6598-e911-a2bb-f0921c167866",
+    "Relationship": "Created",
+    "ObjectType": "AssetCollection"
+  }]
+}
