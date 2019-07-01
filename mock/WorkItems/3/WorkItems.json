@@ -1,0 +1,101 @@
+{
+  "URL": "https://comps-dev.idmod.org/api/WorkItems?filters=State!=Canceled,State!=Succeeded,State!=Failed,State!=Created&orderby=DateCreated%20desc&offset=0&children=tags,files,plugins&format=json",
+  "WorkItems": [{
+    "Id": "2d391a6d-6598-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (a85b6c51) MergeNodesWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-06-26T22:55:01.4500000Z",
+    "LastModified": "2019-06-26T22:55:01.4630000Z",
+    "State": "CommissionRequested",
+    "Worker": {
+      "Name": "MergeNodesWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "Tags": {},
+    "Files": [{
+      "Description": "WorkOrder",
+      "FileType": "WorkOrder",
+      "MD5Checksum": "2eb32778-b6cf-65f1-056a-e73b7517988c",
+      "FileName": "WorkOrder.json",
+      "Length": 1608028,
+      "Uri": "https://comps-dev.idmod.org:443/asset/download/NX9ChTfpQgVgVHQH8DRuq5bOMtU1rZHLcYubZ373sQU_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDJlYlwzMjdcNzhiXDJlYjMyNzc4LWI2Y2YtNjVmMS0wNTZhLWU3M2I3NTE3OTg4Yw__/WorkOrder.json"
+    }]
+  }, {
+    "Id": "29391a6d-6598-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (a85b6c51) MergeNodesWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-06-26T22:55:01.1030000Z",
+    "LastModified": "2019-06-26T22:55:01.1200000Z",
+    "State": "CommissionRequested",
+    "Worker": {
+      "Name": "MergeNodesWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "Tags": {},
+    "Files": [{
+      "Description": "WorkOrder",
+      "FileType": "WorkOrder",
+      "MD5Checksum": "3d5c47ff-a6fc-9136-ddd7-45a875ab3f19",
+      "FileName": "WorkOrder.json",
+      "Length": 1608029,
+      "Uri": "https://comps-dev.idmod.org:443/asset/download/5xpdZpHMVMRxNE1lM-Grw59i5Q-nSfoGPaKYsMOta8w_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDNkNVxjNDdcZmZhXDNkNWM0N2ZmLWE2ZmMtOTEzNi1kZGQ3LTQ1YTg3NWFiM2YxOQ__/WorkOrder.json"
+    }]
+  }, {
+    "Id": "ce2d1d67-6598-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (a85b6c51) MergeNodesWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-06-26T22:55:00.7470000Z",
+    "LastModified": "2019-06-26T22:55:00.7600000Z",
+    "State": "CommissionRequested",
+    "Worker": {
+      "Name": "MergeNodesWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "Tags": {},
+    "Files": [{
+      "Description": "WorkOrder",
+      "FileType": "WorkOrder",
+      "MD5Checksum": "97865713-940e-2faf-b120-9d1da8707733",
+      "FileName": "WorkOrder.json",
+      "Length": 1608029,
+      "Uri": "https://comps-dev.idmod.org:443/asset/download/5A7C-u6E4C0-u7dkvx81PH.IWkV2zfLSl8krzyZMinI_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDk3OFw2NTdcMTM5XDk3ODY1NzEzLTk0MGUtMmZhZi1iMTIwLTlkMWRhODcwNzczMw__/WorkOrder.json"
+    }]
+  }, {
+    "Id": "a85b6c51-6598-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request",
+    "Owner": "psylwester",
+    "DateCreated": "2019-06-26T22:54:14.6670000Z",
+    "LastModified": "2019-06-26T22:55:01.7130000Z",
+    "State": "Waiting",
+    "Worker": {
+      "Name": "InputDataWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\a85\\b6c\\516\\a85b6c51-6598-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0,
+    "Tags": {
+      "IdReference": "6/26/2019, 3:53:31 PM",
+      "Mode": "patch",
+      "NumYears": "7",
+      "OutputDirectory": "\\\\internal.idm.ctr\\IDM-Test\\COMPS\\storage\\ldworking\\a85b6c51-6598-e911-a2bb-f0921c167866",
+      "Parameters": "[\r\n  \"tmean\",\r\n  \"humid\",\r\n  \"rain\"\r\n]",
+      "Project": "IDM-Gabon",
+      "ProjectRoot": "v2017",
+      "Region": "Gabon",
+      "Resolution": "150",
+      "StartYear": "2001",
+      "State": "MergeNodes"
+    },
+    "Files": [{
+      "FileType": "WorkOrder",
+      "MD5Checksum": "e4181861-4602-6318-80a8-cf1852101eed",
+      "FileName": "WorkOrder.json",
+      "Length": 313,
+      "Uri": "https://comps-dev.idmod.org:443/asset/download/11ZXuUwdzyCqNHUdf6LF3NWfIb7ix-MJanQo6zYzIVk_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXGU0MVw4MThcNjE0XGU0MTgxODYxLTQ2MDItNjMxOC04MGE4LWNmMTg1MjEwMWVlZA__/WorkOrder.json"
+    }]
+  }]
+}

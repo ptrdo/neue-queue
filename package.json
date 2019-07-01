@@ -1,6 +1,6 @@
 {
-  "name": "COMPS-UI-Dashboard",
-  "version": "v0.1.0",
+  "name": "comps-ui-dashboard",
+  "version": "v0.1.2",
   "description": "A client view for visualizing the progress of work processing on a high performance computing cluster.",
   "homepage": "https://github.com/ptrdo/neue-queue#readme",
   "main": "queue-chart.js",

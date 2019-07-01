@@ -6,7 +6,7 @@ import _ from "lodash";
  * Means to Monitor Progress of Work Processing on HPC Cluster
  *
  * @author psylwester(at)idmod(dot)org
- * @version 0.1.0, 2019/06/12
+ * @version 0.1.2, 2019/06/12
  * @requires ES6, microdata-template, lodash
  *
  */
@@ -98,7 +98,7 @@ const path = {
     Experiments: "/Experiments?format=json"
   },
   json: {
-    QueueState: "/QueueState.json",
+    QueueState: "/WorkItemQueue.json",
     Stats: "/Stats.json",
     Experiments: "/Experiments.json"
   },

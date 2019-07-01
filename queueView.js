@@ -461,7 +461,7 @@ const QueueView = function(props) {
       { name:"MOCK Simulations 1", value: "mock/Simulations/1/", selected: true },
       { name:"MOCK Simulations 2", value: "mock/Simulations/2/" },
       { name:"MOCK Simulations 3", value: "mock/Simulations/3/" },
-      { name:"MOCK Work Items 1", balue: "mock/WorkItems/1/" }
+      { name:"MOCK Work Items 1", value: "mock/WorkItems/1/" }
     ];
     let fragment = document.createDocumentFragment();
     let input = fragment.appendChild(document.createElement("SELECT"));

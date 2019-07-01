@@ -1,0 +1,15 @@
+{
+  "QueueState": {
+    "Normal": [{
+      "Worker": "InputDataWorker",
+      "Owner": "psylwester",
+      "StateName": "Waiting",
+      "NumberOfWorkItemsInThisGrouping": 1,
+      "SimulationsCount": 0,
+      "SuitesCount": 0,
+      "ExperimentsCount": 0,
+      "FirstWiDateCreated": "2019-07-01T21:36:30.6970000Z",
+      "EnvironmentName": "Bayesian"
+    }]
+  }
+}
