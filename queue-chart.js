@@ -93,12 +93,12 @@ const path = {
   },
   alternative: 1,
   api: {
-    QueueState: "/Metrics/Queue?EnvironmentName=Belegost&format=json",
+    Queue: "/Metrics/Queue?EnvironmentName=Belegost&format=json",
     Stats: "/Experiment/Stats?statsoperations=simulationcount,simulationstatecount&format=json",
     Experiments: "/Experiments?format=json"
   },
   json: {
-    QueueState: "/WorkItemQueue.json",
+    Queue: "/WorkItemQueue.json",
     Stats: "/Stats.json",
     Experiments: "/Experiments.json"
   },
@@ -211,7 +211,7 @@ const fetchAll = function (successCallback, failureCallback)  {
 
   path.config = { mocked: true };
 
-  fetch(path.base+path.endpoint.QueueState, { method:"GET" })
+  fetch(path.base+path.endpoint.Queue, { method:"GET" })
       .then(response => response.json())
       .then(data => collection.update(data.QueueState))
       .then(response => fetch(path.base+path.endpoint.Stats, { method:"GET" }))

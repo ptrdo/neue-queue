@@ -1,0 +1,17 @@
+{
+  "NOTE": "This is a hand-crafted example of what multiple REST Responses would aggregate.",
+  "Flows": {
+    "f4e437b0-3f9c-e911-a2bb-f0921c167866": {
+      "Related": [{
+        "Id": "1372877d-e199-e911-a2bb-f0921c167866",
+        "Relationship": "DependsOn",
+        "ObjectType": "Simulation",
+        "Name": "pyCOMPS: Simulation: Bbondo",
+        "Owner": "bressler",
+        "DateCreated": "2019-06-28T20:15:37.4200000Z",
+        "LastModified": "2019-06-28T20:15:37.4200000Z",
+        "SimulationState": "Running"
+      }]
+    }
+  }
+}

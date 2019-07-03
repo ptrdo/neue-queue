@@ -27,6 +27,9 @@ const QueueView = function(props) {
     },
     get isMocked () {
       return this.mocked;
+    }, 
+    get isSims () {
+      return /Simulations/i.test(this.path);
     }
     
   }, (props||{}));
@@ -128,7 +131,9 @@ const QueueView = function(props) {
           value.forEach(item => {
             if ("ExperimentId" in item && item.ExperimentId in data) {
               Object.assign(item,  data[item.ExperimentId]);
-            }
+            } else if ("WorkItemId" in item && item.WorkItemId in data) {
+              Object.assign(item,  data[item.WorkItemId]); // TODO: SortOn LastCreateTime
+            } 
           });
         }
       });
@@ -304,10 +309,13 @@ const QueueView = function(props) {
           ul.appendChild(block);
           ul.appendChild(more);
 
-          if (_.has(item,  "SimulationStateCount")) {
+          if (_.has(item, "SimulationStateCount")) {
             li.setAttribute("itemid", item["ExperimentId"]);
             setQueueItemDetails(block, item);
             setQueueItemSegments(ul, item["SimulationStateCount"]);
+          } else if (_.has(item, "Related")) {
+            // setQueueItemDetails(block, item);
+            setQueueItemFlow(ul, item);
           } else {
             // @TODO: ORPHAN!
           }
@@ -344,6 +352,29 @@ const QueueView = function(props) {
         });
       });
       fragment.querySelector("li:last-of-type").appendChild(tip);
+    };
+    const setQueueItemFlow = function (fragment, info) {
+      info["Related"].forEach(dependant => {
+        let a = document.createElement("A");
+        let li = document.createElement("LI");
+        let val = document.createElement("VAR");
+        let tip = document.createElement("INS");
+        let type = "Worker" in dependant ? dependant.Worker.Name : "Simulation";
+        tip.appendChild(document.createElement("B"));
+        tip.classList.add("arrow");
+        li.classList.add(dependant["State"]||dependant["SimulationState"]);
+        if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
+          li.classList.add("process");
+        } 
+        li.style.flexGrow = 1;
+        li.style.marginRight = "22px";
+        val.appendChild(document.createTextNode(type));
+        a.appendChild(val);
+        li.appendChild(a);
+        li.appendChild(tip);
+        fragment.appendChild(li);
+      });
+      fragment.querySelector("li:last-of-type").style.marginRight = "0";
     };
     const setQueueItemDetails = function (fragment, info) {
       let dfn = fragment.querySelector("DFN");
@@ -422,12 +453,14 @@ const QueueView = function(props) {
 
   const fetchMock = function (path=config.path, successCallback, failureCallback)  {
     config.path = path;
-    fetch(path + "QueueState.json", { method:"GET" })
+    let primary = config.isSims ? "Queue.json" : "WorkItemQueue.json";
+    let secondary = config.isSims ? "Stats.json" : "Flows.json";
+    fetch(path + primary, { method:"GET" })
     .then(response => response.json())
     .then(data => collection.update(data.QueueState))
-    .then(response => fetch(path + "Stats.json", { method:"GET" }))
+    .then(response => fetch(path + secondary, { method:"GET" }))
     .then(response => response.json())
-    .then(data => collection.append(data.Stats))
+    .then(data => collection.append(data.Stats||data.Flows))
     .then(update => new Promise(function(resolve) {
       if (successCallback && successCallback instanceof Function) {
         successCallback();
@@ -456,17 +489,24 @@ const QueueView = function(props) {
     
     const target = view.parent.querySelector("figcaption legend"); 
     const options = [
-      { name:"API Simulations", disabled: true },
-      { name:"API Work Items", disabled: true },
+      { name:"API Simulations", value: 0, disabled: true },
+      { name:"API Work Items", value: 1, disabled: true },
       { name:"MOCK Simulations 1", value: "mock/Simulations/1/", selected: true },
       { name:"MOCK Simulations 2", value: "mock/Simulations/2/" },
       { name:"MOCK Simulations 3", value: "mock/Simulations/3/" },
-      { name:"MOCK Work Items 1", value: "mock/WorkItems/1/" }
+      { name:"MOCK Work Items 1", value: "mock/WorkItems/1/" },
+      { name:"MOCK Work Items 2", value: "mock/WorkItems/2/" },
+      { name:"MOCK Work Items 3", value: "mock/WorkItems/3/" },
+      { name:"", value: "", disabled: true }
     ];
     let fragment = document.createDocumentFragment();
     let input = fragment.appendChild(document.createElement("SELECT"));
+    let apis = input.appendChild(document.createElement("OPTGROUP"));
+    let sims = input.appendChild(document.createElement("OPTGROUP"));
+    let itms = input.appendChild(document.createElement("OPTGROUP"));
     options.forEach((item,index) => {
-      let opt = input.appendChild(document.createElement("OPTION"));
+      let group = /^\d$/.test(item.value) ? apis : /Simulations/.test(item.value) ? sims : itms;
+      let opt = group.appendChild(document.createElement("OPTION"));
       opt.innerText = item.name;
       opt.setAttribute("value", item.value||index);
       if (item.disabled) {

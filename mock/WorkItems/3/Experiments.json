@@ -1,0 +1,20 @@
+{
+  "API": "https://comps.idmod.org/api/Experiments/c5c7e687-489d-e911-a2c1-c4346bcb1555?statsoperations=simulationcount,simulationstatecount&format=json",
+  "Experiments": [{
+    "Id": "c5c7e687-489d-e911-a2c1-c4346bcb1555",
+    "Name": "Everyone_receiving_ivermectin_different_start_days_3dayIVM",
+    "Owner": "pselvaraj",
+    "DateCreated": "2019-07-03T04:10:46.4730000Z",
+    "LastModified": "2019-07-03T04:10:46.4730000Z"
+  }],
+  "Stats": {
+    "c5c7e687-489d-e911-a2c1-c4346bcb1555": {
+      "SimulationCount": 400,
+      "SimulationStateCount": {
+        "Commissioned": 100,
+        "Running": 200,
+        "Succeeded": 100
+      }
+    }
+  }
+}

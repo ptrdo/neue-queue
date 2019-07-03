@@ -776,6 +776,11 @@ ins.arrow b {
   font-weight: bold;
   z-index: 1;
   cursor: pointer;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 6em;
+  display: inline-block;
 }
 
 #dashboard .queue.chart ul > li var

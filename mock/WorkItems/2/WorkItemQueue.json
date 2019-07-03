@@ -1,11 +1,12 @@
 {
   "QueueState": {
     "Normal": [{
+      "WorkItemId": "f4e437b0-3f9c-e911-a2bb-f0921c167866",
       "Worker": "VisTools",
       "Owner": "bressler",
       "StateName": "Succeeded",
       "NumberOfWorkItemsInThisGrouping": 1,
-      "SimulationsCount": 0,
+      "SimulationsCount": 1,
       "SuitesCount": 0,
       "ExperimentsCount": 0,
       "FirstWiDateCreated": "2019-07-01T20:34:57.4800000Z",

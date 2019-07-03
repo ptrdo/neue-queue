@@ -15,9 +15,6 @@ class Index {
     if (!("postette" in window)) {
       window["postette"] = Postette;
     }
-    if (!("queue" in window)) {
-      window["queue"] = Queue;
-    }
   };
 
   render(rootElement=document) {
@@ -40,6 +37,7 @@ class Index {
       chartContainer:"#QueueView",
       useMockData: true
     });
+    window["queue"] = queue;
 
     let refresh = rootElement.querySelector("[itemid=QueueView] button.refresh");
     refresh.addEventListener("click", function(event) {

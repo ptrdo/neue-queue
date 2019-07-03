@@ -1,101 +1,805 @@
 {
-  "URL": "https://comps-dev.idmod.org/api/WorkItems?filters=State!=Canceled,State!=Succeeded,State!=Failed,State!=Created&orderby=DateCreated%20desc&offset=0&children=tags,files,plugins&format=json",
+  "API": "https://comps.idmod.org/api/WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created,DateCreated%3E=2019-07-02T00:00:00.000Z&orderby=DateCreated%20desc&format=json",
   "WorkItems": [{
-    "Id": "2d391a6d-6598-e911-a2bb-f0921c167866",
-    "Name": "Gabon Input Data Request (a85b6c51) MergeNodesWorker",
-    "Owner": "psylwester",
-    "DateCreated": "2019-06-26T22:55:01.4500000Z",
-    "LastModified": "2019-06-26T22:55:01.4630000Z",
-    "State": "CommissionRequested",
-    "Worker": {
-      "Name": "MergeNodesWorker",
-      "Version": "1.0.0.0_RELEASE"
+      "Id": "50bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "sulwegonde_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:21.4800000Z",
+      "LastModified": "2019-07-03T17:27:05.8800000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\50b\\dc6\\23b\\50bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 34635119,
+      "DockerContainerId": "f0f1dbcc9405dd20745118025c872dc7d722ea8a858f8b73ed398ffb487459fd",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
     },
-    "EnvironmentName": "Bayesian",
-    "Tags": {},
-    "Files": [{
-      "Description": "WorkOrder",
-      "FileType": "WorkOrder",
-      "MD5Checksum": "2eb32778-b6cf-65f1-056a-e73b7517988c",
-      "FileName": "WorkOrder.json",
-      "Length": 1608028,
-      "Uri": "https://comps-dev.idmod.org:443/asset/download/NX9ChTfpQgVgVHQH8DRuq5bOMtU1rZHLcYubZ373sQU_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDJlYlwzMjdcNzhiXDJlYjMyNzc4LWI2Y2YtNjVmMS0wNTZhLWU3M2I3NTE3OTg4Yw__/WorkOrder.json"
-    }]
-  }, {
-    "Id": "29391a6d-6598-e911-a2bb-f0921c167866",
-    "Name": "Gabon Input Data Request (a85b6c51) MergeNodesWorker",
-    "Owner": "psylwester",
-    "DateCreated": "2019-06-26T22:55:01.1030000Z",
-    "LastModified": "2019-06-26T22:55:01.1200000Z",
-    "State": "CommissionRequested",
-    "Worker": {
-      "Name": "MergeNodesWorker",
-      "Version": "1.0.0.0_RELEASE"
+    {
+      "Id": "4bbdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "sinazeze_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:20.5570000Z",
+      "LastModified": "2019-07-03T17:25:40.1830000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\4bb\\dc6\\23b\\4bbdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 31169667,
+      "DockerContainerId": "343bb8679adcf176fb495da1177dfad9d671779dc889731948f4ce5b4b550570",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
     },
-    "EnvironmentName": "Bayesian",
-    "Tags": {},
-    "Files": [{
-      "Description": "WorkOrder",
-      "FileType": "WorkOrder",
-      "MD5Checksum": "3d5c47ff-a6fc-9136-ddd7-45a875ab3f19",
-      "FileName": "WorkOrder.json",
-      "Length": 1608029,
-      "Uri": "https://comps-dev.idmod.org:443/asset/download/5xpdZpHMVMRxNE1lM-Grw59i5Q-nSfoGPaKYsMOta8w_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDNkNVxjNDdcZmZhXDNkNWM0N2ZmLWE2ZmMtOTEzNi1kZGQ3LTQ1YTg3NWFiM2YxOQ__/WorkOrder.json"
-    }]
-  }, {
-    "Id": "ce2d1d67-6598-e911-a2bb-f0921c167866",
-    "Name": "Gabon Input Data Request (a85b6c51) MergeNodesWorker",
-    "Owner": "psylwester",
-    "DateCreated": "2019-06-26T22:55:00.7470000Z",
-    "LastModified": "2019-06-26T22:55:00.7600000Z",
-    "State": "CommissionRequested",
-    "Worker": {
-      "Name": "MergeNodesWorker",
-      "Version": "1.0.0.0_RELEASE"
+    {
+      "Id": "47bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "sinamalima_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:19.5900000Z",
+      "LastModified": "2019-07-03T17:24:37.2770000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\47b\\dc6\\23b\\47bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 36101888,
+      "DockerContainerId": "10b26929af6058bdc70ebf0d4b0532de5923624706d2c459ebe15ed9a1a00e81",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
     },
-    "EnvironmentName": "Bayesian",
-    "Tags": {},
-    "Files": [{
-      "Description": "WorkOrder",
-      "FileType": "WorkOrder",
-      "MD5Checksum": "97865713-940e-2faf-b120-9d1da8707733",
-      "FileName": "WorkOrder.json",
-      "Length": 1608029,
-      "Uri": "https://comps-dev.idmod.org:443/asset/download/5A7C-u6E4C0-u7dkvx81PH.IWkV2zfLSl8krzyZMinI_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDk3OFw2NTdcMTM5XDk3ODY1NzEzLTk0MGUtMmZhZi1iMTIwLTlkMWRhODcwNzczMw__/WorkOrder.json"
-    }]
-  }, {
-    "Id": "a85b6c51-6598-e911-a2bb-f0921c167866",
-    "Name": "Gabon Input Data Request",
-    "Owner": "psylwester",
-    "DateCreated": "2019-06-26T22:54:14.6670000Z",
-    "LastModified": "2019-06-26T22:55:01.7130000Z",
-    "State": "Waiting",
-    "Worker": {
-      "Name": "InputDataWorker",
-      "Version": "1.0.0.0_RELEASE"
+    {
+      "Id": "43bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "sinafala_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:18.5900000Z",
+      "LastModified": "2019-07-03T17:21:42.5070000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\43b\\dc6\\23b\\43bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 38121791,
+      "DockerContainerId": "73cd0e1c508615a9637ed88eaf1a1a2d7f436246ae48fe639db205c5119984a7",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
     },
-    "EnvironmentName": "Bayesian",
-    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\a85\\b6c\\516\\a85b6c51-6598-e911-a2bb-f0921c167866",
-    "WorkingDirectorySize": 0,
-    "Tags": {
-      "IdReference": "6/26/2019, 3:53:31 PM",
-      "Mode": "patch",
-      "NumYears": "7",
-      "OutputDirectory": "\\\\internal.idm.ctr\\IDM-Test\\COMPS\\storage\\ldworking\\a85b6c51-6598-e911-a2bb-f0921c167866",
-      "Parameters": "[\r\n  \"tmean\",\r\n  \"humid\",\r\n  \"rain\"\r\n]",
-      "Project": "IDM-Gabon",
-      "ProjectRoot": "v2017",
-      "Region": "Gabon",
-      "Resolution": "150",
-      "StartYear": "2001",
-      "State": "MergeNodes"
+    {
+      "Id": "3dbdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "simukanka_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:17.6370000Z",
+      "LastModified": "2019-07-03T17:19:37.8030000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\3db\\dc6\\23b\\3dbdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 21838705,
+      "DockerContainerId": "492e85b719a57f08c866d23ab4aac230b30c9d8efcd0959a94e97072d5a484ba",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
     },
-    "Files": [{
-      "FileType": "WorkOrder",
-      "MD5Checksum": "e4181861-4602-6318-80a8-cf1852101eed",
-      "FileName": "WorkOrder.json",
-      "Length": 313,
-      "Uri": "https://comps-dev.idmod.org:443/asset/download/11ZXuUwdzyCqNHUdf6LF3NWfIb7ix-MJanQo6zYzIVk_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXGU0MVw4MThcNjE0XGU0MTgxODYxLTQ2MDItNjMxOC04MGE4LWNmMTg1MjEwMWVlZA__/WorkOrder.json"
-    }]
-  }]
+    {
+      "Id": "39bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "sikaneka_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:16.6670000Z",
+      "LastModified": "2019-07-03T17:19:32.7730000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\39b\\dc6\\23b\\39bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 30336601,
+      "DockerContainerId": "f5e72b22f9abb25a887283af63a1671b71030af2f5af04a1ee245545ba13c79e",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "32bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "sianyoolo_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:15.6200000Z",
+      "LastModified": "2019-07-03T17:14:14.2570000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\32b\\dc6\\23b\\32bdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 26697440,
+      "DockerContainerId": "64530e48b482c6ac88ce8844a9f4b98205d3bdec662f8aced2e4928a4506c9d2",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "2ebdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "siansowa_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:14.6830000Z",
+      "LastModified": "2019-07-03T17:13:49.4800000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\2eb\\dc6\\23b\\2ebdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 30447177,
+      "DockerContainerId": "55cc99bf1a6bc51b672e6509e400052865da7ba3e2e0d19558df6e623565571b",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "2abdc623-b59d-e911-a2c1-c4346bcb1555",
+      "Name": "siameja_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-03T17:08:13.6370000Z",
+      "LastModified": "2019-07-03T17:15:50.3170000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\2ab\\dc6\\23b\\2abdc623-b59d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 33755800,
+      "DockerContainerId": "e9d8af3e9fa40bb1bf191949fb745ba508edf9d99366a57968c40a16deb00dce",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "681a2545-499d-e911-a2c1-c4346bcb1555",
+      "Name": "Ivermectin scenarios analysis",
+      "Owner": "pselvaraj",
+      "DateCreated": "2019-07-03T04:16:07.6900000Z",
+      "LastModified": "2019-07-03T04:16:38.6430000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\pselvaraj\\workitems\\681\\a25\\454\\681a2545-499d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 124089,
+      "DockerContainerId": "2524966df9f2d90954b3902b7a5ad6ede45b0dc4c3280333a2521bc11a9d8080",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "6141a949-009d-e911-a2c1-c4346bcb1555",
+      "Name": "nanduba_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:33:38.2900000Z",
+      "LastModified": "2019-07-02T20:08:40.4070000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\614\\1a9\\490\\6141a949-009d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 23475235,
+      "DockerContainerId": "958a2acf2fba51df89f5bd5a625bde0f91d7e0533716e5a00c2932cadb4a39d6",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "c12a5b43-009d-e911-a2c1-c4346bcb1555",
+      "Name": "namaila_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:33:35.3330000Z",
+      "LastModified": "2019-07-02T20:08:37.6900000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\c12\\a5b\\430\\c12a5b43-009d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 22870268,
+      "DockerContainerId": "b7f2a8b29802f8f6e0eb9e35a7f2eb9427c9eef5b2e4053f8c234bd4ddf994d7",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "b82a5b43-009d-e911-a2c1-c4346bcb1555",
+      "Name": "nakempa_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:33:34.0400000Z",
+      "LastModified": "2019-07-02T20:06:34.5930000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\b82\\a5b\\430\\b82a5b43-009d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 22705040,
+      "DockerContainerId": "15193643fd52403494e5b56747cfc668b7fd504761da5aa8be12ecf4f648ef54",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "ad2a5b43-009d-e911-a2c1-c4346bcb1555",
+      "Name": "nabutezi_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:33:32.6800000Z",
+      "LastModified": "2019-07-02T20:03:26.8100000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\ad2\\a5b\\430\\ad2a5b43-009d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 25906622,
+      "DockerContainerId": "7c6245b2e42ecd32a1796f17c9b46e9d3b61864c9ea27674229eb6f352568ba9",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "712a5b43-009d-e911-a2c1-c4346bcb1555",
+      "Name": "munyumbwe_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:33:31.1000000Z",
+      "LastModified": "2019-07-02T20:03:58.1870000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\712\\a5b\\430\\712a5b43-009d-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 42108991,
+      "DockerContainerId": "3dfe0710b35297d641b7e6724a85fb83fcb823d0f63fe1fc2ce519fa1eb8714a",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "24ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "mtendere_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:17.7700000Z",
+      "LastModified": "2019-07-02T20:00:24.8400000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\24c\\e10\\aaf\\24ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 37963581,
+      "DockerContainerId": "26114271a30b890fc7683f39bbd37033f8183385708efede529e64af117a103f",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "20ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "moomba_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:16.1130000Z",
+      "LastModified": "2019-07-02T19:58:29.5730000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\20c\\e10\\aaf\\20ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 23550760,
+      "DockerContainerId": "baf5c154a270c60ca20b9a3526908e152d5f6da9346f91043c76f8b62a65c832",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "1bce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "matua_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:14.2100000Z",
+      "LastModified": "2019-07-02T19:57:23.3830000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\1bc\\e10\\aaf\\1bce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 27317099,
+      "DockerContainerId": "ffa53f5c5b05553ef097455da05d30592fadbfe712f644c30372083c4131a190",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "16ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "masuku mines_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:12.5970000Z",
+      "LastModified": "2019-07-02T19:52:24.5200000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\16c\\e10\\aaf\\16ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 20822858,
+      "DockerContainerId": "7d21480c503ac873136239df358189c1b5244788891d18d2db03d54f0892e26e",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "12ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "masuku_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:10.5300000Z",
+      "LastModified": "2019-07-02T19:47:04.6500000Z",
+      "State": "Failed",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "ErrorMessage": "Failing work item, the process returned a non-zero error code: 1\r\n.\r\nCorrelationId: d6721d56-5c97-44f8-b03e-c1745cccc687",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\12c\\e10\\aaf\\12ce10aa-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 23866,
+      "DockerContainerId": "a6829925dfc522a6fb41a243b482433dd5fca113cb1e3defe797b5fcfb48ce25",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "7340cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "masempela_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:08.7670000Z",
+      "LastModified": "2019-07-02T19:53:22.0030000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\734\\0cc\\a3f\\7340cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 26640543,
+      "DockerContainerId": "4c446bc27058eeca89165adb74ffa0a1f321b59ca8113badee6314c8e4cccb24",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "6f40cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "mapatizya_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:07.2500000Z",
+      "LastModified": "2019-07-02T19:54:26.0030000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\6f4\\0cc\\a3f\\6f40cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 44990812,
+      "DockerContainerId": "22ce6f37b0d249b14528cd1088b17861fc4ef3384caef975abd5ff451d0a9968",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "6b40cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "manchanvwa_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:05.8430000Z",
+      "LastModified": "2019-07-02T19:46:57.5930000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\6b4\\0cc\\a3f\\6b40cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 28241191,
+      "DockerContainerId": "aaebea55a0aa8934d3ee997dcecdd49bdf73f2353200550bd9ead9f4580a9903",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "6540cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "maamba_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:04.3430000Z",
+      "LastModified": "2019-07-02T19:45:30.7970000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\654\\0cc\\a3f\\6540cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 27575920,
+      "DockerContainerId": "bca2d31a96114a31dbd447269964550072c8ff5936e6c640bfdc096090a5b31c",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "6040cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "luyaba_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:02.8300000Z",
+      "LastModified": "2019-07-02T19:46:20.5000000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\604\\0cc\\a3f\\6040cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 25327300,
+      "DockerContainerId": "048629ae0dd28180c3b6ead1da4a2720fe8566ebe7b6c076e90dec4a774ec405",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "5940cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "luumbo_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:29:01.4200000Z",
+      "LastModified": "2019-07-02T19:41:52.5500000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\594\\0cc\\a3f\\5940cca3-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 39318513,
+      "DockerContainerId": "4f127e7211a30cce48989eca2fccb7c1e6bdfb626b244261af10bbdbbb375f00",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "4e9bd19d-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "kazimaulu_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:28:59.8600000Z",
+      "LastModified": "2019-07-02T19:39:45.5430000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\4e9\\bd1\\9df\\4e9bd19d-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 23286343,
+      "DockerContainerId": "be87ba167aa32a90b97319de2038dc583686142e8a424d35973aa648758f1536",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "289bd19d-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "kasikili_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:28:58.5170000Z",
+      "LastModified": "2019-07-02T19:39:29.8700000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\289\\bd1\\9df\\289bd19d-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 23117276,
+      "DockerContainerId": "67f0a5997ce1599eaf26f47afa444674364c8b7a7704aa5b3d2d26a1068b10f2",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "f99ad19d-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "jembo_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:28:56.7800000Z",
+      "LastModified": "2019-07-02T19:35:45.8130000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\f99\\ad1\\9df\\f99ad19d-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 27035141,
+      "DockerContainerId": "24c35dca4f3214c8ad957c4fe150e8e544aa9094a4946092c8920c1753994744",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "f59ad19d-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "jamba_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:28:55.5170000Z",
+      "LastModified": "2019-07-02T19:34:16.6870000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\f59\\ad1\\9df\\f59ad19d-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 27551398,
+      "DockerContainerId": "009cd8c34808c3595e2fd01606d9c2e781d87f84614ba37e911b5244d19ed98b",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "f19ad19d-ff9c-e911-a2c1-c4346bcb1555",
+      "Name": "harmony_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T19:28:54.0800000Z",
+      "LastModified": "2019-07-02T19:34:28.9400000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\f19\\ad1\\9df\\f19ad19d-ff9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 22971565,
+      "DockerContainerId": "2bcaf388a911c8c28fdeb7d7b98ef146322ea423f99b7b0bf67e1020e8f22b7c",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "a0de807c-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "dimbwe_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:24.9230000Z",
+      "LastModified": "2019-07-02T17:49:19.4970000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\a0d\\e80\\7ce\\a0de807c-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 22918756,
+      "DockerContainerId": "b72f421dc1ae8095843abdb02ec54ad1bb7deb2913b9082542e8772f24604f13",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "883c6776-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "chiyabi_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:19.7070000Z",
+      "LastModified": "2019-07-02T17:43:55.2700000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\883\\c67\\76e\\883c6776-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 27493100,
+      "DockerContainerId": "9c6daf7da9c0b6b0fdc42d935cc2ed4ae9fcdf59711e01ae0b89d58ddda5dd57",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "633c6776-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "chisanga_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:17.9570000Z",
+      "LastModified": "2019-07-02T17:44:43.4200000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\633\\c67\\76e\\633c6776-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 27411468,
+      "DockerContainerId": "4118135af3fa8f7fafc5b412096c5431680e5f1aa2618958d8bd91451978faf4",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "f53b6776-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "chabbobboma_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:14.5970000Z",
+      "LastModified": "2019-07-02T17:44:38.6200000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\f53\\b67\\76e\\f53b6776-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 42960003,
+      "DockerContainerId": "3c6fe00cd9b7a9656eeff4d2d632ca1c6d28b6eb4440e9e5811c5e40d4995285",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "a33b6776-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "buleyamalima_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:11.9700000Z",
+      "LastModified": "2019-07-02T17:38:52.0700000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\a33\\b67\\76e\\a33b6776-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 31627746,
+      "DockerContainerId": "45b58daf72d17a4b0e2187cae2ec0e33a4912800f07c1594316f1a9279b6e25c",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "7a495e70-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "bbondo_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:09.7830000Z",
+      "LastModified": "2019-07-02T17:38:02.4470000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\7a4\\95e\\70e\\7a495e70-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 26032395,
+      "DockerContainerId": "3c9ed1eed2c3d07b7c9e3f7d2cb1e2025d36c029e6d19618ed96b785eaf8b790",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "41495e70-ef9c-e911-a2c1-c4346bcb1555",
+      "Name": "batoka_comparison",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T17:33:08.2070000Z",
+      "LastModified": "2019-07-02T17:39:21.2400000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "e81d16ae-6fc5-406f-bf86-3c82a78f4935",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\414\\95e\\70e\\41495e70-ef9c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 23965583,
+      "DockerContainerId": "0be496910adf05da8d3c5ea2f9fb1af1d27d932d8ef639044b629cf2e02e1c79",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "2b1e1039-849c-e911-a2c1-c4346bcb1555",
+      "Name": "rcd_cf_endpoints",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T04:45:32.8470000Z",
+      "LastModified": "2019-07-02T04:45:43.2270000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "139fe497-383d-4f30-bbfe-89ff22a28a5b",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\2b1\\e10\\398\\2b1e1039-849c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 69747,
+      "DockerContainerId": "45efed16842fcffc4f2ff4fe718afb8dbbd109d882b7195c332065b8789ae9da",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    },
+    {
+      "Id": "d236876d-839c-e911-a2c1-c4346bcb1555",
+      "Name": "rcd_cf_endpoints",
+      "Owner": "jsuresh",
+      "DateCreated": "2019-07-02T04:39:59.3600000Z",
+      "LastModified": "2019-07-02T04:40:09.2370000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "268280c1-0f5b-4b25-bf04-2b577bedfbc0",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\jsuresh\\workitems\\d23\\687\\6d8\\d236876d-839c-e911-a2c1-c4346bcb1555",
+      "WorkingDirectorySize": 1185,
+      "DockerContainerId": "80faf7b2646ae8fc76c899b1a053d7e70cf7a9e47d1d66db2b67726548266cc7",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1"
+    }
+  ]
 }

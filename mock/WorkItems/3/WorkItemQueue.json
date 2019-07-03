@@ -1,15 +1,15 @@
 {
   "QueueState": {
     "Normal": [{
-      "WorkItemId": "45b88b49-489c-e911-a2bb-f0921c167866",
-      "Worker": "InputDataWorker",
-      "Owner": "psylwester",
+      "WorkItemId": "681a2545-499d-e911-a2c1-c4346bcb1555",
+      "Worker": "DockerWorker",
+      "Owner": "pselvaraj",
       "StateName": "Waiting",
       "NumberOfWorkItemsInThisGrouping": 1,
       "SimulationsCount": 0,
       "SuitesCount": 0,
       "ExperimentsCount": 0,
-      "FirstWiDateCreated": "2019-07-01T21:36:30.6970000Z",
+      "FirstWiDateCreated": "2019-07-03T04:16:07.6900000Z",
       "EnvironmentName": "Bayesian"
     }]
   }
