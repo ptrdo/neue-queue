@@ -6,7 +6,7 @@
         "Id": "4cb88b49-489c-e911-a2bb-f0921c167866",
         "Name": "Gabon Input Data Request (45b88b49) DemographicsWorker",
         "Owner": "psylwester",
-        "Relationship": "DependsOn",
+        "Relationship": "Subject",
         "ObjectType": "WorkItem",
         "DateCreated": "2019-07-01T21:36:39.0700000Z",
         "LastModified": "2019-07-01T21:36:54.1730000Z",

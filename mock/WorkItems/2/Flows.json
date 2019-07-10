@@ -3,6 +3,19 @@
   "Flows": {
     "f4e437b0-3f9c-e911-a2bb-f0921c167866": {
       "Related": [{
+        "Id": "f4e437b0-3f9c-e911-a2bb-f0921c167866",
+        "Name": "Vis-Tools Work Item",
+        "Owner": "bressler",
+        "Relationship": "Subject",
+        "ObjectType": "WorkItem",
+        "DateCreated": "2019-07-01T20:34:57.4800000Z",
+        "LastModified": "2019-07-01T20:40:10.0930000Z",
+        "State": "Succeeded",
+        "Worker": {
+          "Name": "VisTools",
+          "Version": "1.0.0.0_BKR"
+        }
+      }, {
         "Id": "1372877d-e199-e911-a2bb-f0921c167866",
         "Relationship": "DependsOn",
         "ObjectType": "Simulation",

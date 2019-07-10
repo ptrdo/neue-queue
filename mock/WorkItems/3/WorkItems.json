@@ -1,6 +1,26 @@
 {
   "API": "https://comps.idmod.org/api/WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created,DateCreated%3E=2019-07-02T00:00:00.000Z&orderby=DateCreated%20desc&format=json",
   "WorkItems": [{
+      "Id": "3175306b-0155-e911-a2c0-c4346bcb1554",
+      "Name": "Vector model comparison",
+      "Owner": "pselvaraj",
+      "DateCreated": "2019-07-02T04:40:29.8630000Z",
+      "LastModified": "2019-07-02T04:43:34.8300000Z",
+      "State": "Succeeded",
+      "Worker": {
+        "Name": "DockerWorker",
+        "Version": "1.0.0.0_RELEASE"
+      },
+      "EnvironmentName": "Belegost",
+      "HostName": "IDMPPAPP03",
+      "WorkerInstanceId": "aeb4dcb4-6ec4-45eb-b447-fa35e9b2327e",
+      "WorkingDirectory": "\\\\internal.idm.ctr\\IDM\\Home\\pselvaraj\\workitems\\317\\530\\6b0\\3175306b-0155-e911-a2c0-c4346bcb1554",
+      "WorkingDirectorySize": 923128095,
+      "DockerContainerId": "f99426fc3bf1be2d57691c4103f0edb55cc1f49ab215358b204ff9504d356660",
+      "DockerHost": "http://IDMPPAPP06.internal.idm.ctr:2375",
+      "DockerImageId": "sha256:f73b99cc889667d1e6a7196542faf85b72eeed8e65c1145344c3a2ac3f677cc1",
+    },
+    {
       "Id": "50bdc623-b59d-e911-a2c1-c4346bcb1555",
       "Name": "sulwegonde_comparison",
       "Owner": "jsuresh",

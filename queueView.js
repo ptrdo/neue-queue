@@ -354,25 +354,30 @@ const QueueView = function(props) {
       fragment.querySelector("li:last-of-type").appendChild(tip);
     };
     const setQueueItemFlow = function (fragment, info) {
-      info["Related"].forEach(dependant => {
+      info["Related"].forEach(member => {
         let a = document.createElement("A");
         let li = document.createElement("LI");
         let val = document.createElement("VAR");
         let tip = document.createElement("INS");
-        let type = "Worker" in dependant ? dependant.Worker.Name : "Simulation";
-        tip.appendChild(document.createElement("B"));
-        tip.classList.add("arrow");
-        li.classList.add(dependant["State"]||dependant["SimulationState"]);
-        if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
-          li.classList.add("process");
-        } 
-        li.style.flexGrow = 1;
-        li.style.marginRight = "22px";
-        val.appendChild(document.createTextNode(type));
-        a.appendChild(val);
-        li.appendChild(a);
-        li.appendChild(tip);
-        fragment.appendChild(li);
+        let type = member.ObjectType;
+        if (/^Experiment$/i.test(type)) {
+          setQueueItemSegments(fragment, member["SimulationStateCount"]);
+          fragment.querySelector("li:last-of-type").style.marginRight = "22px";
+        } else {
+          tip.appendChild(document.createElement("B"));
+          tip.classList.add("arrow");
+          val.appendChild(document.createTextNode("Worker" in member ? member.Worker.Name : type));
+          a.appendChild(val);
+          li.appendChild(a);
+          li.appendChild(tip);
+          li.classList.add(member["State"]||member["SimulationState"], type);
+          if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
+            li.classList.add("process");
+          }
+          li.style.flexGrow = /^Work/i.test(type) ? 1 : 10;
+          li.style.marginRight = "22px";
+          fragment.appendChild(li);
+        }
       });
       fragment.querySelector("li:last-of-type").style.marginRight = "0";
     };
