@@ -11,13 +11,17 @@ import _ from "lodash";
  */
 
 const QueueView = function(props) {
-  
+
   const config = Object.assign({
-    
+
     scoreSize: 24,
     mocked: false,
-    path: "mock/Simulations/1/",
-    
+    mockRoot: "mock/", /* /app/dashboard/data/ */
+    mockPath: "Simulations/1/",
+
+    set mockChoice (val) {
+      this.mockPath = val;
+    },
     set useMockData (opt) {
       if (this.mocked) {
         // local wins
@@ -27,11 +31,14 @@ const QueueView = function(props) {
     },
     get isMocked () {
       return this.mocked;
-    }, 
+    },
+    get mockURL () {
+      return (this.mockRoot + this.mockPath).replace(/(?<!\:)\/\//,"/");
+    },
     get isSims () {
-      return /Simulations/i.test(this.path);
+      return /Simulations/i.test(this.mockPath);
     }
-    
+
   }, (props||{}));
 
 
@@ -43,7 +50,7 @@ const QueueView = function(props) {
     set parent(ele) {
       this.root = ele;
     },
-    
+
     set chart(ele) {
       this.output = ele;
     },
@@ -51,7 +58,7 @@ const QueueView = function(props) {
     get parent() {
       return this.root;
     },
-    
+
     get chart() {
       return this.output;
     }
@@ -59,7 +66,7 @@ const QueueView = function(props) {
 
   const collection = {
 
-    input: { 
+    input: {
       /* @TODO: Cache inputs for diff and refresh (of same) */
     },
     output: {},
@@ -80,7 +87,7 @@ const QueueView = function(props) {
         if (_.has(node, "Related")) {
           basisISOString = _.get(_.first(node.Related), "DateCreated", null);
           node["RelatedCount"] = node.Related.length || 0;
-        } 
+        }
         if (!!basisISOString) {
           if (config.isMocked) {
             basisISOString = vitalizeMockDate(basisISOString);
@@ -93,17 +100,17 @@ const QueueView = function(props) {
           node["ElapsedStartString"] = basisString;
         }
       };
-      
-      const scoreSizes = function (splits, max=config.scoreSize) { 
-        let result = [0]; 
-        let split = max/Math.max(1, splits-1); 
-        let last = 0; 
-        while (last < max) { 
-          result.push(parseFloat((last+=split).toFixed(1))); 
-        } 
-        return result; 
+
+      const scoreSizes = function (splits, max=config.scoreSize) {
+        let result = [0];
+        let split = max/Math.max(1, splits-1);
+        let last = 0;
+        while (last < max) {
+          result.push(parseFloat((last+=split).toFixed(1)));
+        }
+        return result;
       };
-      
+
       Object.values(data).forEach(value => {
         if (Array.isArray(value)) {
           value.forEach(item => {
@@ -113,7 +120,7 @@ const QueueView = function(props) {
           dateTransform(value);
         }
       });
-      
+
       Object.values(PRIORITY).forEach(bucket => {
         if (bucket.key in data) {
           let counts = data[bucket.key].map((item) => { return item["SimulationCount"]; });
@@ -139,12 +146,12 @@ const QueueView = function(props) {
               Object.assign(item,  updates[item.ExperimentId]);
             } else if ("WorkItemId" in item && item.WorkItemId in updates) {
               Object.assign(item,  updates[item.WorkItemId]); // TODO: SortOn LastCreateTime
-            } 
+            }
           });
         }
       });
     },
-    
+
     advance: function (rate=.1) {
       Object.values(this.output).forEach(value => {
         if (Array.isArray(value)) {
@@ -192,7 +199,7 @@ const QueueView = function(props) {
       return this.output;
     }
   };
-  
+
   /* UTILITIES */
 
   const wait = time => new Promise((resolve) => setTimeout(resolve, time));
@@ -255,7 +262,7 @@ const QueueView = function(props) {
   const onClick = function(event) {
     event.preventDefault();
     console.log("onClick", event);
-    
+
     let arrow = event.target.closest("li[itemid]");
     if (!!arrow) {
       arrow.classList.toggle("active");
@@ -269,9 +276,9 @@ const QueueView = function(props) {
   const unClick = function() {
     view.chart.removeEventListener("click", onClick);
   };
-  
+
   const render = function(callback) {
-    
+
     const setQueueBucket = function (parent, name) {
       let div = document.createElement("DIV");
       let ol = document.createElement("OL");
@@ -294,14 +301,14 @@ const QueueView = function(props) {
         parent.classList.add("empty");
       } else {
         data.forEach(item => {
-          
+
           let li = document.createElement("LI");
           let ul = document.createElement("UL");
           let block = document.createElement("LI");
           let more = document.createElement("LI");
           let icon = document.createElement("I");
-          
-          icon.classList.add("material-icons"); 
+
+          icon.classList.add("material-icons");
           icon.appendChild(document.createTextNode("more_vert"));
           more.appendChild(icon);
           more.classList.add("more");
@@ -309,7 +316,7 @@ const QueueView = function(props) {
           block.appendChild(document.createElement("DFN"));
           block.classList.add("block");
           block.style.width = `${item.size}%`;
-          
+
           doc.appendChild(li);
           li.appendChild(ul);
           ul.appendChild(block);
@@ -418,28 +425,28 @@ const QueueView = function(props) {
     };
 
     if (!!view.chart) {
-      
+
       console.error(`${config.chartContainer} is already rendered!`, view.element);
       if (!!callback && callback instanceof Function) {
         callback(view.element);
       }
-      
+
     } else {
 
       view.parent = document.querySelector(config.selector);
       view.chart = view.parent.querySelector(config.chartContainer);
       view.chart.addEventListener("click", onClick);
       view.chart.classList.add("process");
-      
+
       // setTimeout(function () {
-        for (let item in PRIORITY) {
-          let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
-          setQueueItems(bucket, PRIORITY[item].key);
-        }
-        addSourceSelect();
-        if (!!callback && callback instanceof Function) {
-          callback(view.element);
-        }
+      for (let item in PRIORITY) {
+        let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
+        setQueueItems(bucket, PRIORITY[item].key);
+      }
+      addSourceSelect();
+      if (!!callback && callback instanceof Function) {
+        callback(view.element);
+      }
       // }, 0);
 
       wait(300).then(() => view.chart.classList.remove("process"));
@@ -471,52 +478,51 @@ const QueueView = function(props) {
 
   /* MOCK DEMO */
 
-  const fetchMock = function (path=config.path, successCallback, failureCallback)  {
-    config.path = path;
+  const fetchMock = function (successCallback, failureCallback)  {
     let primary = config.isSims ? "Queue.json" : "WorkItemQueue.json";
     let secondary = config.isSims ? "Stats.json" : "Flows.json";
-    fetch(path + primary, { method:"GET" })
-    .then(response => response.json())
-    .then(data => collection.update(data.QueueState))
-    .then(response => fetch(path + secondary, { method:"GET" }))
-    .then(response => response.json())
-    .then(data => collection.append(data.Stats||data.Flows))
-    .then(update => new Promise(function(resolve) {
-      if (successCallback && successCallback instanceof Function) {
-        successCallback();
-      }
-      setTimeout(function () {
-        resolve(update);
-      }, 0);
-    }))
-    .catch(function (error) {
-      if (failureCallback && failureCallback instanceof Function) {
-        failureCallback(error);
-      } else {
-        console.error("queueView.fetchMock", error);
-      }
-    })
-    .finally(function () {
-      console.log("Fetched Mock Data from:", path);
-    });
+    fetch(config.mockURL + primary, { method:"GET" })
+        .then(response => response.json())
+        .then(data => collection.update(data.QueueState))
+        .then(response => fetch(config.mockURL + secondary, { method:"GET" }))
+        .then(response => response.json())
+        .then(data => collection.append(data.Stats||data.Flows))
+        .then(update => new Promise(function(resolve) {
+          if (successCallback && successCallback instanceof Function) {
+            successCallback();
+          }
+          setTimeout(function () {
+            resolve(update);
+          }, 0);
+        }))
+        .catch(function (error) {
+          if (failureCallback && failureCallback instanceof Function) {
+            failureCallback(error);
+          } else {
+            console.error("queueView.fetchMock", error);
+          }
+        })
+        .finally(function () {
+          console.log("Fetched Mock Data:", config.mockURL, primary, secondary);
+        });
   };
-  
+
   const addSourceSelect = function() {
-    
+
     if (view.parent.querySelector("figcaption legend select")) {
       return;
     }
-    
-    const target = view.parent.querySelector("figcaption legend"); 
+
+    const target = view.parent.querySelector("figcaption legend");
     const options = [
-      { name:"API Simulations", value: 0, disabled: true },
+      { name:"API Simulations", value: 0, selected: true },
       { name:"API Work Items", value: 1, disabled: true },
-      { name:"MOCK Simulations 1", value: "mock/Simulations/1/", selected: true },
-      { name:"MOCK Simulations 2", value: "mock/Simulations/2/" },
-      { name:"MOCK Simulations 3", value: "mock/Simulations/3/" },
-      { name:"MOCK Work Items 1", value: "mock/WorkItems/1/" },
-      { name:"MOCK Work Items 2", value: "mock/WorkItems/2/" },
-      { name:"MOCK Work Items 3", value: "mock/WorkItems/3/" },
+      { name:"MOCK Simulations 1", value: "Simulations/1/" },
+      { name:"MOCK Simulations 2", value: "Simulations/2/" },
+      { name:"MOCK Simulations 3", value: "Simulations/3/" },
+      { name:"MOCK Work Items 1", value: "WorkItems/1/" },
+      { name:"MOCK Work Items 2", value: "WorkItems/2/" },
+      { name:"MOCK Work Items 3", value: "WorkItems/3/" },
       { name:"", value: "", disabled: true }
     ];
     let fragment = document.createDocumentFragment();
@@ -542,7 +548,8 @@ const QueueView = function(props) {
       if (!/^[0-9]$/.test(event.target.value)) {
         config.mocked = true;
         destroy(true);
-        fetchMock(event.target.value, render, recoup);
+        config.mockChoice = event.target.value;
+        fetchMock(render, recoup);
       } else {
         config.mocked = false;
         // inelegant, but this select-option feature is only temporary.
@@ -556,20 +563,20 @@ const QueueView = function(props) {
       }
     });
   };
-  
+
   return {
 
     /**
      * draw is the backwards-compatible interface called from dashboard/view.
-     * @TODO: Auth expiry can spur subsequent draws. 
-     * 
-     * @public called upon initial render and subsequent refresh (click). 
+     * @TODO: Auth expiry can spur subsequent draws.
+     *
+     * @public called upon initial render and subsequent refresh (click).
      * @param {Object} overrides (optional) modification since instantiation.
      * @param {Function} callback (optional) code to execute upon render (at dashboard/view).
      * @return null
      */
     draw: function(overrides, callback) {
-      
+
       if (config.isMocked) {
         if (!!view.chart) {
           collection.advance();
@@ -577,12 +584,12 @@ const QueueView = function(props) {
           render(() => { /* callback */ });
           return;
         } else {
-          fetchMock(config.path, () => {
+          fetchMock(() => {
             render(() => { /* callback */ });
           });
         }
       } else {
-        
+
         // dangerous, but insulated by view and module.
         Object.assign(config, (overrides||{}));
         destroy(true); // TODO: Only if need be.
@@ -591,33 +598,33 @@ const QueueView = function(props) {
         render(callback);
       }
     },
-    
+
     redraw: function(overrides) {
       console.log("redraw!", overrides);
     },
-    
+
     getView: function() {
       return view;
     },
-    
+
     getCollection: function() {
       return collection.latest;
     },
-    
+
     getConfig: function() {
       return config;
     },
-    
+
     setScoreSize: function(value) {
       if (/^[1-9][0-9]$|[1-9]$/.test(value)) {
-        
+
         config.scoreSize = parseInt(value);
         destroy(true);
-        
+
         // @TODO: this.redraw(); // repreps existing data, rerenders.
-        
+
         if (config.isMocked) {
-          fetchMock(config.path, () => { render(); });
+          fetchMock(() => { render(); });
         } else {
           collection.update(config.queue);
           collection.append(config.stats);
@@ -627,7 +634,7 @@ const QueueView = function(props) {
         console.warn("scoreSize requires an integer between 0-100 (default is 24).")
       }
     },
-    
+
     isMocked: function() {
       return config.isMocked;
     },
