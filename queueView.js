@@ -75,19 +75,22 @@ const QueueView = function(props) {
 
       const dateTransform = function (node) {
         /* preprocess dates from service-supplied GMT to ui-conducive Local */
-        let basis, basic, simple, elapsed;
-        if (node.hasOwnProperty("LastCreateTime")) {
+        let basisDate, basisString, elapsedHours;
+        let basisISOString = _.get(node, "LastCreateTime", _.get(node, "DateCreated", null));
+        if (_.has(node, "Related")) {
+          basisISOString = _.get(_.first(node.Related), "DateCreated", null);
+          node["RelatedCount"] = node.Related.length || 0;
+        } 
+        if (!!basisISOString) {
           if (config.isMocked) {
-            node.LastCreateTime = vitalizeMockDate(node.LastCreateTime);
+            basisISOString = vitalizeMockDate(basisISOString);
           }
-          basis = new Date(Date.parse(node.LastCreateTime));
-          basic = basis.toLocaleDateString("en-US",{ month: "long", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
-          simple = basis.toLocaleDateString("en-US",{ weekday:"short", hour:"2-digit", minute:"2-digit" });
-          elapsed = ((Date.now() - basis)/1000/60/60).toFixed(1);
-          node["LastCreateBasic"] = basic;
-          node["LastCreateParts"] = simple.replace(/^(.*)(\d+\:\d+)(\s+)(.*)$/, "$1$2$4").split(/\s+/);
-          node["ElapsedTime"] = elapsed;
-          node["Created"] = elapsed > .1 ? "~" + elapsed + " hrs ago": "moments ago"
+          basisDate = new Date(Date.parse(basisISOString));
+          basisString = basisDate.toLocaleDateString("en-US",{ month: "long", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+          elapsedHours = ((Date.now() - basisDate)/1000/60/60).toFixed(1);
+          node["ElapsedHours"] = elapsedHours;
+          node["ElapsedString"] = elapsedHours > .1 ? "~" + elapsedHours + " hrs ago": "moments ago";
+          node["ElapsedStartString"] = basisString;
         }
       };
       
@@ -106,6 +109,8 @@ const QueueView = function(props) {
           value.forEach(item => {
             dateTransform(item);
           });
+        } else {
+          dateTransform(value);
         }
       });
       
@@ -126,13 +131,14 @@ const QueueView = function(props) {
     },
 
     merge: function(data) {
+      let updates = this.prep(data);
       Object.values(this.output).forEach(value => {
         if (Array.isArray(value)) {
           value.forEach(item => {
-            if ("ExperimentId" in item && item.ExperimentId in data) {
-              Object.assign(item,  data[item.ExperimentId]);
-            } else if ("WorkItemId" in item && item.WorkItemId in data) {
-              Object.assign(item,  data[item.WorkItemId]); // TODO: SortOn LastCreateTime
+            if ("ExperimentId" in item && item.ExperimentId in updates) {
+              Object.assign(item,  updates[item.ExperimentId]);
+            } else if ("WorkItemId" in item && item.WorkItemId in updates) {
+              Object.assign(item,  updates[item.WorkItemId]); // TODO: SortOn LastCreateTime
             } 
           });
         }
@@ -314,7 +320,8 @@ const QueueView = function(props) {
             setQueueItemDetails(block, item);
             setQueueItemSegments(ul, item["SimulationStateCount"]);
           } else if (_.has(item, "Related")) {
-            // setQueueItemDetails(block, item);
+            li.setAttribute("itemid", item["WorkItemId"]);
+            setQueueItemDetails(block, item);
             setQueueItemFlow(ul, item);
           } else {
             // @TODO: ORPHAN!
@@ -382,12 +389,7 @@ const QueueView = function(props) {
       fragment.querySelector("li:last-of-type").style.marginRight = "0";
     };
     const setQueueItemDetails = function (fragment, info) {
-      let dfn = fragment.querySelector("DFN");
-      let dl = document.createElement("DL");
-      let dt = document.createElement("DT");
-      dt.appendChild(document.createTextNode("Experiment"));
-      dl.appendChild(dt);
-      ["Owner","ExperimentId","NodeGroup","Created","SimulationCount"].forEach(key => {
+      let implement = function (key) {
         let dd = document.createElement("DD");
         let name = document.createElement("VAR");
         let value = document.createElement("DATA");
@@ -396,8 +398,21 @@ const QueueView = function(props) {
         dd.setAttribute("itemprop", key);
         dd.appendChild(name);
         dd.appendChild(value);
-        dl.appendChild(dd)
-      });
+        dl.appendChild(dd);
+      };
+      let dfn = fragment.querySelector("DFN");
+      let dl = document.createElement("DL");
+      let dt = document.createElement("DT");
+      dl.appendChild(dt);
+
+      if (_.has(info, "SimulationStateCount")) {
+        dt.appendChild(document.createTextNode("Experiment"));
+        ["Owner","ExperimentId","NodeGroup","ElapsedString","SimulationCount"].forEach(implement);
+      } else if (_.has(info, "Related")) {
+        dt.appendChild(document.createTextNode("Work Flow"));
+        ["Owner","WorkItemId","EnvironmentName","ElapsedString","RelatedCount"].forEach(implement);
+      }
+
       dfn.classList.add("tooltip");
       dfn.appendChild(dl);
     };
