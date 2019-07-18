@@ -12,13 +12,93 @@ import _ from "lodash";
 
 const QueueView = function(props) {
 
+  /* STATIC */
+
+  const MODE = {
+    Simulations: "Simulations",
+    WorkItems: "WorkItems"
+  };
+
+  const PRIORITY = {
+    1: {
+      key: "Highest",
+      name: "Highest Priority"
+    },
+    2: {
+      key: "AboveNormal",
+      name: "Above Normal"
+    },
+    3: {
+      key: "Normal",
+      name: "Normal Priority"
+    },
+    4: {
+      key: "BelowNormal",
+      name: "Below Normal"
+    },
+    5: {
+      key: "Lowest",
+      name: "Lowest Priority"
+    }
+  };
+
+  const STATE = {
+    "PreActive": [
+      "Created",
+      "QueuedForCommission",
+      "CommissionRequested",
+      "Commissioned",
+      "Provisioning",
+      "Validating"
+    ],
+    "Active": [
+      "Running",
+      "Waiting",
+      "QueuedForResume",
+      "ResumeRequested",
+      "Resumed",
+      "Retry"
+    ],
+    "PostActive": [
+      "CancelRequested",
+      "Canceling",
+      "Canceled",
+      "Failed",
+      "Succeeded"
+    ]
+  };
+
+  /* CONFIG */
+
   const config = Object.assign({
 
+    auth: function () { return "comps" in window ? window.comps.auth : window.idmauth },
+    entity: MODE.Simulations,
     scoreSize: 24,
     mocked: false,
-    mockRoot: "mock/", /* /app/dashboard/data/ */
+    mockRoot: ("comps" in window ? "/app/dashboard/data/" : "mock/"),
     mockPath: "Simulations/1/",
+    endpoint: ("comps" in window ? "/api/" : "https://comps2.idmod.org/api/"), /* @TODO: import config */
 
+    workFlowScopeInDays: 1,
+    workFlowsActiveOnly: false,
+
+    set workFlowScope (num) {
+      this.workFlowScopeInDays = /^\d+\.?\d*$/.test(num) ? parseFloat(num) : 1; // default
+    },
+    get daysOfWorkFlows () {
+      return this.workFlowScopeInDays;
+    },
+    set workFlowsActive (boo) {
+      this.workFlowsActiveOnly = !!boo;
+    },
+    get activeWorkFlowsOnly () {
+      return this.workFlowsActiveOnly;
+    },
+
+    set modeEntity (val) {
+      this.entity = /work/i.test(val) ? MODE.WorkItems : MODE.Simulations;
+    },
     set mockChoice (val) {
       this.mockPath = val;
     },
@@ -35,8 +115,11 @@ const QueueView = function(props) {
     get mockURL () {
       return (this.mockRoot + this.mockPath).replace(/(?<!\:)\/\//,"/");
     },
-    get isSims () {
-      return /Simulations/i.test(this.mockPath);
+    get isSimulations () {
+      return this.entity === MODE.Simulations;
+    },
+    get mode () {
+      return this.entity;
     }
 
   }, (props||{}));
@@ -204,55 +287,9 @@ const QueueView = function(props) {
 
   const wait = time => new Promise((resolve) => setTimeout(resolve, time));
 
-  /* STATIC */
-
-  const PRIORITY = {
-    1: {
-      key: "Highest",
-      name: "Highest Priority"
-    },
-    2: {
-      key: "AboveNormal",
-      name: "Above Normal"
-    },
-    3: {
-      key: "Normal",
-      name: "Normal Priority"
-    },
-    4: {
-      key: "BelowNormal",
-      name: "Below Normal"
-    },
-    5: {
-      key: "Lowest",
-      name: "Lowest Priority"
-    }
-  };
-
-  const STATE = {
-    "PreActive": [
-      "Created",
-      "QueuedForCommission",
-      "CommissionRequested",
-      "Commissioned",
-      "Provisioning",
-      "Validating"
-    ],
-    "Active": [
-      "Running",
-      "Waiting",
-      "QueuedForResume",
-      "ResumeRequested",
-      "Resumed",
-      "Retry"
-    ],
-    "PostActive": [
-      "CancelRequested",
-      "Canceling",
-      "Canceled",
-      "Failed",
-      "Succeeded"
-    ]
+  const scopeDate = function () {
+    let hours = 24 * config.daysOfWorkFlows;
+    return new Date(Date.now()-Math.floor(1000*60*60*hours)).toISOString();
   };
 
   /**
@@ -264,8 +301,12 @@ const QueueView = function(props) {
     console.log("onClick", event);
 
     let arrow = event.target.closest("li[itemid]");
-    if (!!arrow) {
+    if (!!arrow && !event.target.classList.contains("block")) {
       arrow.classList.toggle("active");
+    } else {
+      view.chart.querySelectorAll("li[itemid].active").forEach(tooltip => {
+        tooltip.classList.remove("active");
+      });
     }
   };
 
@@ -476,11 +517,55 @@ const QueueView = function(props) {
     }
   };
 
+  /* WORKFLOWS */
+
+  const fetchWorkFlows = function (successCallback, failureCallback)  {
+    let scope = `,DateCreated%3E=${scopeDate()}`;
+    let primary = config.isMocked ? config.mockURL + "WorkItems.json" : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
+    let secondary = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/ebf6f68f-9aa8-e911-a2bb-f0921c167866/Related?format=json`;
+    let tertiary = config.isMocked ? config.mockURL + "Entity.json" : `${config.endpoint}Simulations/7a5d0f65-9aa8-e911-a2bb-f0921c167866?format=json`;
+    getSecure(primary)
+        .then(data => console.log("primary", data.WorkItems))
+        .then(response => getSecure(secondary))
+        .then(data => console.log("secondary", data) /* forEachWorkItem(getRelated) */)
+        .then(response => getSecure(tertiary))
+        .then(data => console.log("tertiary", data.Simulations) /* forEachRelated(getDetail) */)
+        .then(update => new Promise(function(resolve) {
+          if (successCallback && successCallback instanceof Function) {
+            successCallback();
+          }
+          setTimeout(function () {
+            resolve(update);
+          }, 0);
+        }))
+        .catch(function (error) {
+          if (failureCallback && failureCallback instanceof Function) {
+            failureCallback(error);
+          } else {
+            console.error("queueView.fetchWorkFlows", error);
+          }
+        })
+        .finally(function () {
+          console.log("Fetched Work Flows!");
+        });
+  };
+
+  const getSecure = function(url) {
+    return fetch(url, {
+      method: "GET",
+      cache: "no-cache",
+      headers: {
+        "X-COMPS-Token": config.auth().getToken()
+      }
+    })
+        .then(response => response.json());
+  };
+
   /* MOCK DEMO */
 
   const fetchMock = function (successCallback, failureCallback)  {
-    let primary = config.isSims ? "Queue.json" : "WorkItemQueue.json";
-    let secondary = config.isSims ? "Stats.json" : "Flows.json";
+    let primary = config.isSimulations ? "Queue.json" : "WorkItemQueue.json";
+    let secondary = config.isSimulations ? "Stats.json" : "Flows.json";
     fetch(config.mockURL + primary, { method:"GET" })
         .then(response => response.json())
         .then(data => collection.update(data.QueueState))
@@ -516,7 +601,7 @@ const QueueView = function(props) {
     const target = view.parent.querySelector("figcaption legend");
     const options = [
       { name:"API Simulations", value: 0, selected: true },
-      { name:"API Work Items", value: 1, disabled: true },
+      { name:"API Work Items", value: 1 },
       { name:"MOCK Simulations 1", value: "Simulations/1/" },
       { name:"MOCK Simulations 2", value: "Simulations/2/" },
       { name:"MOCK Simulations 3", value: "Simulations/3/" },
@@ -531,7 +616,7 @@ const QueueView = function(props) {
     let sims = input.appendChild(document.createElement("OPTGROUP"));
     let itms = input.appendChild(document.createElement("OPTGROUP"));
     options.forEach((item,index) => {
-      let group = /^\d$/.test(item.value) ? apis : /Simulations/.test(item.value) ? sims : itms;
+      let group = /^\d$/.test(item.value) ? apis : (new RegExp(MODE.Simulations)).test(item.value) ? sims : itms;
       let opt = group.appendChild(document.createElement("OPTION"));
       opt.innerText = item.name;
       opt.setAttribute("value", item.value||index);
@@ -548,11 +633,25 @@ const QueueView = function(props) {
       if (!/^[0-9]$/.test(event.target.value)) {
         config.mocked = true;
         destroy(true);
+        config.modeEntity = (new RegExp(MODE.Simulations)).test(event.target.value) ? MODE.Simulations : MODE.WorkItems;
         config.mockChoice = event.target.value;
         fetchMock(render, recoup);
       } else {
         config.mocked = false;
-        // inelegant, but this select-option feature is only temporary.
+        config.modeEntity = event.target.value > 0 ? MODE.WorkItems : MODE.Simulations;
+        if (config.isSimulations) {
+          try {
+            // proxy for dashboard.refreshMetric(name,interaction);
+            config.api(config.mode,true);
+          } catch (err) {
+            console.error("An API was not established by the instantiator!", err);
+          }
+        } else {
+          destroy(true);
+          fetchWorkFlows();
+        }
+
+        /* inelegant means to trigger an element of the parent view...
         let refresh = view.parent.querySelector("button.refresh");
         let click = new MouseEvent("click", {
           view: window,
@@ -560,6 +659,7 @@ const QueueView = function(props) {
           cancelable: true
         });
         refresh.dispatchEvent(click);
+         */
       }
     });
   };
@@ -615,6 +715,10 @@ const QueueView = function(props) {
       return config;
     },
 
+    getMode: function() {
+      return config.mode;
+    },
+
     setScoreSize: function(value) {
       if (/^[1-9][0-9]$|[1-9]$/.test(value)) {
 
@@ -637,6 +741,20 @@ const QueueView = function(props) {
 
     isMocked: function() {
       return config.isMocked;
+    },
+
+    setWorkFlowsFilter: function(boo) {
+      // @param {Boolean} true shows only active workflows, false shows all within scope (API only).
+      config.workFlowsActive = boo;
+      let message = config.activeWorkFlowsOnly ? "ONLY ACTIVE" : "ALL";
+      console.log(`The Work Flow Queue will now show ${message} items found within scope!`);
+    },
+
+    setWorkFlowsScope: function(days) {
+      // @param {Number} days to go back from now in collecting Top-Level Work Items (API only). 
+      config.workFlowScope = days;
+      let message = 1 >= config.daysOfWorkFlows ? " day!" : " days!";
+      console.log(`The Work Flow Queue will now show items within the past ${config.daysOfWorkFlows+message}`);
     },
 
     status: function () {

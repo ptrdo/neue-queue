@@ -35,7 +35,17 @@ class Index {
       type: "arrow",
       selector: "[itemid=QueueView]",
       chartContainer:"#QueueView",
-      useMockData: true
+      useMockData: true,
+      modeEntity: "Simulations",
+      api: function(mode,refresh) {
+        if (!!mode) {
+          this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
+        }
+        if (!!refresh) {
+          // refreshMetric("QueueView", true);
+          alert("There is no controller to GET this data!");
+        }
+      }
     });
     window["queue"] = queue;
 

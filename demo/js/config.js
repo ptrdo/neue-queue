@@ -7,7 +7,7 @@ export default {
    */
 
   version: "0.1.0",
-  endpoint: "https://comps-dev.idmod.org/api/",
+  endpoint: "https://comps2.idmod.org/api/",
   appName: "COMPS"
 
 };
