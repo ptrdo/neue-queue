@@ -113,7 +113,7 @@ const QueueView = function(props) {
       return this.mocked;
     },
     get mockURL () {
-      return (this.mockRoot + this.mockPath).replace(/(?<!\:)\/\//,"/");
+      return (this.mockRoot + this.mockPath).replace(/\/\//,"/");
     },
     get isSimulations () {
       return this.entity === MODE.Simulations;
@@ -519,17 +519,22 @@ const QueueView = function(props) {
 
   /* WORKFLOWS */
 
-  const fetchWorkFlows = function (successCallback, failureCallback)  {
+  const fetchWorkItems = function (successCallback, failureCallback)  {
     let scope = `,DateCreated%3E=${scopeDate()}`;
     let primary = config.isMocked ? config.mockURL + "WorkItems.json" : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
-    let secondary = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/ebf6f68f-9aa8-e911-a2bb-f0921c167866/Related?format=json`;
+    let secondary = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/eff6f68f-9aa8-e911-a2bb-f0921c167866/Related?format=json`;
     let tertiary = config.isMocked ? config.mockURL + "Entity.json" : `${config.endpoint}Simulations/7a5d0f65-9aa8-e911-a2bb-f0921c167866?format=json`;
     getSecure(primary)
-        .then(data => console.log("primary", data.WorkItems))
-        .then(response => getSecure(secondary))
-        .then(data => console.log("secondary", data) /* forEachWorkItem(getRelated) */)
-        .then(response => getSecure(tertiary))
-        .then(data => console.log("tertiary", data.Simulations) /* forEachRelated(getDetail) */)
+        .then(data => {
+
+          console.log("primary", data.WorkItems);
+          fetchWorkFlow(data.WorkItems);
+
+        })
+        // .then(response => getSecure(secondary))
+        // .then(data => console.log("secondary", data) /* forEachWorkItem(getRelated) */)
+        // .then(response => getSecure(tertiary))
+        // .then(data => console.log("tertiary", data.Simulations) /* forEachRelated(getDetail) */)
         .then(update => new Promise(function(resolve) {
           if (successCallback && successCallback instanceof Function) {
             successCallback();
@@ -542,12 +547,91 @@ const QueueView = function(props) {
           if (failureCallback && failureCallback instanceof Function) {
             failureCallback(error);
           } else {
-            console.error("queueView.fetchWorkFlows", error);
+            console.error("queueView.fetchWorkItems", error);
           }
         })
         .finally(function () {
-          console.log("Fetched Work Flows!");
+          console.log("Fetched ALL Work Items!");
         });
+  };
+
+
+  let cache = []; // @TODO Collection
+  let cursor = -1;
+  const fetchWorkFlow = function (source) {
+
+    let item, guid, url;
+
+    if (!!source) {
+      cache = source;
+      cursor = -1;
+    }
+
+    if (++cursor < cache.length) {
+
+      item = cache[cursor];
+      guid = item.Id;
+      url = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/${guid}/Related?format=json`;
+
+      getSecure(url)
+      .then(data => {
+
+        item["Flow"] = data;
+
+        if ("Related" in data && data.Related.length > 0) {
+          fetchWorkFlowItems(item, 0);
+        }
+
+      })
+      .catch(function (error) {
+        ("queueView.fetchWorkFlow", error);
+      })
+      .finally(function () {
+        fetchWorkFlow(); // goto next
+      });
+
+
+    } else {
+
+      // finish or continue
+      console.log("Fetched ALL Related!");
+    }
+
+  };
+
+  const fetchWorkFlowItems = function (flow, index) {
+
+    let item, entity, guid, url;
+
+    console.log("items", arguments);
+
+    if ("Related" in flow && !!flow.Related.length > index) {
+
+      item = flow.Related[index];
+      entity = item.ObjectType + "s";
+      guid = item.Id;
+      url = `${config.endpoint}${entity}/${guid}?format=json`;
+
+      getSecure(url)
+      .then(data => {
+
+        Object.assign(item,data);
+
+      })
+      .catch(function (error) {
+        ("queueView.fetchWorkFlowItems", error);
+      })
+      .finally(function () {
+        fetchWorkFlowItems(flow,++index); // goto next
+      });
+
+
+    } else {
+
+      // finish or continue
+      console.log("Fetched ALL Related Items!");
+    }
+
   };
 
   const getSecure = function(url) {
@@ -557,8 +641,7 @@ const QueueView = function(props) {
       headers: {
         "X-COMPS-Token": config.auth().getToken()
       }
-    })
-        .then(response => response.json());
+    }).then(response => response.json());
   };
 
   /* MOCK DEMO */
@@ -648,7 +731,7 @@ const QueueView = function(props) {
           }
         } else {
           destroy(true);
-          fetchWorkFlows();
+          fetchWorkItems();
         }
 
         /* inelegant means to trigger an element of the parent view...
