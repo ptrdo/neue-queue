@@ -16,7 +16,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ["*", ".js", ".jsx"]
+    extensions: ["*", ".js", ".jsx"],
+    alias: {
+      config: path.resolve(__dirname, "js/config.js")
+    }
   },
   plugins: [
     new webpack.ProvidePlugin({

@@ -1,5 +1,5 @@
 import "jquery";
-import Config from "./config";
+import Config from "config";
 import Auth from "comps-ui-auth";
 
 import Index from "./index.js";

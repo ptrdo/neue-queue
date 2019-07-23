@@ -1,11 +1,12 @@
 import _ from "lodash";
+import Config from "config";
 
 /**
  * QueueView
  * Dashboard visualiser of cluster traffic
  *
  * @author psylwester(at)idmod(dot)org
- * @version 1.00, 2019/06/19
+ * @version 1.00, 2019/07/22
  * @requires ES6, lodash
  *
  */
@@ -78,7 +79,7 @@ const QueueView = function(props) {
     mocked: false,
     mockRoot: ("comps" in window ? "/app/dashboard/data/" : "mock/"),
     mockPath: "Simulations/1/",
-    endpoint: ("comps" in window ? "/api/" : "https://comps2.idmod.org/api/"), /* @TODO: import config */
+    endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps2.idmod.org/api/")),
 
     workFlowScopeInDays: 1,
     workFlowsActiveOnly: false,
@@ -124,7 +125,6 @@ const QueueView = function(props) {
 
   }, (props||{}));
 
-
   const view = {
 
     root: null,
@@ -154,15 +154,18 @@ const QueueView = function(props) {
     },
     output: {},
 
-    prep: function (data) {
-
+    /**
+     * groomDates prepares Date values for human consumption.
+     * @param {Object} data is the source of values to groom. 
+     * @return {Object} the groomed data. 
+     */
+    groomDates: function (data) {
       const vitalizeMockDate = function (dateString) {
         let yesterday = new Date(Date.now() - (36 * 60 * 60 * 1000));
         let yesterdate = yesterday.toISOString().split("T")[0];
         let recently = new Date(Date.parse(yesterdate + "T" + dateString.split("T")[1]) + (16 * 60 * 60 * 1000));
         return recently.toISOString();
       };
-
       const dateTransform = function (node) {
         /* preprocess dates from service-supplied GMT to ui-conducive Local */
         let basisDate, basisString, elapsedHours;
@@ -183,7 +186,33 @@ const QueueView = function(props) {
           node["ElapsedStartString"] = basisString;
         }
       };
+      if ("LastCreateTime" in data || "DateCreated" in data) {
+        // likely a simple entity node
+        dateTransform(data);
+      } else if ("Normal" in data) {
+        // likely a root collection of priority buckets
+        Object.values(data).forEach(value => {
+          if (Array.isArray(value)) {
+            value.forEach(item => {
+              dateTransform(item);
+            });
+          }
+        });
+      } else if (Array.isArray(data)) {
+        // likely a collection update
+        data.forEach(item => {
+          dateTransform(item);
+        });
+      }
+      return data;
+    },
 
+    /**
+     * prepPriorities establishes priority buckets and scoring. 
+     * @param {Object} data is likely a QueueState API Response.
+     * @return {Object} the prepped data.
+     */
+    prepPriorities: function (data) {
       const scoreSizes = function (splits, max=config.scoreSize) {
         let result = [0];
         let split = max/Math.max(1, splits-1);
@@ -193,17 +222,6 @@ const QueueView = function(props) {
         }
         return result;
       };
-
-      Object.values(data).forEach(value => {
-        if (Array.isArray(value)) {
-          value.forEach(item => {
-            dateTransform(item);
-          });
-        } else {
-          dateTransform(value);
-        }
-      });
-
       Object.values(PRIORITY).forEach(bucket => {
         if (bucket.key in data) {
           let counts = data[bucket.key].map((item) => { return item["SimulationCount"]; });
@@ -220,19 +238,33 @@ const QueueView = function(props) {
       return data;
     },
 
+    /**
+     * merge assigns new info to any Collection by aligning existing Ids with incoming Ids.
+     * @param {Object} data is the new info to merge into this Collection. 
+     */
     merge: function(data) {
-      let updates = this.prep(data);
+      let updates = this.groomDates(data);
       Object.values(this.output).forEach(value => {
         if (Array.isArray(value)) {
           value.forEach(item => {
             if ("ExperimentId" in item && item.ExperimentId in updates) {
               Object.assign(item,  updates[item.ExperimentId]);
-            } else if ("WorkItemId" in item && item.WorkItemId in updates) {
-              Object.assign(item,  updates[item.WorkItemId]); // TODO: SortOn LastCreateTime
+            } else if ("Id" in item && item.Id in updates) {
+              Object.assign(item,  updates[item.Id]); // TODO: SortOn LastCreateTime
             }
           });
         }
       });
+    },
+
+    /**
+     * augment puts new info at a known target of data.
+     * @param {Object} target is the destination of new info. 
+     * @param {Object} source is the new info.
+     * @param {Boolean} pristine maintains new info without grooming dates. 
+     */
+    augment: function(target, source, pristine) {
+      Object.assign(target,  !!pristine ? source : this.groomDates(source));
     },
 
     advance: function (rate=.1) {
@@ -265,12 +297,7 @@ const QueueView = function(props) {
     },
 
     update: function (data) {
-      this.output = this.prep(data);
-      return this.output;
-    },
-
-    append: function (data) {
-      this.merge(data);
+      this.output = this.prepPriorities(this.groomDates(data));
       return this.output;
     },
 
@@ -367,7 +394,12 @@ const QueueView = function(props) {
             li.setAttribute("itemid", item["ExperimentId"]);
             setQueueItemDetails(block, item);
             setQueueItemSegments(ul, item["SimulationStateCount"]);
+          } else if (_.has(item, "Flow")) {
+            li.setAttribute("itemid", item["Id"]);
+            setQueueItemDetails(block, item);
+            setQueueItemFlow(ul, item["Flow"]);
           } else if (_.has(item, "Related")) {
+            // @TODO: update Workflow mock data
             li.setAttribute("itemid", item["WorkItemId"]);
             setQueueItemDetails(block, item);
             setQueueItemFlow(ul, item);
@@ -409,7 +441,9 @@ const QueueView = function(props) {
       fragment.querySelector("li:last-of-type").appendChild(tip);
     };
     const setQueueItemFlow = function (fragment, info) {
-      info["Related"].forEach(member => {
+      info["Related"]
+      .filter(item => item.ObjectType != "AssetCollection")
+      .forEach(member => {
         let a = document.createElement("A");
         let li = document.createElement("LI");
         let val = document.createElement("VAR");
@@ -456,6 +490,9 @@ const QueueView = function(props) {
       if (_.has(info, "SimulationStateCount")) {
         dt.appendChild(document.createTextNode("Experiment"));
         ["Owner","ExperimentId","NodeGroup","ElapsedString","SimulationCount"].forEach(implement);
+      } else if (_.has(info, "Flow")) {
+        dt.appendChild(document.createTextNode("Work Flow"));
+        ["Owner","Id","EnvironmentName","ElapsedString","RelatedCount"].forEach(implement);
       } else if (_.has(info, "Related")) {
         dt.appendChild(document.createTextNode("Work Flow"));
         ["Owner","WorkItemId","EnvironmentName","ElapsedString","RelatedCount"].forEach(implement);
@@ -521,115 +558,96 @@ const QueueView = function(props) {
 
   const fetchWorkItems = function (successCallback, failureCallback)  {
     let scope = `,DateCreated%3E=${scopeDate()}`;
-    let primary = config.isMocked ? config.mockURL + "WorkItems.json" : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
-    let secondary = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/eff6f68f-9aa8-e911-a2bb-f0921c167866/Related?format=json`;
-    let tertiary = config.isMocked ? config.mockURL + "Entity.json" : `${config.endpoint}Simulations/7a5d0f65-9aa8-e911-a2bb-f0921c167866?format=json`;
-    getSecure(primary)
+    let url = config.isMocked ? config.mockURL + "WorkItems.json" : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
+    getSecure(url)
+    .then(data => {
+      /* @TODO: QUALIFY WORKFLOWS BY PRIORITY! */
+      collection.update({ "Normal": data.WorkItems });
+      fetchWorkFlow(0);
+    })
+    .then(update => new Promise(function(resolve) {
+      if (successCallback && successCallback instanceof Function) {
+        successCallback();
+      }
+      setTimeout(function () {
+        resolve(update);
+      }, 0);
+    }))
+    .catch(function (error) {
+      if (failureCallback && failureCallback instanceof Function) {
+        failureCallback(error);
+      } else {
+        console.error("queueView.fetchWorkItems", error);
+      }
+    })
+    .finally(function () {
+      console.log("Fetched ALL Work Items!");
+    });
+  };
+  
+  const fetchWorkFlow = function (cursor) {
+    let item, guid, url;
+    let source = collection.latest.Normal;
+    if (-1 < cursor && cursor < source.length) {
+      item = source[cursor];
+      guid = _.get(item, "Id");
+      if (!!item && !!guid) {
+        url = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/${guid}/Related?format=json`;
+        getSecure(url)
         .then(data => {
-
-          console.log("primary", data.WorkItems);
-          fetchWorkFlow(data.WorkItems);
-
-        })
-        // .then(response => getSecure(secondary))
-        // .then(data => console.log("secondary", data) /* forEachWorkItem(getRelated) */)
-        // .then(response => getSecure(tertiary))
-        // .then(data => console.log("tertiary", data.Simulations) /* forEachRelated(getDetail) */)
-        .then(update => new Promise(function(resolve) {
-          if (successCallback && successCallback instanceof Function) {
-            successCallback();
-          }
-          setTimeout(function () {
-            resolve(update);
-          }, 0);
-        }))
-        .catch(function (error) {
-          if (failureCallback && failureCallback instanceof Function) {
-            failureCallback(error);
+          data.Related.unshift(_.clone(item));
+          collection.augment(item,{ "Flow": data }, true);
+          if ("Related" in data && data.Related.length > 0) {
+            fetchWorkFlowItems(item, 0);
           } else {
-            console.error("queueView.fetchWorkItems", error);
+            // this is a singular Work Item
           }
+        })
+        .catch(function (error) {
+          ("queueView.fetchWorkFlow", error);
         })
         .finally(function () {
-          console.log("Fetched ALL Work Items!");
+          fetchWorkFlow(cursor+1); // goto next
         });
-  };
-
-
-  let cache = []; // @TODO Collection
-  let cursor = -1;
-  const fetchWorkFlow = function (source) {
-
-    let item, guid, url;
-
-    if (!!source) {
-      cache = source;
-      cursor = -1;
-    }
-
-    if (++cursor < cache.length) {
-
-      item = cache[cursor];
-      guid = item.Id;
-      url = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/${guid}/Related?format=json`;
-
-      getSecure(url)
-      .then(data => {
-
-        item["Flow"] = data;
-
-        if ("Related" in data && data.Related.length > 0) {
-          fetchWorkFlowItems(item, 0);
-        }
-
-      })
-      .catch(function (error) {
-        ("queueView.fetchWorkFlow", error);
-      })
-      .finally(function () {
-        fetchWorkFlow(); // goto next
-      });
-
-
+      } else {
+        fetchWorkFlow(cursor+1); // goto next
+      }
+      
     } else {
 
       // finish or continue
       console.log("Fetched ALL Related!");
+      render();
     }
-
   };
 
-  const fetchWorkFlowItems = function (flow, index) {
-
-    let item, entity, guid, url;
-
-    console.log("items", arguments);
-
-    if ("Related" in flow && !!flow.Related.length > index) {
-
-      item = flow.Related[index];
-      entity = item.ObjectType + "s";
-      guid = item.Id;
-      url = `${config.endpoint}${entity}/${guid}?format=json`;
-
-      getSecure(url)
-      .then(data => {
-
-        Object.assign(item,data);
-
-      })
-      .catch(function (error) {
-        ("queueView.fetchWorkFlowItems", error);
-      })
-      .finally(function () {
-        fetchWorkFlowItems(flow,++index); // goto next
-      });
-
+  const fetchWorkFlowItems = function (item, cursor) {
+    let relation, entity, guid, url;
+    let flow = _.get(item, "Flow");
+    if (!!flow && "Related" in flow && -1 < cursor && cursor < flow.Related.length) {
+      relation = flow.Related[cursor];
+      entity = _.get(relation, "ObjectType");
+      guid = _.get(relation, "Id");
+      if (!!entity && !!guid && /Simulation|Experiment|WorkItem/i.test(entity)) {
+        url = `${config.endpoint}${entity}s/${guid}?format=json`;
+        getSecure(url)
+        .then(data => {
+          collection.augment(relation, data[`${entity}s`][0]);
+        })
+        .catch(function (error) {
+          ("queueView.fetchWorkFlowItems", error);
+        })
+        .finally(function () {
+          fetchWorkFlowItems(item,cursor+1); // goto next
+        });
+      } else {
+        fetchWorkFlowItems(item,cursor+1);
+      }
 
     } else {
 
       // finish or continue
-      console.log("Fetched ALL Related Items!");
+      // console.log("Fetched ALL Related Items!", item.Id);
     }
 
   };
@@ -654,7 +672,7 @@ const QueueView = function(props) {
         .then(data => collection.update(data.QueueState))
         .then(response => fetch(config.mockURL + secondary, { method:"GET" }))
         .then(response => response.json())
-        .then(data => collection.append(data.Stats||data.Flows))
+        .then(data => { collection.merge(data.Stats||data.Flows); return collection.latest; })
         .then(update => new Promise(function(resolve) {
           if (successCallback && successCallback instanceof Function) {
             successCallback();
@@ -777,7 +795,7 @@ const QueueView = function(props) {
         Object.assign(config, (overrides||{}));
         destroy(true); // TODO: Only if need be.
         collection.update(config.queue);
-        collection.append(config.stats);
+        collection.merge(config.stats);
         render(callback);
       }
     },
@@ -814,7 +832,7 @@ const QueueView = function(props) {
           fetchMock(() => { render(); });
         } else {
           collection.update(config.queue);
-          collection.append(config.stats);
+          collection.merge(config.stats);
           render();
         }
       } else {
