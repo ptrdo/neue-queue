@@ -344,6 +344,23 @@ const QueueView = function(props) {
   const unClick = function() {
     view.chart.removeEventListener("click", onClick);
   };
+  
+  let scrolling = 0;
+  const onScroll = function (event) {
+    if (!scrolling) {
+      event.target.classList.add("scrolling");
+    } else {
+      clearInterval(scrolling);
+    }
+    scrolling = setInterval(function () {
+      event.target.classList.remove("scrolling");
+      scrolling = 0;
+    }, 500);
+  };
+  
+  const unScroll = function () {
+    view.chart.removeEventListener("scroll", onScroll);
+  };
 
   const render = function(callback) {
 
@@ -393,16 +410,11 @@ const QueueView = function(props) {
           if (_.has(item, "SimulationStateCount")) {
             li.setAttribute("itemid", item["ExperimentId"]);
             setQueueItemDetails(block, item);
-            setQueueItemSegments(ul, item["SimulationStateCount"]);
+            setQueueItemSegments(ul, item);
           } else if (_.has(item, "Flow")) {
             li.setAttribute("itemid", item["Id"]);
             setQueueItemDetails(block, item);
-            setQueueItemFlow(ul, item["Flow"]);
-          } else if (_.has(item, "Related")) {
-            // @TODO: update Workflow mock data
-            li.setAttribute("itemid", item["WorkItemId"]);
-            setQueueItemDetails(block, item);
-            setQueueItemFlow(ul, item);
+            setQueueItemFlow(ul, item.Flow);
           } else {
             // @TODO: ORPHAN!
           }
@@ -410,7 +422,8 @@ const QueueView = function(props) {
         ol.appendChild(doc);
       }
     };
-    const setQueueItemSegments = function (fragment, info) {
+    const setQueueItemSegments = function (fragment, item) {
+      let info = item["SimulationStateCount"];
       let tip = document.createElement("INS");
       tip.appendChild(document.createElement("B"));
       tip.classList.add("arrow");
@@ -420,6 +433,7 @@ const QueueView = function(props) {
             let a = document.createElement("A");
             let li = document.createElement("LI");
             let val = document.createElement("VAR");
+            li.setAttribute("title", status);
             li.classList.add(status);
             li.style.flexGrow = info[status];
             if (stage == "Active") {
@@ -450,7 +464,7 @@ const QueueView = function(props) {
         let tip = document.createElement("INS");
         let type = member.ObjectType;
         if (/^Experiment$/i.test(type)) {
-          setQueueItemSegments(fragment, member["SimulationStateCount"]);
+          setQueueItemSegments(fragment, member);
           fragment.querySelector("li:last-of-type").style.marginRight = "22px";
         } else {
           tip.appendChild(document.createElement("B"));
@@ -459,7 +473,8 @@ const QueueView = function(props) {
           a.appendChild(val);
           li.appendChild(a);
           li.appendChild(tip);
-          li.classList.add(member["State"]||member["SimulationState"], type);
+          li.setAttribute("title", member.Name);
+          li.classList.add(member["State"]||member["SimulationState"]||"DefaultState", type);
           if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
             li.classList.add("process");
           }
@@ -493,9 +508,6 @@ const QueueView = function(props) {
       } else if (_.has(info, "Flow")) {
         dt.appendChild(document.createTextNode("Work Flow"));
         ["Owner","Id","EnvironmentName","ElapsedString","RelatedCount"].forEach(implement);
-      } else if (_.has(info, "Related")) {
-        dt.appendChild(document.createTextNode("Work Flow"));
-        ["Owner","WorkItemId","EnvironmentName","ElapsedString","RelatedCount"].forEach(implement);
       }
 
       dfn.classList.add("tooltip");
@@ -513,6 +525,7 @@ const QueueView = function(props) {
 
       view.parent = document.querySelector(config.selector);
       view.chart = view.parent.querySelector(config.chartContainer);
+      view.chart.addEventListener("scroll", onScroll);
       view.chart.addEventListener("click", onClick);
       view.chart.classList.add("process");
 
@@ -544,6 +557,7 @@ const QueueView = function(props) {
   const destroy = function (reset) {
     if (!!view.chart) {
       unClick();
+      unScroll();
       while (view.chart.firstChild) {
         view.chart.removeChild(view.chart.firstChild);
       }
@@ -556,6 +570,11 @@ const QueueView = function(props) {
 
   /* WORKFLOWS */
 
+  /**
+   * fetchWorkItems is initial call to get TopLevel items within the scope of concern.
+   * @param successCallback
+   * @param failureCallback
+   */
   const fetchWorkItems = function (successCallback, failureCallback)  {
     let scope = `,DateCreated%3E=${scopeDate()}`;
     let url = config.isMocked ? config.mockURL + "WorkItems.json" : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
@@ -584,23 +603,34 @@ const QueueView = function(props) {
       console.log("Fetched ALL Work Items!");
     });
   };
-  
+
+  /**
+   * fetchWorkFlow is an iterative call upon every item in the Response of fetchWorkItems(); 
+   * @param {Integer} cursor is the position within the TopLevel items within the scope of concern. 
+   */
   const fetchWorkFlow = function (cursor) {
-    let item, guid, url;
+    let item, guid, url, count, last;
     let source = collection.latest.Normal;
     if (-1 < cursor && cursor < source.length) {
+      last = cursor == source.length-1;
       item = source[cursor];
       guid = _.get(item, "Id");
       if (!!item && !!guid) {
         url = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/${guid}/Related?format=json`;
         getSecure(url)
         .then(data => {
-          data.Related.unshift(_.clone(item));
-          collection.augment(item,{ "Flow": data }, true);
+          if (_.has(data, "Related")) {
+            data.Related.unshift(Object.assign({ Relationship:"Ancestor" }, _.clone(item)));
+            count = data.Related.filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
+          }
+          collection.augment(item,{ Flow: data, RelatedCount: count }, true);
           if ("Related" in data && data.Related.length > 0) {
-            fetchWorkFlowItems(item, 0);
+            fetchWorkFlowItems(item, 0, last);
           } else {
             // this is a singular Work Item
+            if (!!last) {
+              wait(0).then(() => render());
+            } 
           }
         })
         .catch(function (error) {
@@ -617,39 +647,95 @@ const QueueView = function(props) {
 
       // finish or continue
       console.log("Fetched ALL Related!");
-      render();
     }
   };
 
-  const fetchWorkFlowItems = function (item, cursor) {
-    let relation, entity, guid, url;
+  /**
+   * fetchWorkFlowItems is an iterative call upon every item in the Response of fetchWorkFlow(); 
+   * @param {Object} item is the Collection node to be augmented. 
+   * @param {Integer} cursor is the position within the target node's collection of "Related" items.
+   * @param {Boolean} last is true when this is the final workflow to populate.
+   */
+  const fetchWorkFlowItems = function (item, cursor, last) {
+    let relation, entity, guid, url, index;
     let flow = _.get(item, "Flow");
     if (!!flow && "Related" in flow && -1 < cursor && cursor < flow.Related.length) {
       relation = flow.Related[cursor];
       entity = _.get(relation, "ObjectType");
       guid = _.get(relation, "Id");
       if (!!entity && !!guid && /Simulation|Experiment|WorkItem/i.test(entity)) {
-        url = `${config.endpoint}${entity}s/${guid}?format=json`;
+        url = config.isMocked ? config.mockURL + `Entities.json` : `${config.endpoint}${entity}s/${guid}?format=json`;
         getSecure(url)
         .then(data => {
-          collection.augment(relation, data[`${entity}s`][0]);
+          index = data[`${entity}s`].findIndex(item => { return item.Id == guid });
+          collection.augment(relation, data[`${entity}s`][index]);
+          if (/Experiment/i.test(entity)) {
+            fetchWorkFlowItemStats(relation, last);
+            last = false;
+          }
         })
         .catch(function (error) {
           ("queueView.fetchWorkFlowItems", error);
         })
         .finally(function () {
-          fetchWorkFlowItems(item,cursor+1); // goto next
+          fetchWorkFlowItems(item,cursor+1, last); // goto next
         });
       } else {
-        fetchWorkFlowItems(item,cursor+1);
+        fetchWorkFlowItems(item,cursor+1, last);
       }
 
     } else {
 
       // finish or continue
-      // console.log("Fetched ALL Related Items!", item.Id);
+      if (!!last) {
+        wait(100).then(() => render());
+      }
     }
+  };
 
+  /**
+   * fetchWorkFlowItemStats is a secondary call upon every Experiment in the Response of fetchWorkFlow();
+   * @param {Object} item is the Collection node to be augmented.
+   * @param {Boolean} last is true when this is the final workflow to populate.
+   */
+  const fetchWorkFlowItemStats = function (item, last) {
+    let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s/${guid}?format=json`;
+    let payload = { ExperimentIds:[item.Id] };
+    if (config.isMocked) {
+      getSecure(url)
+      .then(data => {
+        if (_.has(data, ["Stats", item.Id])) {
+          collection.augment(item, data.Stats[item.Id]);
+        } else {
+          console.error("queueView.fetchWorkFlowItemStats", "Unexpected Mock Data", data);
+        }
+      })
+      .catch(function (error) {
+        ("queueView.fetchWorkFlowItemStats", error);
+      })
+      .finally(function () {
+        if (!!last) {
+          wait(100).then(() => render());
+        }
+      });
+    } else {
+      postSecure(url, payload)
+      .then(data => {
+        if (_.has(data, ["Stats", item.Id])) {
+          collection.augment(item, data.Stats[item.Id]);
+        } else {
+          console.error("queueView.fetchWorkFlowItemStats", "Unexpected POST Response", data);
+        }
+      })
+      .catch(function (error) {
+        ("queueView.fetchWorkFlowItemStats", error);
+      })
+      .finally(function () {
+        if (!!last) {
+          wait(100).then(() => render());
+        }
+      });
+    }
   };
 
   const getSecure = function(url) {
@@ -662,35 +748,46 @@ const QueueView = function(props) {
     }).then(response => response.json());
   };
 
-  /* MOCK DEMO */
+  const postSecure = function(url, payload={}) {
+    return fetch(url, {
+      method: "GET",
+      cache: "no-cache",
+      headers: {
+        "X-COMPS-Token": config.auth().getToken()
+      },
+      body: JSON.stringify(payload)
+    }).then(response => response.json());
+  };
 
-  const fetchMock = function (successCallback, failureCallback)  {
-    let primary = config.isSimulations ? "Queue.json" : "WorkItemQueue.json";
-    let secondary = config.isSimulations ? "Stats.json" : "Flows.json";
-    fetch(config.mockURL + primary, { method:"GET" })
-        .then(response => response.json())
-        .then(data => collection.update(data.QueueState))
-        .then(response => fetch(config.mockURL + secondary, { method:"GET" }))
-        .then(response => response.json())
-        .then(data => { collection.merge(data.Stats||data.Flows); return collection.latest; })
-        .then(update => new Promise(function(resolve) {
-          if (successCallback && successCallback instanceof Function) {
-            successCallback();
-          }
-          setTimeout(function () {
-            resolve(update);
-          }, 0);
-        }))
-        .catch(function (error) {
-          if (failureCallback && failureCallback instanceof Function) {
-            failureCallback(error);
-          } else {
-            console.error("queueView.fetchMock", error);
-          }
-        })
-        .finally(function () {
-          console.log("Fetched Mock Data:", config.mockURL, primary, secondary);
-        });
+  /* MOCK SIMULATIONS */
+
+  const fetchMockSimulations = function (successCallback, failureCallback)  {
+    let primary = config.mockURL + "Queue.json";
+    let secondary = config.mockURL + "Stats.json";
+    fetch(primary, { method:"GET" })
+    .then(response => response.json())
+    .then(data => collection.update(data.QueueState))
+    .then(response => fetch(secondary, { method:"GET" }))
+    .then(response => response.json())
+    .then(data => { collection.merge(data.Stats); return collection.latest; })
+    .then(update => new Promise(function(resolve) {
+      if (successCallback && successCallback instanceof Function) {
+        successCallback();
+      }
+      setTimeout(function () {
+        resolve(update);
+      }, 0);
+    }))
+    .catch(function (error) {
+      if (failureCallback && failureCallback instanceof Function) {
+        failureCallback(error);
+      } else {
+        console.error("queueView.fetchMockSimulations", error);
+      }
+    })
+    .finally(function () {
+      console.log("Fetched Mock Simulation Data:", primary, secondary);
+    });
   };
 
   const addSourceSelect = function() {
@@ -736,7 +833,17 @@ const QueueView = function(props) {
         destroy(true);
         config.modeEntity = (new RegExp(MODE.Simulations)).test(event.target.value) ? MODE.Simulations : MODE.WorkItems;
         config.mockChoice = event.target.value;
-        fetchMock(render, recoup);
+        if (config.isSimulations) {
+          fetchMockSimulations(render, recoup);
+        } else {
+          fetchWorkItems(
+          () => {
+            /* successCallback */
+          },
+          () => {
+            /* successCallback */
+          });
+        }
       } else {
         config.mocked = false;
         config.modeEntity = event.target.value > 0 ? MODE.WorkItems : MODE.Simulations;
@@ -749,18 +856,14 @@ const QueueView = function(props) {
           }
         } else {
           destroy(true);
-          fetchWorkItems();
+          fetchWorkItems(
+          () => {
+            /* successCallback */
+          },
+          () => {
+            /* successCallback */
+          });
         }
-
-        /* inelegant means to trigger an element of the parent view...
-        let refresh = view.parent.querySelector("button.refresh");
-        let click = new MouseEvent("click", {
-          view: window,
-          bubbles: true,
-          cancelable: true
-        });
-        refresh.dispatchEvent(click);
-         */
       }
     });
   };
@@ -785,9 +888,17 @@ const QueueView = function(props) {
           render(() => { /* callback */ });
           return;
         } else {
-          fetchMock(() => {
-            render(() => { /* callback */ });
-          });
+          if (config.isSimulations) {
+            fetchMockSimulations(render, recoup);
+          } else {
+            fetchWorkItems(
+            () => {
+              /* successCallback */
+            },
+            () => {
+              /* successCallback */
+            });
+          }
         }
       } else {
 
@@ -829,7 +940,7 @@ const QueueView = function(props) {
         // @TODO: this.redraw(); // repreps existing data, rerenders.
 
         if (config.isMocked) {
-          fetchMock(() => { render(); });
+          fetchMockSimulations(() => { render(); });
         } else {
           collection.update(config.queue);
           collection.merge(config.stats);

@@ -1,5 +1,5 @@
 {
-  "API": "https://comps-dev.idmod.org/api/WorkItems/45b88b49-489c-e911-a2bb-f0921c167866/Related?format=json",
+  "API": "/api/WorkItems/45b88b49-489c-e911-a2bb-f0921c167866/Related?format=json",
   "Id": "45b88b49-489c-e911-a2bb-f0921c167866",
   "Ancestors": [],
   "Related": [{

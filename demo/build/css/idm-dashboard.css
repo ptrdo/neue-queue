@@ -883,9 +883,14 @@ ins.arrow b {
   background-color: hotpink;
 }
 
+#dashboard .queue.chart figure output .DefaultState,
+#dashboard .queue.chart figure output .DefaultState .arrow b
+{
+  background-color: silver;
+}
+
 #dashboard .queue.chart ol > li dfn.tooltip
 {
-/*float: right;*/
   position: absolute;
   display: inline-block;
   height: 0;
@@ -901,6 +906,10 @@ ins.arrow b {
 	font-size: unset;
 }
 
+#dashboard .queue.chart .scrolling ol > li dfn.tooltip {
+  position: relative;
+}
+
 #dashboard .queue.chart ol > li dfn.tooltip:hover {
   z-index: 1000;
 }
@@ -910,7 +919,7 @@ ins.arrow b {
   position: absolute;
 }
 
-#dashboard .queue.chart ol > li:hover a var
+#dashboard .queue.chart li:hover > a var
 {
   color: black !important;
 }

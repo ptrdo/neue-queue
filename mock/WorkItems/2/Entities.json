@@ -1,4 +1,5 @@
 {
+  "NOTE": "This is an aggregation of api/Simulations, api/Experiments, and/or api/WorkItems per Response of api/Related.",
   "Simulations": [{
     "Id": "1372877d-e199-e911-a2bb-f0921c167866",
     "Name": "pyCOMPS: Simulation: Bbondo",

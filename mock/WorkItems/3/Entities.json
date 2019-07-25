@@ -1,5 +1,6 @@
 {
-  "API": "https://comps.idmod.org/api/Experiments/c5c7e687-489d-e911-a2c1-c4346bcb1555?statsoperations=simulationcount,simulationstatecount&format=json",
+  "NOTE": "This is an aggregation of api/Simulations, api/Experiments, and/or api/WorkItems per Response of api/Related.",
+  "API": "/api/Experiments/c5c7e687-489d-e911-a2c1-c4346bcb1555?statsoperations=simulationcount,simulationstatecount&format=json",
   "Experiments": [{
     "Id": "7f8a723d-5f54-e911-a2c0-c4346bcb1554",
     "Name": "Ivermectin_nochildbearingage_new_vector_model",

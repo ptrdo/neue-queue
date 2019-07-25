@@ -1,0 +1,116 @@
+{
+  "NOTE": "This is an aggregation of api/Simulations, api/Experiments, and/or api/WorkItems per Response of api/Related.",
+  "WorkItems": [{
+    "Id": "45b88b49-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:36:30.6970000Z",
+    "LastModified": "2019-07-01T21:39:16.6630000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "InputDataWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "6f5de73f-b2f1-4c29-b44c-cc144b393771",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\45b\\88b\\494\\45b88b49-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }, {
+    "Id": "aa88fd97-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (45b88b49) NaNCheckWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:38:42.8370000Z",
+    "LastModified": "2019-07-01T21:39:03.6800000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "NaNCheckWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "da502fce-42a4-4385-8897-cbb814b1224a",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\aa8\\8fd\\974\\aa88fd97-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }, {
+    "Id": "a288fd97-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (45b88b49) NaNCheckWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:38:42.7100000Z",
+    "LastModified": "2019-07-01T21:38:55.7100000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "NaNCheckWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "da502fce-42a4-4385-8897-cbb814b1224a",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\a28\\8fd\\974\\a288fd97-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }, {
+    "Id": "fdf78957-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (45b88b49) MergeNodesWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:36:56.1400000Z",
+    "LastModified": "2019-07-01T21:38:31.7100000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "MergeNodesWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "3aaacb36-6d56-475f-bdbe-91a379b6a7d1",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\fdf\\789\\574\\fdf78957-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }, {
+    "Id": "f6f78957-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (45b88b49) MergeNodesWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:36:55.8130000Z",
+    "LastModified": "2019-07-01T21:37:48.3300000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "MergeNodesWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "3aaacb36-6d56-475f-bdbe-91a379b6a7d1",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\f6f\\789\\574\\f6f78957-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }, {
+    "Id": "f1f78957-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request (45b88b49) MergeNodesWorker",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:36:55.5000000Z",
+    "LastModified": "2019-07-01T21:37:28.3770000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "MergeNodesWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "3aaacb36-6d56-475f-bdbe-91a379b6a7d1",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\f1f\\789\\574\\f1f78957-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }, {
+    "Id": "45b88b49-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request",
+    "Owner": "psylwester",
+    "DateCreated": "2019-07-01T21:36:30.6970000Z",
+    "LastModified": "2019-07-01T21:39:16.6630000Z",
+    "State": "Succeeded",
+    "Worker": {
+      "Name": "InputDataWorker",
+      "Version": "1.0.0.0_RELEASE"
+    },
+    "EnvironmentName": "Bayesian",
+    "HostName": "IDMSPAPP11",
+    "WorkerInstanceId": "6f5de73f-b2f1-4c29-b44c-cc144b393771",
+    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\45b\\88b\\494\\45b88b49-489c-e911-a2bb-f0921c167866",
+    "WorkingDirectorySize": 0
+  }]
+}
