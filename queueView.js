@@ -172,7 +172,7 @@ const QueueView = function(props) {
         let basisISOString = _.get(node, "LastCreateTime", _.get(node, "DateCreated", null));
         if (_.has(node, "Related")) {
           basisISOString = _.get(_.first(node.Related), "DateCreated", null);
-          node["RelatedCount"] = node.Related.length || 0;
+          node["RelatedCount"] = node["Related"].length || 0;
         }
         if (!!basisISOString) {
           if (config.isMocked) {
@@ -455,8 +455,8 @@ const QueueView = function(props) {
       fragment.querySelector("li:last-of-type").appendChild(tip);
     };
     const setQueueItemFlow = function (fragment, info) {
-      info["Related"]
-      .filter(item => item.ObjectType != "AssetCollection")
+      _.concat(info["Ancestors"],info["Related"])
+      .filter(item => item["ObjectType"] != "AssetCollection")
       .forEach(member => {
         let a = document.createElement("A");
         let li = document.createElement("LI");
@@ -474,6 +474,7 @@ const QueueView = function(props) {
           li.appendChild(a);
           li.appendChild(tip);
           li.setAttribute("title", member.Name);
+          console.log(member["State"]||member["SimulationState"]||"DefaultState",member);
           li.classList.add(member["State"]||member["SimulationState"]||"DefaultState", type);
           if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
             li.classList.add("process");
@@ -620,11 +621,11 @@ const QueueView = function(props) {
         getSecure(url)
         .then(data => {
           if (_.has(data, "Related")) {
-            data.Related.unshift(Object.assign({ Relationship:"Ancestor" }, _.clone(item)));
-            count = data.Related.filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
+            data["Ancestors"].unshift(Object.assign({ Relationship:"Ancestor" }, _.clone(item)));
+            count = data["Related"].filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
           }
           collection.augment(item,{ Flow: data, RelatedCount: count }, true);
-          if ("Related" in data && data.Related.length > 0) {
+          if ("Related" in data && data["Related"].length > 0) {
             fetchWorkFlowItems(item, 0, last);
           } else {
             // this is a singular Work Item
@@ -659,8 +660,8 @@ const QueueView = function(props) {
   const fetchWorkFlowItems = function (item, cursor, last) {
     let relation, entity, guid, url, index;
     let flow = _.get(item, "Flow");
-    if (!!flow && "Related" in flow && -1 < cursor && cursor < flow.Related.length) {
-      relation = flow.Related[cursor];
+    if (!!flow && "Related" in flow && -1 < cursor && cursor < flow["Related"].length) {
+      relation = flow["Related"][cursor];
       entity = _.get(relation, "ObjectType");
       guid = _.get(relation, "Id");
       if (!!entity && !!guid && /Simulation|Experiment|WorkItem/i.test(entity)) {
@@ -699,43 +700,26 @@ const QueueView = function(props) {
    * @param {Boolean} last is true when this is the final workflow to populate.
    */
   const fetchWorkFlowItemStats = function (item, last) {
-    let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s/${guid}?format=json`;
-    let payload = { ExperimentIds:[item.Id] };
-    if (config.isMocked) {
-      getSecure(url)
-      .then(data => {
-        if (_.has(data, ["Stats", item.Id])) {
-          collection.augment(item, data.Stats[item.Id]);
-        } else {
-          console.error("queueView.fetchWorkFlowItemStats", "Unexpected Mock Data", data);
-        }
-      })
-      .catch(function (error) {
-        ("queueView.fetchWorkFlowItemStats", error);
-      })
-      .finally(function () {
-        if (!!last) {
-          wait(100).then(() => render());
-        }
-      });
-    } else {
-      postSecure(url, payload)
-      .then(data => {
-        if (_.has(data, ["Stats", item.Id])) {
-          collection.augment(item, data.Stats[item.Id]);
-        } else {
-          console.error("queueView.fetchWorkFlowItemStats", "Unexpected POST Response", data);
-        }
-      })
-      .catch(function (error) {
-        ("queueView.fetchWorkFlowItemStats", error);
-      })
-      .finally(function () {
-        if (!!last) {
-          wait(100).then(() => render());
-        }
-      });
-    }
+    let guid = _.get(item, "Id");
+    let entity = _.get(item, "ObjectType");
+    let params = "Stats?statsoperations=simulationcount,simulationstatecount&format=json";
+    let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s/${guid}/${params}`;
+    getSecure(url)
+    .then(data => {
+      if (_.has(data, ["Stats", item.Id])) {
+        collection.augment(item, data.Stats[item.Id]);
+      } else {
+        console.error("queueView.fetchWorkFlowItemStats", "Unexpected Mock Data", data);
+      }
+    })
+    .catch(function (error) {
+      ("queueView.fetchWorkFlowItemStats", error);
+    })
+    .finally(function () {
+      if (!!last) {
+        wait(100).then(() => render());
+      }
+    });
   };
 
   const getSecure = function(url) {

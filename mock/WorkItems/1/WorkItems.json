@@ -2,20 +2,20 @@
   "API": "/api/WorkItems?filters=State!=Canceled,State!=Succeeded,State!=Failed,State!=Created&orderby=DateCreated%20desc&offset=0&format=json",
   "NOTE": "This is a distillation of ONLY the Work Items concerning this demonstration!",
   "WorkItems": [{
-    "Id": "4cb88b49-489c-e911-a2bb-f0921c167866",
-    "Name": "Gabon Input Data Request (45b88b49) DemographicsWorker",
+    "Id": "45b88b49-489c-e911-a2bb-f0921c167866",
+    "Name": "Gabon Input Data Request",
     "Owner": "psylwester",
-    "DateCreated": "2019-07-01T21:36:39.0700000Z",
-    "LastModified": "2019-07-01T21:36:54.1730000Z",
+    "DateCreated": "2019-07-01T21:36:30.6970000Z",
+    "LastModified": "2019-07-01T21:39:16.6630000Z",
     "State": "Succeeded",
     "Worker": {
-      "Name": "DemographicsWorker",
+      "Name": "InputDataWorker",
       "Version": "1.0.0.0_RELEASE"
     },
     "EnvironmentName": "Bayesian",
     "HostName": "IDMSPAPP11",
-    "WorkerInstanceId": "57a0b459-674f-4cb5-b516-566a041f0883",
-    "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\4cb\\88b\\494\\4cb88b49-489c-e911-a2bb-f0921c167866",
+    "WorkerInstanceId": "6f5de73f-b2f1-4c29-b44c-cc144b393771",
+    "WorkingDirectory":"\\\\internal.idm.ctr\\IDM-Test\\home\\psylwester\\workitems\\b\\88b\\94\\b88b49-489c-e911-a2bb-f0921c167866",
     "WorkingDirectorySize": 0
   }]
 }

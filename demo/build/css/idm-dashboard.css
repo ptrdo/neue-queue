@@ -532,8 +532,8 @@ html[data-useragent*="MSIE 10"]
 
 #dashboard .queue.chart figure output > div.empty
 {
-  min-width: 60px;
-  width: 8%;
+  min-width: 80px;
+  width: 6%;
 }
 
 #dashboard .queue.chart figure output > div:last-of-type
