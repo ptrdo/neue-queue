@@ -889,6 +889,8 @@ ins.arrow b {
   background-color: silver;
 }
 
+/* TOOLTIP */
+
 #dashboard .queue.chart ol > li dfn.tooltip
 {
   position: absolute;
@@ -907,7 +909,7 @@ ins.arrow b {
 }
 
 #dashboard .queue.chart .scrolling ol > li dfn.tooltip {
-  position: relative;
+  /* position: relative; */
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip:hover {
@@ -1011,6 +1013,23 @@ ins.arrow b {
   font-size: 100%;
   top: -0.15em;
 }
+
+#dashboard [itemid=QueueView].queue.chart ol > li:hover dfn.tooltip
+{
+  overflow: visible;
+  opacity: 1;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip
+{
+  overflow: visible;
+  opacity: 1;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip  dl {
+  margin-left: 16px;
+}
+
 
 /* DISABLED */
 
@@ -1172,23 +1191,6 @@ ins.hoverover
   background: #006666;
   color: cyan;
 }
-
-#dashboard [itemid=QueueView].queue.chart ol > li:hover dfn.tooltip
-{
-  overflow: hidden;
-  opacity: 0;
-}
-
-#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip
-{
-  overflow: visible;
-  opacity: 1;
-}
-
-#dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip  dl {
-  margin-left: 16px;
-}
-
 
 
 /* RESPONSIVE-QUEUE */

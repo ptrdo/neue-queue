@@ -16,22 +16,5 @@
     "DateCreated": "2019-04-01T23:01:05.4730000Z",
     "LastModified": "2019-04-01T23:01:05.4730000Z",
     "Tags": {}
-  }],
-  "Stats": {
-    "7f8a723d-5f54-e911-a2c0-c4346bcb1554": {
-      "SimulationCount": 4400,
-      "SimulationStateCount": {
-        "Commissioned": 400,
-        "Running": 1000,
-        "Succeeded": 3400
-      }
-    },
-    "aeb59903-d254-e911-a2c0-c4346bcb1554": {
-      "SimulationCount": 4400,
-      "SimulationStateCount": {
-        "Running": 400,
-        "Succeeded": 4000
-      }
-    }
-  }
+  }]
 }

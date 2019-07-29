@@ -346,7 +346,9 @@ const QueueView = function(props) {
     let arrow = event.target.closest("li[itemid]");
     if (!!arrow && !event.target.classList.contains("block")) {
       arrow.classList.toggle("active");
+      arrow.querySelector("dfn.tooltip").removeAttribute("style");
     } else {
+      // click-away...
       view.chart.querySelectorAll("li[itemid].active").forEach(tooltip => {
         tooltip.classList.remove("active");
       });
@@ -365,6 +367,10 @@ const QueueView = function(props) {
   const onScroll = function (event) {
     if (!scrolling) {
       event.target.classList.add("scrolling");
+      event.target.querySelectorAll("li[itemid].active").forEach(tooltip => {
+        // TODO: try harder to allow scroll of tooltips!
+        tooltip.classList.remove("active");
+      })
     } else {
       clearInterval(scrolling);
     }
@@ -388,14 +394,13 @@ const QueueView = function(props) {
       let width = parseInt(item.querySelector("dfn.tooltip dl").offsetWidth);
       let left = parseInt(rect.left);
       let indent = parseInt(item.querySelector("li.block").offsetWidth);
-      let top = parseInt(item.closest("output").getBoundingClientRect().top);
-
-      // let mleft = Math.max(event.pageX, (left + indent)) - left - indent - width;
-      // if ((mleft + left) < 0) { mleft = -20; }
-
-      console.log("mouseenter", item.nodeName, left, width);
-
-      // item.querySelector("dfn.tooltip").style.marginLeft = mleft;
+      let mleft = Math.max(0, Math.max(event.pageX, (left + indent)) - left - indent - width);
+      
+      if (!item.classList.contains("active")) {
+        item.querySelector("dfn.tooltip").style.marginLeft = `${mleft}px`;
+      }
+      
+      //let top = parseInt(item.closest("output").getBoundingClientRect().top);
       // marginTop: !!ff ? 0 : -top /* FF-specific adjustment (due to scrollTop) */
 
       if (!item.classList.contains("detailed")) {
@@ -476,7 +481,7 @@ const QueueView = function(props) {
           } else {
             // @TODO: ORPHAN!
           }
-          li.addEventListener("mouseenter", onMouseEnter);
+          // li.addEventListener("mouseenter", onMouseEnter);
         })
         ol.appendChild(doc);
       }
@@ -508,6 +513,7 @@ const QueueView = function(props) {
               li.appendChild(median);
             }
             fragment.appendChild(li);
+            li.addEventListener("mouseenter", onMouseEnter);
           }
         });
       });
@@ -533,7 +539,6 @@ const QueueView = function(props) {
           li.appendChild(a);
           li.appendChild(tip);
           li.setAttribute("title", member.Name);
-          console.log(member["State"]||member["SimulationState"]||"DefaultState",member);
           li.classList.add(member["State"]||member["SimulationState"]||"DefaultState", type);
           if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
             li.classList.add("process");
@@ -541,6 +546,7 @@ const QueueView = function(props) {
           li.style.flexGrow = /^Work/i.test(type) ? 1 : 10;
           li.style.marginRight = "22px";
           fragment.appendChild(li);
+          li.addEventListener("mouseenter", onMouseEnter);
         }
       });
       fragment.querySelector("li:last-of-type").style.marginRight = "0";
