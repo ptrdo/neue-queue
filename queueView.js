@@ -147,6 +147,13 @@ const QueueView = function(props) {
     }
   };
 
+  /**
+   * collection receives, transforms, and supplies data for display.
+   *
+   * @private
+   * @property {Object} input (unused) is internal cache of Request Response.
+   * @property {Object} output is the coalesced and transformed data for display.
+   */
   const collection = {
 
     input: {
@@ -267,6 +274,10 @@ const QueueView = function(props) {
       Object.assign(target,  !!pristine ? source : this.groomDates(source));
     },
 
+    /**
+     * advance emulates a passage of time by moving mock data through states toward completion.
+     * @param {Number} rate is the relative speed to progress items (default:0.1).
+     */
     advance: function (rate=.1) {
       Object.values(this.output).forEach(value => {
         if (Array.isArray(value)) {
@@ -296,6 +307,11 @@ const QueueView = function(props) {
       });
     },
 
+    /**
+     * update is the primary setter of new Request Response data.
+     * @param data
+     * @return {collection.output|{}}
+     */
     update: function (data) {
       this.output = this.prepPriorities(this.groomDates(data));
       return this.output;
@@ -319,14 +335,14 @@ const QueueView = function(props) {
     return new Date(Date.now()-Math.floor(1000*60*60*hours)).toISOString();
   };
 
+  /* EVENT-HANDLERS */
+
   /**
    * onClick handles view's click interactions.
    * @param {Event}
    */
   const onClick = function(event) {
     event.preventDefault();
-    console.log("onClick", event);
-
     let arrow = event.target.closest("li[itemid]");
     if (!!arrow && !event.target.classList.contains("block")) {
       arrow.classList.toggle("active");
@@ -341,8 +357,8 @@ const QueueView = function(props) {
    * unClick removes listeners to view's interaction.
    * @todo manage listeners
    */
-  const unClick = function() {
-    view.chart.removeEventListener("click", onClick);
+  const unClick = function(holder) {
+    holder.removeEventListener("click", onClick);
   };
   
   let scrolling = 0;
@@ -358,9 +374,51 @@ const QueueView = function(props) {
     }, 500);
   };
   
-  const unScroll = function () {
-    view.chart.removeEventListener("scroll", onScroll);
+  const unScroll = function (holder) {
+    holder.removeEventListener("scroll", onScroll);
   };
+
+  const onMouseEnter = function (event) {
+
+    let item = event.target.closest("li[itemid]");
+
+    if (!!item) {
+      event.stopPropagation();
+      let rect = item.getBoundingClientRect();
+      let width = parseInt(item.querySelector("dfn.tooltip dl").offsetWidth);
+      let left = parseInt(rect.left);
+      let indent = parseInt(item.querySelector("li.block").offsetWidth);
+      let top = parseInt(item.closest("output").getBoundingClientRect().top);
+
+      // let mleft = Math.max(event.pageX, (left + indent)) - left - indent - width;
+      // if ((mleft + left) < 0) { mleft = -20; }
+
+      console.log("mouseenter", item.nodeName, left, width);
+
+      // item.querySelector("dfn.tooltip").style.marginLeft = mleft;
+      // marginTop: !!ff ? 0 : -top /* FF-specific adjustment (due to scrollTop) */
+
+      if (!item.classList.contains("detailed")) {
+        /*
+        if (!!item.data("id")) {
+          fetchItemDetail($item.data("id"), function (data) {
+            if (!!data && "Name" in data) {
+              $item.find("dt:first").text(data.Name);
+            }
+          });
+        }
+        */
+        item.classList.add("detailed");
+      }
+    }
+  };
+
+  const unMouseEnter = function (holder) {
+    holder.removeEventListener("mouseenter",onMouseEnter);
+  };
+
+
+  /* VIEW */
 
   const render = function(callback) {
 
@@ -418,6 +476,7 @@ const QueueView = function(props) {
           } else {
             // @TODO: ORPHAN!
           }
+          li.addEventListener("mouseenter", onMouseEnter);
         })
         ol.appendChild(doc);
       }
@@ -557,8 +616,8 @@ const QueueView = function(props) {
    */
   const destroy = function (reset) {
     if (!!view.chart) {
-      unClick();
-      unScroll();
+      unClick(view.chart);
+      unScroll(view.chart);
       while (view.chart.firstChild) {
         view.chart.removeChild(view.chart.firstChild);
       }
