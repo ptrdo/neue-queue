@@ -82,7 +82,7 @@ body.dashboard #content section#dashboard
   flex-shrink: 1;
 
   -webkit-flex-basis: 49%;
-/*-ms-flex-preferred-size: 49%;*/
+  /*-ms-flex-preferred-size: 49%;*/
   flex-basis: 49%;
 
   width: 49%;
@@ -95,11 +95,16 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
 
 #dashboard .chart figure
 {
-  background: white;
+  background-color: white;
   border: 1px solid white;
-  transition-property: border;
-  transition-duration: 300ms;
-  transition-timing-function: ease-in;
+  transition: border 300ms ease-in;
+  transition: background-color 300ms ease-out;
+}
+
+#dashboard .chart figure.process
+{
+  background-color: palegoldenrod;
+  transition: none;
 }
 
 #dashboard .chart:not(.no-data) figure:hover
@@ -174,12 +179,12 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
 
 #dashboard .chart figcaption legend
 {
-	width: auto;
+  width: auto;
   float: right;
   display: inline-block;
   margin: 6px;
-	font-size: unset;
-	border: none;
+  font-size: unset;
+  border: none;
 }
 
 #dashboard .chart figure output
@@ -194,11 +199,6 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
 #dashboard .chart.no-data figure output
 {
   background: whitesmoke;
-}
-
-#dashboard .chart figure output.process
-{
-  background: palegoldenrod;
 }
 
 /* CHART HACK IE 10 */
@@ -391,9 +391,9 @@ html[data-useragent*="MSIE 10"]
   box-sizing: border-box;
 }
 
-  #dashboard .highcharts-legend-head button:hover {
-    color: #0072a2;
-  }
+#dashboard .highcharts-legend-head button:hover {
+  color: #0072a2;
+}
 
 #dashboard .minimized .highcharts-legend-head button {
   display: none;
@@ -409,7 +409,7 @@ html[data-useragent*="MSIE 10"]
   display: none;
 }
 
-#dashboard .highcharts-legend > .highcharts-legend-item 
+#dashboard .highcharts-legend > .highcharts-legend-item
 {
   width: 110px;
   height: 25px;
@@ -451,7 +451,7 @@ html[data-useragent*="MSIE 10"]
 #dashboard .queue.chart legend span.CommissionRequested,
 #dashboard .queue.chart legend span.Commissioned,
 #dashboard .queue.chart legend span.Commissioning {
-   color: lightseagreen;
+  color: lightseagreen;
 }
 #dashboard .queue.chart legend span.Running { color: orange; }
 #dashboard .queue.chart legend span.Waiting { color: cornflowerblue; }
@@ -461,7 +461,7 @@ html[data-useragent*="MSIE 10"]
 #dashboard .queue.chart legend span.ResumeRequested,
 #dashboard .queue.chart legend span.Resumed,
 #dashboard .queue.chart legend span.Resuming {
-   color: springgreen;
+  color: springgreen;
 }
 #dashboard .queue.chart legend span.Succeeded { color: seagreen; }
 #dashboard .queue.chart legend span.Failed { color: red; }
@@ -487,8 +487,8 @@ html[data-useragent*="MSIE 10"]
   overflow-y: auto;
   max-height: 300px;
   border-top: 1px dotted silver;
-	font-size: 100%;
-	font-size: unset;
+  font-size: 100%;
+  font-size: unset;
 }
 
 #dashboard .queue.chart figure output {
@@ -601,7 +601,7 @@ html[data-useragent*="MSIE 10"]
   justify-content: flex-end;
   margin: 10px;
   width: 100%;
-	min-width: 2em; /* for when a bucket has very many items */
+  min-width: 2em; /* for when a bucket has very many items */
   opacity: 1;
 
   margin-left: 10px;
@@ -693,7 +693,7 @@ html[data-useragent*="MSIE 10"]
 #dashboard .queue.chart figure output ul.elsewhere > li.block,
 #dashboard .queue.chart figure output ul.elsewhere > li.flex-faux
 {
-/* Work Item Queue: unauthorized Environments */
+  /* Work Item Queue: unauthorized Environments */
   flex-grow: 0 !important;
   width: 0 !important;
 }
@@ -749,7 +749,7 @@ ins.arrow b {
   width: 2em;
   height: 2em;
   background: black;
- -webkit-transform: rotate(45deg) translate(-1em, 1em);
+  -webkit-transform: rotate(45deg) translate(-1em, 1em);
   transform: rotate(45deg) translate(-1em, 1em);
 
   /* serifed */
@@ -761,9 +761,9 @@ ins.arrow b {
 
 #dashboard .queue.chart ul > li > a
 {
-	display: inline-block;
-	width: 100%;
-	height: inherit;
+  display: inline-block;
+  width: 100%;
+  height: inherit;
 }
 
 #dashboard .queue.chart ul > li > a > var
@@ -897,19 +897,14 @@ ins.arrow b {
   display: inline-block;
   height: 0;
   width: 0;
-  margin: 0;
   overflow: hidden;
   z-index: 999;
 
   opacity: 0;
   transition: all 50ms ease-out;
 
-	font-size: 100%;
-	font-size: unset;
-}
-
-#dashboard .queue.chart .scrolling ol > li dfn.tooltip {
-  /* position: relative; */
+  font-size: 100%;
+  font-size: unset;
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip:hover {
@@ -985,7 +980,7 @@ ins.arrow b {
 {
   content: ":";
   padding-right: 4px;
-	margin-right: 6px;
+  margin-right: 6px;
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip data
@@ -1004,8 +999,8 @@ ins.arrow b {
 {
   border: none;
   border-top: 1px solid silver;
-	margin-top: 8px;
-	margin-bottom: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip sup
@@ -1039,7 +1034,7 @@ ins.arrow b {
   -ms-flex-order: 100;
   order: 100;
   -webkit-flex-basis: 100%;
-/*-ms-flex-preferred-size: 100%;*/
+  /*-ms-flex-preferred-size: 100%;*/
   flex-basis: 100%;
   width: 100%;
   margin: -5px -15px;
@@ -1165,7 +1160,7 @@ ins.hoverover
   color: lightblue;
 }
 
-#dashboard .queue.chart figure output ul > li.more i.material-icons 
+#dashboard .queue.chart figure output ul > li.more i.material-icons
 {
   vertical-align: middle;
   line-height: 1.3;
@@ -1174,13 +1169,13 @@ ins.hoverover
 }
 
 #dashboard .queue.chart figure output ul > li.more:hover,
-#dashboard .queue.chart figure output li.active ul > li.more 
+#dashboard .queue.chart figure output li.active ul > li.more
 {
   background: cyan;
   color: darkcyan;
 }
 
-#dashboard .queue.chart figure output li.active ul > li.more:hover 
+#dashboard .queue.chart figure output li.active ul > li.more:hover
 {  background: darkcyan;
   color: lightblue;
 }

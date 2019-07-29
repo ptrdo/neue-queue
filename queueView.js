@@ -82,7 +82,7 @@ const QueueView = function(props) {
     endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps2.idmod.org/api/")),
 
     workFlowScopeInDays: 1,
-    workFlowsActiveOnly: false,
+    workFlowsActiveOnly: true,
 
     set workFlowScope (num) {
       this.workFlowScopeInDays = /^\d+\.?\d*$/.test(num) ? parseFloat(num) : 1; // default
@@ -119,6 +119,9 @@ const QueueView = function(props) {
     get isSimulations () {
       return this.entity === MODE.Simulations;
     },
+    get isWorkItems () {
+      return this.entity === MODE.WorkItems;
+    },
     get mode () {
       return this.entity;
     }
@@ -142,6 +145,10 @@ const QueueView = function(props) {
       return this.root;
     },
 
+    get figure() {
+      return this.root.querySelector("figure") || this.root;
+    },
+
     get chart() {
       return this.output;
     }
@@ -163,8 +170,8 @@ const QueueView = function(props) {
 
     /**
      * groomDates prepares Date values for human consumption.
-     * @param {Object} data is the source of values to groom. 
-     * @return {Object} the groomed data. 
+     * @param {Object} data is the source of values to groom.
+     * @return {Object} the groomed data.
      */
     groomDates: function (data) {
       const vitalizeMockDate = function (dateString) {
@@ -215,7 +222,7 @@ const QueueView = function(props) {
     },
 
     /**
-     * prepPriorities establishes priority buckets and scoring. 
+     * prepPriorities establishes priority buckets and scoring.
      * @param {Object} data is likely a QueueState API Response.
      * @return {Object} the prepped data.
      */
@@ -247,7 +254,7 @@ const QueueView = function(props) {
 
     /**
      * merge assigns new info to any Collection by aligning existing Ids with incoming Ids.
-     * @param {Object} data is the new info to merge into this Collection. 
+     * @param {Object} data is the new info to merge into this Collection.
      */
     merge: function(data) {
       let updates = this.groomDates(data);
@@ -266,9 +273,9 @@ const QueueView = function(props) {
 
     /**
      * augment puts new info at a known target of data.
-     * @param {Object} target is the destination of new info. 
+     * @param {Object} target is the destination of new info.
      * @param {Object} source is the new info.
-     * @param {Boolean} pristine maintains new info without grooming dates. 
+     * @param {Boolean} pristine maintains new info without grooming dates.
      */
     augment: function(target, source, pristine) {
       Object.assign(target,  !!pristine ? source : this.groomDates(source));
@@ -343,6 +350,8 @@ const QueueView = function(props) {
    */
   const onClick = function(event) {
     event.preventDefault();
+    console.log("onClick", event);
+
     let arrow = event.target.closest("li[itemid]");
     if (!!arrow && !event.target.classList.contains("block")) {
       arrow.classList.toggle("active");
@@ -362,7 +371,7 @@ const QueueView = function(props) {
   const unClick = function(holder) {
     holder.removeEventListener("click", onClick);
   };
-  
+
   let scrolling = 0;
   const onScroll = function (event) {
     if (!scrolling) {
@@ -379,7 +388,7 @@ const QueueView = function(props) {
       scrolling = 0;
     }, 500);
   };
-  
+
   const unScroll = function (holder) {
     holder.removeEventListener("scroll", onScroll);
   };
@@ -395,11 +404,15 @@ const QueueView = function(props) {
       let left = parseInt(rect.left);
       let indent = parseInt(item.querySelector("li.block").offsetWidth);
       let mleft = Math.max(0, Math.max(event.pageX, (left + indent)) - left - indent - width);
-      
+      let mtop = view.chart.scrollTop;
+
       if (!item.classList.contains("active")) {
         item.querySelector("dfn.tooltip").style.marginLeft = `${mleft}px`;
       }
-      
+      if (!!mtop) {
+        item.querySelector("dfn.tooltip").style.marginTop = `-${mtop}px`;
+      }
+
       //let top = parseInt(item.closest("output").getBoundingClientRect().top);
       // marginTop: !!ff ? 0 : -top /* FF-specific adjustment (due to scrollTop) */
 
@@ -442,6 +455,9 @@ const QueueView = function(props) {
       let doc = document.createDocumentFragment();
       let ol = parent.querySelector("OL");
       let data = collection.latest[key]||[];
+      if (config.isWorkItems) {
+        data = data.filter(item => _.has(item, "Active") || !config.activeWorkFlowsOnly)
+      }
       if (_.isEmpty(data)) {
         let li = document.createElement("LI");
         li.appendChild(document.createTextNode("empty"));
@@ -449,7 +465,6 @@ const QueueView = function(props) {
         parent.classList.add("empty");
       } else {
         data.forEach(item => {
-
           let li = document.createElement("LI");
           let ul = document.createElement("UL");
           let block = document.createElement("LI");
@@ -481,8 +496,7 @@ const QueueView = function(props) {
           } else {
             // @TODO: ORPHAN!
           }
-          // li.addEventListener("mouseenter", onMouseEnter);
-        })
+        });
         ol.appendChild(doc);
       }
     };
@@ -581,21 +595,19 @@ const QueueView = function(props) {
     };
 
     if (!!view.chart) {
+      // @TODO: Diff with Collection! 
+      console.warn(`${config.chartContainer} was already rendered!`, view.element);
+      destroy();
+    }
 
-      console.error(`${config.chartContainer} is already rendered!`, view.element);
-      if (!!callback && callback instanceof Function) {
-        callback(view.element);
-      }
+    view.parent = document.querySelector(config.selector);
+    view.chart = view.parent.querySelector(config.chartContainer);
+    view.chart.addEventListener("scroll", onScroll);
+    view.chart.addEventListener("click", onClick);
+    view.figure.classList.add("process");
 
-    } else {
-
-      view.parent = document.querySelector(config.selector);
-      view.chart = view.parent.querySelector(config.chartContainer);
-      view.chart.addEventListener("scroll", onScroll);
-      view.chart.addEventListener("click", onClick);
-      view.chart.classList.add("process");
-
-      // setTimeout(function () {
+    wait(10)
+    .then(() => {
       for (let item in PRIORITY) {
         let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
         setQueueItems(bucket, PRIORITY[item].key);
@@ -604,10 +616,11 @@ const QueueView = function(props) {
       if (!!callback && callback instanceof Function) {
         callback(view.element);
       }
-      // }, 0);
+    });
 
-      wait(300).then(() => view.chart.classList.remove("process"));
-    }
+    wait(300)
+    .then(() => view.figure.classList.remove("process"));
+
   };
 
   /**
@@ -671,8 +684,8 @@ const QueueView = function(props) {
   };
 
   /**
-   * fetchWorkFlow is an iterative call upon every item in the Response of fetchWorkItems(); 
-   * @param {Integer} cursor is the position within the TopLevel items within the scope of concern. 
+   * fetchWorkFlow is an iterative call upon every item in the Response of fetchWorkItems();
+   * @param {Integer} cursor is the position within the TopLevel items within the scope of concern.
    */
   const fetchWorkFlow = function (cursor) {
     let item, guid, url, count, last;
@@ -696,7 +709,7 @@ const QueueView = function(props) {
             // this is a singular Work Item
             if (!!last) {
               wait(0).then(() => render());
-            } 
+            }
           }
         })
         .catch(function (error) {
@@ -708,7 +721,7 @@ const QueueView = function(props) {
       } else {
         fetchWorkFlow(cursor+1); // goto next
       }
-      
+
     } else {
 
       // finish or continue
@@ -717,13 +730,13 @@ const QueueView = function(props) {
   };
 
   /**
-   * fetchWorkFlowItems is an iterative call upon every item in the Response of fetchWorkFlow(); 
-   * @param {Object} item is the Collection node to be augmented. 
+   * fetchWorkFlowItems is an iterative call upon every item in the Response of fetchWorkFlow();
+   * @param {Object} item is the Collection node to be augmented.
    * @param {Integer} cursor is the position within the target node's collection of "Related" items.
    * @param {Boolean} last is true when this is the final workflow to populate.
    */
   const fetchWorkFlowItems = function (item, cursor, last) {
-    let relation, entity, guid, url, index;
+    let relation, entity, guid, url, index, node;
     let flow = _.get(item, "Flow");
     if (!!flow && "Related" in flow && -1 < cursor && cursor < flow["Related"].length) {
       relation = flow["Related"][cursor];
@@ -734,9 +747,13 @@ const QueueView = function(props) {
         getSecure(url)
         .then(data => {
           index = data[`${entity}s`].findIndex(item => { return item.Id == guid });
-          collection.augment(relation, data[`${entity}s`][index]);
+          node = data[`${entity}s`][index];
+          collection.augment(relation, node);
+          if (_.intersection(_.concat(STATE.PreActive,STATE.Active),[node["State"],node["SimulationState"]]).length > 0) {
+            item["Active"] = true;
+          }
           if (/Experiment/i.test(entity)) {
-            fetchWorkFlowItemStats(relation, last);
+            fetchWorkFlowItemStats(relation, last, info => { item["Active"] = info["Active"] });
             last = false;
           }
         })
@@ -763,8 +780,10 @@ const QueueView = function(props) {
    * fetchWorkFlowItemStats is a secondary call upon every Experiment in the Response of fetchWorkFlow();
    * @param {Object} item is the Collection node to be augmented.
    * @param {Boolean} last is true when this is the final workflow to populate.
+   * @param {Function} callback
    */
-  const fetchWorkFlowItemStats = function (item, last) {
+  const fetchWorkFlowItemStats = function (item, last, callback) {
+    let active = false;
     let guid = _.get(item, "Id");
     let entity = _.get(item, "ObjectType");
     let params = "Stats?statsoperations=simulationcount,simulationstatecount&format=json";
@@ -773,6 +792,9 @@ const QueueView = function(props) {
     .then(data => {
       if (_.has(data, ["Stats", item.Id])) {
         collection.augment(item, data.Stats[item.Id]);
+        if (_.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(data.Stats[item.Id]["SimulationStateCount"])).length > 0) {
+          active = true;
+        }
       } else {
         console.error("queueView.fetchWorkFlowItemStats", "Unexpected Mock Data", data);
       }
@@ -783,6 +805,9 @@ const QueueView = function(props) {
     .finally(function () {
       if (!!last) {
         wait(100).then(() => render());
+      }
+      if (!!callback && callback instanceof Function) {
+        callback({ Id: guid, Active: active });
       }
     });
   };
@@ -814,29 +839,29 @@ const QueueView = function(props) {
     let primary = config.mockURL + "Queue.json";
     let secondary = config.mockURL + "Stats.json";
     fetch(primary, { method:"GET" })
-    .then(response => response.json())
-    .then(data => collection.update(data.QueueState))
-    .then(response => fetch(secondary, { method:"GET" }))
-    .then(response => response.json())
-    .then(data => { collection.merge(data.Stats); return collection.latest; })
-    .then(update => new Promise(function(resolve) {
-      if (successCallback && successCallback instanceof Function) {
-        successCallback();
-      }
-      setTimeout(function () {
-        resolve(update);
-      }, 0);
-    }))
-    .catch(function (error) {
-      if (failureCallback && failureCallback instanceof Function) {
-        failureCallback(error);
-      } else {
-        console.error("queueView.fetchMockSimulations", error);
-      }
-    })
-    .finally(function () {
-      console.log("Fetched Mock Simulation Data:", primary, secondary);
-    });
+        .then(response => response.json())
+        .then(data => collection.update(data.QueueState))
+        .then(response => fetch(secondary, { method:"GET" }))
+        .then(response => response.json())
+        .then(data => { collection.merge(data.Stats); return collection.latest; })
+        .then(update => new Promise(function(resolve) {
+          if (successCallback && successCallback instanceof Function) {
+            successCallback();
+          }
+          setTimeout(function () {
+            resolve(update);
+          }, 0);
+        }))
+        .catch(function (error) {
+          if (failureCallback && failureCallback instanceof Function) {
+            failureCallback(error);
+          } else {
+            console.error("queueView.fetchMockSimulations", error);
+          }
+        })
+        .finally(function () {
+          console.log("Fetched Mock Simulation Data:", primary, secondary);
+        });
   };
 
   const addSourceSelect = function() {
@@ -877,6 +902,7 @@ const QueueView = function(props) {
     target.prepend(fragment);
     input.addEventListener("change", function(event) {
       event.preventDefault();
+      view.figure.classList.add("process");
       if (!/^[0-9]$/.test(event.target.value)) {
         config.mocked = true;
         destroy(true);
@@ -950,13 +976,24 @@ const QueueView = function(props) {
           }
         }
       } else {
-
-        // dangerous, but insulated by view and module.
-        Object.assign(config, (overrides||{}));
-        destroy(true); // TODO: Only if need be.
-        collection.update(config.queue);
-        collection.merge(config.stats);
-        render(callback);
+        if (config.isSimulations) {
+          // dangerous, but insulated by view and module.
+          Object.assign(config, (overrides || {}));
+          destroy(true); // TODO: Only if need be.
+          collection.update(config.queue);
+          collection.merge(config.stats);
+          render(callback);
+        } else {
+          fetchWorkItems(
+          () => {
+            /* successCallback */
+            () => view.figure.classList.remove("process");
+          },
+          () => {
+            /* successCallback */
+            () => view.figure.classList.remove("process");
+          });
+        }
       }
     },
 
