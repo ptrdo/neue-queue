@@ -21,8 +21,14 @@
     "FirstCreateTime": "2019-02-07T22:31:36.9600000Z",
     "LastCreateTime": "2019-02-07T22:31:40.5700000Z",
     "NodeGroup": "emod_abcd"
-  }],
-    "AboveNormal": [{
+  }], 
+  "AboveNormal": [{
+    "Owner": "psylwester",
+    "SimulationCount": 1,
+    "FirstCreateTime": "2019-07-31T19:02:10.1630000Z",
+    "LastCreateTime": "2019-07-31T19:02:10.1630000Z",
+    "NodeGroup": "emod_abcd"
+  }, {
     "ExperimentId": "efad87e3-7529-e911-a2bf-c4346bcb1554",
     "Owner": "allee",
     "SimulationCount": 100,
@@ -44,7 +50,7 @@
     "LastCreateTime": "2019-02-08T04:26:38.0570000Z",
     "NodeGroup": "emod_32cores"
   }],
-    "Highest": [{
+  "Highest": [{
     "ExperimentId": "1fdf335d-c72b-e911-a2c5-c4346bcb7273",
     "Owner": "pselvaraj",
     "SimulationCount": 500,

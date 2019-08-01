@@ -45,6 +45,7 @@ const QueueView = function(props) {
 
   const STATE = {
     "PreActive": [
+      "Orphan",
       "Created",
       "QueuedForCommission",
       "CommissionRequested",
@@ -79,7 +80,7 @@ const QueueView = function(props) {
     mocked: false,
     mockRoot: ("comps" in window ? "/app/dashboard/data/" : "mock/"),
     mockPath: "Simulations/1/",
-    endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps2.idmod.org/api/")),
+    endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps-dev.idmod.org/api/")),
 
     workFlowScopeInDays: 1,
     workFlowsActiveOnly: true,
@@ -196,14 +197,14 @@ const QueueView = function(props) {
           basisString = basisDate.toLocaleDateString("en-US",{ month: "long", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
           elapsedHours = ((Date.now() - basisDate)/1000/60/60).toFixed(1);
           node["ElapsedHours"] = elapsedHours;
-          node["ElapsedString"] = elapsedHours > .1 ? "~" + elapsedHours + " hrs ago": "moments ago";
+          node["Elapsed"] = elapsedHours > .1 ? "~" + elapsedHours + " hrs ago": "moments ago";
           node["ElapsedStartString"] = basisString;
         }
       };
       if ("LastCreateTime" in data || "DateCreated" in data) {
         // likely a simple entity node
         dateTransform(data);
-      } else if ("Normal" in data) {
+      } else if (_.intersection(_.map(PRIORITY, "key"), Object.keys(data)).length > 0) {
         // likely a root collection of priority buckets
         Object.values(data).forEach(value => {
           if (Array.isArray(value)) {
@@ -269,6 +270,33 @@ const QueueView = function(props) {
           });
         }
       });
+    },
+
+    /**
+     * findItemById is a deep search for a node containing the given GUID. 
+     * @param {String} guid is the identifier to search for.
+     * @returns {null|Object} the node found, or null if not. 
+     */
+    findItemById: function(guid) {
+      let found = null;
+      for (let bucket in this.output) {
+        let related, entity = _.find(this.output[bucket], function(item) { 
+          let match = guid === item.Id || guid === item.ExperimentId; 
+          if (!match && _.has(item, "Flow.Related")) {
+            item.Flow.Related.forEach(relation => {
+              if (guid === relation.Id || guid === relation.ExperimentId) {
+                related = relation; 
+              }
+            });
+          }
+          return match;
+        });
+        if (!!entity || !!related) {
+          found = entity||related;
+          break;
+        }
+      }
+      return found; 
     },
 
     /**
@@ -341,6 +369,18 @@ const QueueView = function(props) {
     let hours = 24 * config.daysOfWorkFlows;
     return new Date(Date.now()-Math.floor(1000*60*60*hours)).toISOString();
   };
+  
+  const deduceEntityType = function (obj) {
+    if ("ExperimentId" in obj) {
+      return "Experiment";
+    } else if ("Worker" in obj) {
+      return "WorkItem";
+    } else if ("ObjectType" in obj) {
+      return obj.ObjectType; 
+    } else {
+      return "Simulation";
+    }
+  };
 
   /* EVENT-HANDLERS */
 
@@ -350,7 +390,7 @@ const QueueView = function(props) {
    */
   const onClick = function(event) {
     event.preventDefault();
-    console.log("onClick", event);
+    // console.log("onClick", event);
 
     let arrow = event.target.closest("li[itemid]");
     if (!!arrow && !event.target.classList.contains("block")) {
@@ -388,7 +428,7 @@ const QueueView = function(props) {
       scrolling = 0;
     }, 500);
   };
-
+  
   const unScroll = function (holder) {
     holder.removeEventListener("scroll", onScroll);
   };
@@ -399,40 +439,48 @@ const QueueView = function(props) {
 
     if (!!item) {
       event.stopPropagation();
+      let guid = item.getAttribute("itemid");
       let rect = item.getBoundingClientRect();
       let width = parseInt(item.querySelector("dfn.tooltip dl").offsetWidth);
       let left = parseInt(rect.left);
       let indent = parseInt(item.querySelector("li.block").offsetWidth);
       let mleft = Math.max(0, Math.max(event.pageX, (left + indent)) - left - indent - width);
       let mtop = view.chart.scrollTop;
-
+      
       if (!item.classList.contains("active")) {
         item.querySelector("dfn.tooltip").style.marginLeft = `${mleft}px`;
       }
       if (!!mtop) {
         item.querySelector("dfn.tooltip").style.marginTop = `-${mtop}px`;
       }
-
-      //let top = parseInt(item.closest("output").getBoundingClientRect().top);
+      
+      // @TODO: Verify this is no longer needed...
+      // let top = parseInt(item.closest("output").getBoundingClientRect().top);
       // marginTop: !!ff ? 0 : -top /* FF-specific adjustment (due to scrollTop) */
 
-      if (!item.classList.contains("detailed")) {
-        /*
-        if (!!item.data("id")) {
-          fetchItemDetail($item.data("id"), function (data) {
-            if (!!data && "Name" in data) {
-              $item.find("dt:first").text(data.Name);
+      if (config.isSimulations && !item.classList.contains("detailed")) {
+        if (!!guid) {
+          fetchItemDetail(guid, function (data) {
+            if (!!data) {
+              if ("Name" in data) {
+                item.querySelector("dt").innerText = data.Name;
+              }
+              if ("SimulationRuntime" in data) {
+                appendTooltip(item, data["SimulationRuntime"], ["-","Min","Median","Max"]);
+              }
+              if ("SimulationUsage" in data) {
+                appendTooltip(item, data["SimulationUsage"], ["-","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
+              }
             }
           });
         }
-        */
         item.classList.add("detailed");
       }
     }
   };
 
   const unMouseEnter = function (holder) {
-    holder.removeEventListener("mouseenter",onMouseEnter);
+    holder.removeEventListener("mouseenter", onMouseEnter);
   };
 
 
@@ -494,7 +542,8 @@ const QueueView = function(props) {
             setQueueItemDetails(block, item);
             setQueueItemFlow(ul, item.Flow);
           } else {
-            // @TODO: ORPHAN!
+            setQueueItemDetails(block, item);
+            setQueueItemSegments(ul, Object.assign(item, {"SimulationStateCount":{"Orphan":1}}));
           }
         });
         ol.appendChild(doc);
@@ -566,6 +615,7 @@ const QueueView = function(props) {
       fragment.querySelector("li:last-of-type").style.marginRight = "0";
     };
     const setQueueItemDetails = function (fragment, info) {
+      /* TODO: coalesce/call appendTooltip(); */
       let implement = function (key) {
         let dd = document.createElement("DD");
         let name = document.createElement("VAR");
@@ -584,10 +634,13 @@ const QueueView = function(props) {
 
       if (_.has(info, "SimulationStateCount")) {
         dt.appendChild(document.createTextNode("Experiment"));
-        ["Owner","ExperimentId","NodeGroup","ElapsedString","SimulationCount"].forEach(implement);
+        ["Owner","ExperimentId","NodeGroup","Elapsed","SimulationCount"].forEach(implement);
       } else if (_.has(info, "Flow")) {
-        dt.appendChild(document.createTextNode("Work Flow"));
-        ["Owner","Id","EnvironmentName","ElapsedString","RelatedCount"].forEach(implement);
+        dt.appendChild(document.createTextNode("Workflow"));
+        ["Owner","Id","EnvironmentName","Elapsed","RelatedCount"].forEach(implement);
+      } else {
+        dt.appendChild(document.createTextNode("Orphan Simulation"));
+        ["Owner",,"NodeGroup","Elapsed"].forEach(implement);
       }
 
       dfn.classList.add("tooltip");
@@ -605,7 +658,7 @@ const QueueView = function(props) {
     view.chart.addEventListener("scroll", onScroll);
     view.chart.addEventListener("click", onClick);
     view.figure.classList.add("process");
-
+  
     wait(10)
     .then(() => {
       for (let item in PRIORITY) {
@@ -617,10 +670,49 @@ const QueueView = function(props) {
         callback(view.element);
       }
     });
-
+    
     wait(300)
     .then(() => view.figure.classList.remove("process"));
+  };
 
+  /**
+   * appendTooltip applies secondary Response data to pre-built tooltip.
+   * NOTE: A hyphen "-" passed as key will embed an <hr> divider.
+   * NOTE: Unfound keys are passed-over and will not be appended.
+   * 
+   * @param {DOMElement} ele is the tooltip element (e/g dfn.tooltip).
+   * @param {Array} keys are the properties to be found in the info.
+   */
+  const appendTooltip = function (ele, info, keys) {
+    let dl = ele.querySelector("DL");
+    let implement = function (key) {
+      let val = 0;
+      let dd = document.createElement("DD");
+      let name = document.createElement("VAR");
+      let value = document.createElement("DATA");
+      if (/^-$/.test(key)) {
+        let divider = document.createElement("HR");
+        dd.appendChild(divider);
+        dl.appendChild(dd);
+      } else if (key in info) {
+        name.appendChild(document.createTextNode(key));
+        if (/^(Min|Median|Max|TotalCoreTimeUsage)$/i.test(key)) {
+          val = parseInt(info[key]);
+          val = val < 1000*60*60 ? (val/1000/60).toFixed(2) + " mins" : (val/1000/60/60).toFixed(2) + " hrs"
+        } else if (/TotalDiskUsage/i.test(key)) {
+          val = parseInt(info[key]);
+          val = (Math.round(val / 10485.76) / 100).toFixed(2).toLocaleString() + " MiB";
+        } else {
+          val = info[key];
+        }
+        value.appendChild(document.createTextNode(val));
+        dd.setAttribute("itemprop", key);
+        dd.appendChild(name);
+        dd.appendChild(value);
+        dl.appendChild(dd);
+      }
+    };
+    keys.forEach(implement);
   };
 
   /**
@@ -679,7 +771,7 @@ const QueueView = function(props) {
       }
     })
     .finally(function () {
-      console.log("Fetched ALL Work Items!");
+      // console.log("Fetched ALL Work Items!");
     });
   };
 
@@ -709,11 +801,11 @@ const QueueView = function(props) {
             // this is a singular Work Item
             if (!!last) {
               wait(0).then(() => render());
-            }
+            } 
           }
         })
         .catch(function (error) {
-          ("queueView.fetchWorkFlow", error);
+          console.error("queueView.fetchWorkFlow", error);
         })
         .finally(function () {
           fetchWorkFlow(cursor+1); // goto next
@@ -725,7 +817,7 @@ const QueueView = function(props) {
     } else {
 
       // finish or continue
-      console.log("Fetched ALL Related!");
+      // console.log("Fetched ALL Related!");
     }
   };
 
@@ -758,7 +850,7 @@ const QueueView = function(props) {
           }
         })
         .catch(function (error) {
-          ("queueView.fetchWorkFlowItems", error);
+          console.error("queueView.fetchWorkFlowItems", error);
         })
         .finally(function () {
           fetchWorkFlowItems(item,cursor+1, last); // goto next
@@ -780,12 +872,12 @@ const QueueView = function(props) {
    * fetchWorkFlowItemStats is a secondary call upon every Experiment in the Response of fetchWorkFlow();
    * @param {Object} item is the Collection node to be augmented.
    * @param {Boolean} last is true when this is the final workflow to populate.
-   * @param {Function} callback
+   * @param {Function} callback 
    */
   const fetchWorkFlowItemStats = function (item, last, callback) {
     let active = false;
     let guid = _.get(item, "Id");
-    let entity = _.get(item, "ObjectType");
+    let entity = deduceEntityType(item);
     let params = "Stats?statsoperations=simulationcount,simulationstatecount&format=json";
     let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s/${guid}/${params}`;
     getSecure(url)
@@ -810,6 +902,55 @@ const QueueView = function(props) {
         callback({ Id: guid, Active: active });
       }
     });
+  };
+
+  /**
+   * fetchItemDetails is a secondary call upon interaction with chart items. 
+   * @param {String} guid is the item of interest which has been interacted with (e/g MouseEnter).
+   * @param {Function} callback returns the data (pointer) to the collection item (or null if not found). 
+   */
+  const fetchItemDetail = function (guid, callback) {
+    let item = collection.findItemById(guid);
+    if (!!item) {
+      let entity = deduceEntityType(item);
+      if (entity === "Experiment") {
+        let params = "statsoperations=simulationruntime,simulationusage&format=json"; // ,simulationcount,simulationstatecount
+        let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}&${params}`;
+        getSecure(url)
+        .then(data => {
+          let updates = 0;
+          if (_.has(data, "Experiments") && Array.isArray(data.Experiments)) {
+            ++updates;
+            collection.augment(item, data.Experiments.filter(item => item.Id === guid)[0]||{});
+          }
+          if (_.has(data, ["Stats", guid])) {
+            ++updates;
+            collection.augment(item, data["Stats"][guid]);
+          }
+          if (updates < 2) {
+            // console.warn("queueView.fetchItemDetail", "Unexpected Response Data!", data);
+          }
+        })
+        .catch(function (error) {
+          console.error("queueView.fetchItemDetail", error);
+        })
+        .finally(function () {
+          if (!!callback && callback instanceof Function) {
+            callback(item);
+          }
+        });
+      } else {
+        // not an Experiment (other entities not currently supported)
+        if (!!callback && callback instanceof Function) {
+          callback(item);
+        }
+      }
+    } else {
+      // not found in Collection (unlikely)
+      if (!!callback && callback instanceof Function) {
+        callback(null);
+      }
+    }
   };
 
   const getSecure = function(url) {
@@ -839,29 +980,29 @@ const QueueView = function(props) {
     let primary = config.mockURL + "Queue.json";
     let secondary = config.mockURL + "Stats.json";
     fetch(primary, { method:"GET" })
-        .then(response => response.json())
-        .then(data => collection.update(data.QueueState))
-        .then(response => fetch(secondary, { method:"GET" }))
-        .then(response => response.json())
-        .then(data => { collection.merge(data.Stats); return collection.latest; })
-        .then(update => new Promise(function(resolve) {
-          if (successCallback && successCallback instanceof Function) {
-            successCallback();
-          }
-          setTimeout(function () {
-            resolve(update);
-          }, 0);
-        }))
-        .catch(function (error) {
-          if (failureCallback && failureCallback instanceof Function) {
-            failureCallback(error);
-          } else {
-            console.error("queueView.fetchMockSimulations", error);
-          }
-        })
-        .finally(function () {
-          console.log("Fetched Mock Simulation Data:", primary, secondary);
-        });
+    .then(response => response.json())
+    .then(data => collection.update(data.QueueState))
+    .then(response => fetch(secondary, { method:"GET" }))
+    .then(response => response.json())
+    .then(data => { collection.merge(data.Stats); return collection.latest; })
+    .then(update => new Promise(function(resolve) {
+      if (successCallback && successCallback instanceof Function) {
+        successCallback();
+      }
+      setTimeout(function () {
+        resolve(update);
+      }, 0);
+    }))
+    .catch(function (error) {
+      if (failureCallback && failureCallback instanceof Function) {
+        failureCallback(error);
+      } else {
+        console.error("queueView.fetchMockSimulations", error);
+      }
+    })
+    .finally(function () {
+      // console.log("Fetched Mock Simulation Data:", primary, secondary);
+    });
   };
 
   const addSourceSelect = function() {
@@ -871,24 +1012,28 @@ const QueueView = function(props) {
     }
 
     const target = view.parent.querySelector("figcaption legend");
-    const options = [
-      { name:"API Simulations", value: 0, selected: true },
-      { name:"API Work Items", value: 1 },
-      { name:"MOCK Simulations 1", value: "Simulations/1/" },
-      { name:"MOCK Simulations 2", value: "Simulations/2/" },
-      { name:"MOCK Simulations 3", value: "Simulations/3/" },
-      { name:"MOCK Work Items 1", value: "WorkItems/1/" },
-      { name:"MOCK Work Items 2", value: "WorkItems/2/" },
-      { name:"MOCK Work Items 3", value: "WorkItems/3/" },
-      { name:"", value: "", disabled: true }
-    ];
+    const options = config.isSimulations ? 
+      [
+        { name:"API Simulations", value: 0, selected: true },
+        { name:"MOCK Simulations 1", value: "Simulations/1/" },
+        { name:"MOCK Simulations 2", value: "Simulations/2/" },
+        { name:"MOCK Simulations 3", value: "Simulations/3/" },
+        { name:"", value: "", disabled: true }
+      ] 
+        :
+      [
+        { name:"API Work Items", value: 1, selected: true },
+        { name:"MOCK Work Items 1", value: "WorkItems/1/" },
+        { name:"MOCK Work Items 2", value: "WorkItems/2/" },
+        { name:"MOCK Work Items 3", value: "WorkItems/3/" },
+        { name:"", value: "", disabled: true }
+      ];
     let fragment = document.createDocumentFragment();
     let input = fragment.appendChild(document.createElement("SELECT"));
     let apis = input.appendChild(document.createElement("OPTGROUP"));
-    let sims = input.appendChild(document.createElement("OPTGROUP"));
-    let itms = input.appendChild(document.createElement("OPTGROUP"));
+    let mock = input.appendChild(document.createElement("OPTGROUP"));
     options.forEach((item,index) => {
-      let group = /^\d$/.test(item.value) ? apis : (new RegExp(MODE.Simulations)).test(item.value) ? sims : itms;
+      let group = /^\d$/.test(item.value) ? apis : mock;
       let opt = group.appendChild(document.createElement("OPTION"));
       opt.innerText = item.name;
       opt.setAttribute("value", item.value||index);
@@ -1045,14 +1190,14 @@ const QueueView = function(props) {
       // @param {Boolean} true shows only active workflows, false shows all within scope (API only).
       config.workFlowsActive = boo;
       let message = config.activeWorkFlowsOnly ? "ONLY ACTIVE" : "ALL";
-      console.log(`The Work Flow Queue will now show ${message} items found within scope!`);
+      console.log(`The Workflow Queue will now show ${message} items found within scope!`);
     },
 
     setWorkFlowsScope: function(days) {
       // @param {Number} days to go back from now in collecting Top-Level Work Items (API only). 
       config.workFlowScope = days;
       let message = 1 >= config.daysOfWorkFlows ? " day!" : " days!";
-      console.log(`The Work Flow Queue will now show items within the past ${config.daysOfWorkFlows+message}`);
+      console.log(`The Workflow Queue will now show items within the past ${config.daysOfWorkFlows+message}`);
     },
 
     status: function () {

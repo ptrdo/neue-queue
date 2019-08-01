@@ -24,7 +24,7 @@ class Index {
       {
         name: "QueueView",
         type: "arrow",
-        title: "A Neue Queue!",
+        title: "Simulations Currently in Queue for Processing",
         description: "On the Belegost Environment",
         css: "chart queue fullwidth",
         enabled: true

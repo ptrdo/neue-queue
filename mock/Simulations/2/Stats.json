@@ -1,9 +1,24 @@
 {
+  "Experiments": [
+    {
+      "Id": "105937d9-0f33-e911-a2c5-c4346bcb7273",
+      "Name": "testGeonode3",
+      "Owner": "allee",
+      "DateCreated": "2019-02-17T23:57:58.3300000Z",
+      "LastModified": "2019-02-17T23:57:58.3300000Z"
+    }
+  ],
   "Stats": {
     "970d658d-682f-e911-a2c5-c4346bcb7273": {
       "SimulationCount": 50,
       "SimulationStateCount": {
         "Running": 50
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "105937d9-0f33-e911-a2c5-c4346bcb7273": {
@@ -12,6 +27,19 @@
         "Running": 1,
         "Succeeded": 97,
         "Failed": 2
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "3b266924-3633-e911-a2c5-c4346bcb7273": {
@@ -20,6 +48,19 @@
         "Running": 13,
         "Succeeded": 81,
         "Failed": 6
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "c57a5c2c-4b33-e911-a2c5-c4346bcb7273": {
@@ -28,6 +69,19 @@
         "Running": 22,
         "Succeeded": 74,
         "Failed": 4
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "a2dc8621-5733-e911-a2c5-c4346bcb7273": {
@@ -36,6 +90,19 @@
         "Running": 35,
         "Succeeded": 64,
         "Failed": 1
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "2c602375-5733-e911-a2c5-c4346bcb7273": {
@@ -44,6 +111,19 @@
         "Running": 30,
         "Succeeded": 69,
         "Failed": 1
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "931ef943-5833-e911-a2c5-c4346bcb7273": {
@@ -52,6 +132,19 @@
         "Running": 28,
         "Succeeded": 70,
         "Failed": 2
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "84ec8dc5-ae33-e911-a2c5-c4346bcb7273": {
@@ -59,6 +152,12 @@
       "SimulationStateCount": {
         "Commissioned": 1874,
         "Running": 526
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     }
   }
