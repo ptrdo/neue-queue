@@ -85,6 +85,9 @@ const QueueView = function(props) {
     workFlowScopeInDays: 1,
     workFlowsActiveOnly: true,
 
+    truncateMin: 6,
+    truncateMax: 100,
+
     set workFlowScope (num) {
       this.workFlowScopeInDays = /^\d+\.?\d*$/.test(num) ? parseFloat(num) : 1; // default
     },
@@ -512,7 +515,17 @@ const QueueView = function(props) {
         ol.appendChild(li);
         parent.classList.add("empty");
       } else {
-        data.forEach(item => {
+        data.some((item,index) => {
+
+          if (index == config.truncateMin && !view.figure.classList.contains("untruncated")) {
+            view.figure.classList.add("truncated");
+            return true;
+          }
+
+          if (index == config.truncateMax) {
+            return true;
+          }
+
           let li = document.createElement("LI");
           let ul = document.createElement("UL");
           let block = document.createElement("LI");
@@ -658,7 +671,9 @@ const QueueView = function(props) {
     view.chart.addEventListener("scroll", onScroll);
     view.chart.addEventListener("click", onClick);
     view.figure.classList.add("process");
-  
+    view.figure.classList.remove("truncated");
+
+
     wait(10)
     .then(() => {
       for (let item in PRIORITY) {
@@ -666,6 +681,7 @@ const QueueView = function(props) {
         setQueueItems(bucket, PRIORITY[item].key);
       }
       addSourceSelect();
+      addTruncateToggle();
       if (!!callback && callback instanceof Function) {
         callback(view.element);
       }
@@ -736,6 +752,7 @@ const QueueView = function(props) {
     }
     if (!!reset) {
       collection.reset();
+      view.figure.classList.remove("truncated", "untruncated");
     }
   };
 
@@ -1002,6 +1019,40 @@ const QueueView = function(props) {
     })
     .finally(function () {
       // console.log("Fetched Mock Simulation Data:", primary, secondary);
+    });
+  };
+
+  const addTruncateToggle = function() {
+
+    if (view.figure.querySelector("ins.truncation")) {
+      return;
+    }
+
+    const target = view.figure;
+    const toggle = document.createElement("INS");
+    [{
+      control:"disable",
+      content: `Only the top ${config.truncateMin} of each priority are being shown (there are <var>#</var> total). Click to show more.`
+    }, {
+      control:"enable",
+      content: `As many as ${config.truncateMax} of each priority are being shown (there are <var>#</var> total). Click to show fewer.`
+
+    }].forEach(opt => {
+      let span = document.createElement("SPAN");
+      span.classList.add(opt.control);
+      span.innerHTML = opt.content;
+      toggle.appendChild(span);
+    });
+
+    toggle.classList.add("truncation");
+    target.appendChild(toggle);
+
+    toggle.addEventListener("click", function(event) {
+      event.stopPropagation();
+      let isTruncated = view.figure.classList.contains("truncated");
+      view.figure.classList.toggle("truncated", !isTruncated);
+      view.figure.classList.toggle("untruncated", isTruncated);
+      render();
     });
   };
 
