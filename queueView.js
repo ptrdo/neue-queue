@@ -6,7 +6,7 @@ import Config from "config";
  * Dashboard visualiser of cluster traffic
  *
  * @author psylwester(at)idmod(dot)org
- * @version 1.00, 2019/07/22
+ * @version 2.00, 2019/08/01
  * @requires ES6, lodash
  *
  */
@@ -134,7 +134,7 @@ const QueueView = function(props) {
 
   const view = {
 
-    root: null,
+    root: document.querySelector("[itemid=QueueView]"),
     ouput: null,
 
     set parent(ele) {
