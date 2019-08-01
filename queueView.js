@@ -200,7 +200,7 @@ const QueueView = function(props) {
           basisString = basisDate.toLocaleDateString("en-US",{ month: "long", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
           elapsedHours = ((Date.now() - basisDate)/1000/60/60).toFixed(1);
           node["ElapsedHours"] = elapsedHours;
-          node["Elapsed"] = elapsedHours > .1 ? "~" + elapsedHours + " hrs ago": "moments ago";
+          node["Elapsed"] = elapsedHours > .1 ? "~" + elapsedHours + " hrs": "moments";
           node["ElapsedStartString"] = basisString;
         }
       };
@@ -533,6 +533,7 @@ const QueueView = function(props) {
           let icon = document.createElement("I");
 
           icon.classList.add("material-icons");
+          icon.setAttribute("title", "Pin/Unpin Details");
           icon.appendChild(document.createTextNode("more_vert"));
           more.appendChild(icon);
           more.classList.add("more");
@@ -579,6 +580,13 @@ const QueueView = function(props) {
             if (stage == "Active") {
               li.classList.add("process"); // TODO: consider the stage as className
             }
+            if (/Orphan/.test(status)) {
+              a.setAttribute("href",`/#explore/Simulations?filters=Owner=${item.Owner}`);
+              a.setAttribute("title", `Explore ${item.Owner}'s Simulations`);
+            } else {
+              a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${item.ExperimentId},SimulationState=${status}`);
+              a.setAttribute("title", info[status] > 1 ? `Explore These ${status} Simulations` : `Explore This ${status} Simulation`);
+            }
             val.appendChild(document.createTextNode(info[status]));
             a.appendChild(val);
             li.appendChild(a);
@@ -596,6 +604,7 @@ const QueueView = function(props) {
       fragment.querySelector("li:last-of-type").appendChild(tip);
     };
     const setQueueItemFlow = function (fragment, info) {
+      let id = info["Ancestors"][0].Id;
       _.concat(info["Ancestors"],info["Related"])
       .filter(item => item["ObjectType"] != "AssetCollection")
       .forEach(member => {
@@ -612,6 +621,8 @@ const QueueView = function(props) {
           tip.classList.add("arrow");
           val.appendChild(document.createTextNode("Worker" in member ? member.Worker.Name : type));
           a.appendChild(val);
+          a.setAttribute("href",`/#explore/WorkItems?filters=Id=${id}&related=true`);
+          a.setAttribute("title", `Explore This Workflow`);
           li.appendChild(a);
           li.appendChild(tip);
           li.setAttribute("title", member.Name);
@@ -653,7 +664,7 @@ const QueueView = function(props) {
         ["Owner","Id","EnvironmentName","Elapsed","RelatedCount"].forEach(implement);
       } else {
         dt.appendChild(document.createTextNode("Orphan Simulation"));
-        ["Owner",,"NodeGroup","Elapsed"].forEach(implement);
+        ["Owner","NodeGroup","Elapsed"].forEach(implement);
       }
 
       dfn.classList.add("tooltip");
