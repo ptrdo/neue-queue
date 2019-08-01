@@ -392,18 +392,20 @@ const QueueView = function(props) {
    * @param {Event}
    */
   const onClick = function(event) {
-    event.preventDefault();
-    // console.log("onClick", event);
+    if (event.target.nodeName == "A") {
 
-    let arrow = event.target.closest("li[itemid]");
-    if (!!arrow && !event.target.classList.contains("block")) {
-      arrow.classList.toggle("active");
-      arrow.querySelector("dfn.tooltip").removeAttribute("style");
     } else {
-      // click-away...
-      view.chart.querySelectorAll("li[itemid].active").forEach(tooltip => {
-        tooltip.classList.remove("active");
-      });
+      event.preventDefault();
+      let arrow = event.target.closest("li[itemid]");
+      if (!!arrow && !event.target.classList.contains("block")) {
+        arrow.classList.toggle("active");
+        arrow.querySelector("dfn.tooltip").removeAttribute("style");
+      } else {
+        // click-away...
+        view.chart.querySelectorAll("li[itemid].active").forEach(tooltip => {
+          tooltip.classList.remove("active");
+        });
+      }
     }
   };
 
