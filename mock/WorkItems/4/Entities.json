@@ -1,0 +1,32 @@
+{
+  "NOTE": "This is an aggregation of api/Simulations, api/Experiments, and/or api/WorkItems per Response of api/Related.",
+  "API": "/api/Experiments/c5c7e687-489d-e911-a2c1-c4346bcb1555?statsoperations=simulationcount,simulationstatecount&format=json",
+  "Experiments": [{
+    "Id": "7f8a723d-5f54-e911-a2c0-c4346bcb1554",
+    "Name": "Ivermectin_nochildbearingage_new_vector_model",
+    "Owner": "pselvaraj",
+    "DateCreated": "2019-04-01T09:19:25.1030000Z",
+    "LastModified": "2019-04-01T09:19:25.1030000Z"
+  },
+  {
+    "Id": "aeb59903-d254-e911-a2c0-c4346bcb1554",
+    "Name": "Ivermectin_nochildbearingage_old_vector_model",
+    "Owner": "pselvaraj",
+    "DateCreated": "2019-04-01T23:01:05.4730000Z",
+    "LastModified": "2019-04-01T23:01:05.4730000Z"
+  },
+  {
+    "Id": "d00c0e8a-7bb7-e911-a2bb-f0921c167866",
+    "Name": "MultiPathogen Model",
+    "Owner": "nnoori",
+    "DateCreated": "2019-04-01T09:19:25.1030000Z",
+    "LastModified": "2019-04-01T09:19:25.1030000Z"
+  },
+  {
+    "Id": "d10c0e8a-7bb7-e911-a2bb-f0921c167866",
+    "Name": "MultiPathogen Model 2",
+    "Owner": "nnoori",
+    "DateCreated": "2019-04-01T23:01:05.4730000Z",
+    "LastModified": "2019-04-01T23:01:05.4730000Z"
+  }]
+}

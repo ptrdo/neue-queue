@@ -1,0 +1,133 @@
+{
+  "Experiments": [
+    {
+      "Id": "8115b4cb-432a-e911-a2bf-c4346bcb1554",
+      "Name": "testOrig_383388d_zambia",
+      "Owner": "allee",
+      "DateCreated": "2019-06-21T18:30:01.2970000Z",
+      "LastModified": "2019-06-21T18:30:01.2970000Z"
+    },
+    {
+      "Id": "efad87e3-7529-e911-a2bf-c4346bcb1554",
+      "Name": "Mystery_dem_test_iter76",
+      "Owner": "jgauld",
+      "DateCreated": "2019-06-21T15:28:10.0000000Z",
+      "LastModified": "2019-06-21T15:28:10.0000000Z"
+    },
+    {
+      "Id": "84ec8dc5-ae33-e911-a2c5-c4346bcb7273",
+      "Name": "Zimbabwe--0.05--rep3--test201906020830_iter31",
+      "Owner": "abershteyn",
+      "DateCreated": "2019-06-21T15:25:57.8800000Z",
+      "LastModified": "2019-06-21T15:25:57.8800000Z"
+    },
+    {
+      "Id": "45fa4250-6f2a-e911-a2bf-c4346bcb1554",
+      "Name": "RSA_Random_Pop_NoIP_1354reps",
+      "Owner": "abershteyn",
+      "DateCreated": "2019-06-21T13:38:05.4770000Z",
+      "LastModified": "2019-06-21T13:38:05.4770000Z"
+    },
+    {
+      "Id": "e45265d7-b029-e911-a2bf-c4346bcb1554",
+      "Name": "testGeonode4",
+      "Owner": "allee",
+      "DateCreated": "2019-06-21T15:30:20.5000000Z",
+      "LastModified": "2019-06-21T15:30:20.5000000Z"
+    },
+    {
+      "Id": "1fdf335d-c72b-e911-a2c5-c4346bcb7273",
+      "Name": "Chronic0.1ratioAgeNew_iter223",
+      "Owner": "jgauld",
+      "DateCreated": "2019-06-21T15:32:32.7570000Z",
+      "LastModified": "2019-06-21T15:32:32.7570000Z"
+    },
+    {
+      "Id": "99b7796b-4d2b-e911-a2c5-c4346bcb7273",
+      "Name": "Chronic0.1ratioAgeNew_iter224",
+      "Owner": "jgauld",
+      "DateCreated": "2019-06-21T15:48:32.6700000Z",
+      "LastModified": "2019-06-21T15:48:32.6700000Z"
+    }
+  ],
+  "Stats": {
+    "8115b4cb-432a-e911-a2bf-c4346bcb1554": {
+      "SimulationCount": 500,
+      "SimulationStateCount": {
+        "Running": 27,
+        "Succeeded": 448,
+		"Commissioned": 25
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
+      }
+    },
+    "efad87e3-7529-e911-a2bf-c4346bcb1554": {
+      "SimulationCount": 250,
+      "SimulationStateCount": {
+        "Commissioned": 250
+      }
+    },
+    "e45265d7-b029-e911-a2bf-c4346bcb1554": {
+      "SimulationCount": 512,
+      "SimulationStateCount": {
+        "Commissioned": 512
+      }
+    },
+    "84ec8dc5-ae33-e911-a2c5-c4346bcb7273": {
+      "SimulationCount": 740,
+      "SimulationStateCount": {
+        "Commissioned": 740
+      }
+    },
+    "1fdf335d-c72b-e911-a2c5-c4346bcb7273": {
+      "SimulationCount": 128,
+      "SimulationStateCount": {
+        "Commissioned": 128
+      }
+    },
+    "99b7796b-4d2b-e911-a2c5-c4346bcb7273": {
+      "SimulationCount": 384,
+      "SimulationStateCount": {
+        "Running": 384
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
+      }
+    },
+    "45fa4250-6f2a-e911-a2bf-c4346bcb1554": {
+      "SimulationCount": 1354,
+      "SimulationStateCount": {
+        "Running": 352,
+        "Succeeded": 1000,
+		"Failed": 2
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
+      }
+    }
+  }
+}

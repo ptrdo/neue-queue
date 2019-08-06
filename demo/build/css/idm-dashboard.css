@@ -950,6 +950,7 @@ ins.arrow b {
 
 #dashboard .queue.chart ol > li dfn.tooltip dl dt
 {
+  min-width: 12em;
   margin: -3px -9px 6px -9px;
   padding: 6px 6px 7px 9px;
   white-space: normal;

@@ -36,6 +36,7 @@ class Index {
       selector: "[itemid=QueueView]",
       chartContainer:"#QueueView",
       useMockData: true,
+      mockPath: "Simulations/1/", /* default */
       modeEntity: "Simulations",
       api: function(mode,refresh) {
         if (!!mode) {

@@ -1,0 +1,25 @@
+[{
+  "Id": "3175306b-0155-e911-a2c0-c4346bcb1554",
+  "Ancestors": [],
+  "Related": [{
+    "Id": "7f8a723d-5f54-e911-a2c0-c4346bcb1554",
+    "Relationship": "DependsOn",
+    "ObjectType": "Experiment"
+  }, {
+    "Id": "aeb59903-d254-e911-a2c0-c4346bcb1554",
+    "Relationship": "DependsOn",
+    "ObjectType": "Experiment"
+  }]
+}, {
+  "Id": "f24b6939-eb92-e911-a2bb-f0921c167866",
+  "Ancestors": [],
+  "Related": [{
+    "Id": "d00c0e8a-7bb7-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "Experiment"
+  }, {
+    "Id": "d10c0e8a-7bb7-e911-a2bb-f0921c167866",
+    "Relationship": "DependsOn",
+    "ObjectType": "Experiment"
+  }]
+}]

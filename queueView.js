@@ -75,11 +75,11 @@ const QueueView = function(props) {
   const config = Object.assign({
 
     auth: function () { return "comps" in window ? window.comps.auth : window.idmauth },
-    entity: MODE.Simulations,
+    entity: MODE.WorkItems,
     scoreSize: 24,
     mocked: false,
     mockRoot: ("comps" in window ? "/app/dashboard/data/" : "mock/"),
-    mockPath: "Simulations/1/",
+    mockPath: "",
     endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps-dev.idmod.org/api/")),
 
     workFlowScopeInDays: 1,
@@ -385,6 +385,14 @@ const QueueView = function(props) {
     }
   };
 
+  const isValidGuid = function (candidate) {
+    if (arguments.length > 0) {
+      return /[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}/.test(candidate);
+    } else {
+      return false; 
+    }
+  };
+
   /* EVENT-HANDLERS */
 
   /**
@@ -393,13 +401,32 @@ const QueueView = function(props) {
    */
   const onClick = function(event) {
     if (event.target.nodeName == "A") {
-
+      
     } else {
       event.preventDefault();
-      let arrow = event.target.closest("li[itemid]");
-      if (!!arrow && !event.target.classList.contains("block")) {
-        arrow.classList.toggle("active");
-        arrow.querySelector("dfn.tooltip").removeAttribute("style");
+      let ele = event.target.closest("li[itemid]");
+      if (!!ele && !ele.classList.contains("block")) {
+        let guid = ele.getAttribute("itemid");
+        ele.classList.toggle("active");
+        ele.querySelector("dfn.tooltip").removeAttribute("style");
+        if (config.isSimulations && !ele.classList.contains("detailed")) {
+          if (isValidGuid(guid)) {
+            fetchItemDetail(guid, function (data) {
+              if (!!data) {
+                if ("Name" in data) {
+                  ele.querySelector("dt").innerText = data.Name;
+                }
+                if ("SimulationRuntime" in data) {
+                  appendTooltip(ele, data["SimulationRuntime"], ["-", "Min", "Median", "Max"]);
+                }
+                if ("SimulationUsage" in data) {
+                  appendTooltip(ele, data["SimulationUsage"], ["-", "MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
+                }
+              }
+              ele.classList.add("detailed");
+            });
+          }
+        }
       } else {
         // click-away...
         view.chart.querySelectorAll("li[itemid].active").forEach(tooltip => {
@@ -440,46 +467,46 @@ const QueueView = function(props) {
 
   const onMouseEnter = function (event) {
 
-    let item = event.target.closest("li[itemid]");
+    let ele = event.target.closest("li[itemid]");
 
-    if (!!item) {
+    if (!!ele) {
       event.stopPropagation();
-      let guid = item.getAttribute("itemid");
-      let rect = item.getBoundingClientRect();
-      let width = parseInt(item.querySelector("dfn.tooltip dl").offsetWidth);
+      let guid = ele.getAttribute("itemid");
+      let rect = ele.getBoundingClientRect();
+      let width = parseInt(ele.querySelector("dfn.tooltip dl").offsetWidth);
       let left = parseInt(rect.left);
-      let indent = parseInt(item.querySelector("li.block").offsetWidth);
+      let indent = parseInt(ele.querySelector("li.block").offsetWidth);
       let mleft = Math.max(0, Math.max(event.pageX, (left + indent)) - left - indent - width);
       let mtop = view.chart.scrollTop;
       
-      if (!item.classList.contains("active")) {
-        item.querySelector("dfn.tooltip").style.marginLeft = `${mleft}px`;
+      if (!ele.classList.contains("active")) {
+        ele.querySelector("dfn.tooltip").style.marginLeft = `${mleft}px`;
       }
       if (!!mtop) {
-        item.querySelector("dfn.tooltip").style.marginTop = `-${mtop}px`;
+        ele.querySelector("dfn.tooltip").style.marginTop = `-${mtop}px`;
       }
       
       // @TODO: Verify this is no longer needed...
-      // let top = parseInt(item.closest("output").getBoundingClientRect().top);
+      // let top = parseInt(ele.closest("output").getBoundingClientRect().top);
       // marginTop: !!ff ? 0 : -top /* FF-specific adjustment (due to scrollTop) */
 
-      if (config.isSimulations && !item.classList.contains("detailed")) {
-        if (!!guid) {
+      if (config.isSimulations && !ele.classList.contains("detailed")) {
+        if (isValidGuid(guid)) {
           fetchItemDetail(guid, function (data) {
             if (!!data) {
               if ("Name" in data) {
-                item.querySelector("dt").innerText = data.Name;
+                ele.querySelector("dt").innerText = data.Name;
               }
               if ("SimulationRuntime" in data) {
-                appendTooltip(item, data["SimulationRuntime"], ["-","Min","Median","Max"]);
+                appendTooltip(ele, data["SimulationRuntime"], ["-","Min","Median","Max"]);
               }
               if ("SimulationUsage" in data) {
-                appendTooltip(item, data["SimulationUsage"], ["-","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
+                appendTooltip(ele, data["SimulationUsage"], ["-","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
               }
             }
+            ele.classList.add("detailed");
           });
         }
-        item.classList.add("detailed");
       }
     }
   };
@@ -509,7 +536,15 @@ const QueueView = function(props) {
       let ol = parent.querySelector("OL");
       let data = collection.latest[key]||[];
       if (config.isWorkItems) {
-        data = data.filter(item => _.has(item, "Active") || !config.activeWorkFlowsOnly)
+        data = data.filter(item => {
+          if (!config.activeWorkFlowsOnly) {
+            return true;
+          } else if (_.has(item, "Active")) {
+            return item.Active; 
+          } else {
+            return _.has(item, "State") && _.intersection(_.concat(STATE.PreActive,STATE.Active),[item.State]).length > 0;
+          }
+        });         
       }
       if (_.isEmpty(data)) {
         let li = document.createElement("LI");
@@ -558,8 +593,10 @@ const QueueView = function(props) {
             setQueueItemDetails(block, item);
             setQueueItemFlow(ul, item.Flow);
           } else {
+            li.setAttribute("itemid", "orphan");
+            collection.augment(item, {"SimulationStateCount":{"Orphan":1}}, true);
             setQueueItemDetails(block, item);
-            setQueueItemSegments(ul, Object.assign(item, {"SimulationStateCount":{"Orphan":1}}));
+            setQueueItemSegments(ul, item);
           }
         });
         ol.appendChild(doc);
@@ -570,6 +607,7 @@ const QueueView = function(props) {
       let tip = document.createElement("INS");
       tip.appendChild(document.createElement("B"));
       tip.classList.add("arrow");
+      if (!info) return;
       ["PreActive","Active","PostActive"].forEach(stage => {
         STATE[stage].forEach(status => {
           if (status in info) {
@@ -616,7 +654,13 @@ const QueueView = function(props) {
         let tip = document.createElement("INS");
         let type = member.ObjectType;
         if (/^Experiment$/i.test(type)) {
-          setQueueItemSegments(fragment, member);
+          if ("SimulationStateCount" in member) {
+            setQueueItemSegments(fragment, member);
+          } else {
+            fetchItemDetail(id, function(){
+              setQueueItemSegments(fragment, member);
+            }, true);
+          }
           fragment.querySelector("li:last-of-type").style.marginRight = "22px";
         } else {
           tip.appendChild(document.createElement("B"));
@@ -821,18 +865,23 @@ const QueueView = function(props) {
         getSecure(url)
         .then(data => {
           if (_.has(data, "Related")) {
-            data["Ancestors"].unshift(Object.assign({ Relationship:"Ancestor" }, _.clone(item)));
-            count = data["Related"].filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
+            data = [data];
           }
-          collection.augment(item,{ Flow: data, RelatedCount: count }, true);
-          if ("Related" in data && data["Related"].length > 0) {
-            fetchWorkFlowItems(item, 0, last);
-          } else {
-            // this is a singular Work Item
-            if (!!last) {
-              wait(0).then(() => render());
-            } 
-          }
+          data.forEach(node => {
+            if (_.has(node, "Related")) {
+              node["Ancestors"].unshift(Object.assign({ Relationship:"Ancestor" }, _.clone(item)));
+              count = node["Related"].filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
+            }
+            collection.augment(item,{ Flow: node, RelatedCount: count }, true);
+            if ("Related" in node && node["Related"].length > 0) {
+              fetchWorkFlowItems(item, 0, last);
+            } else {
+              // this is a singular Work Item
+              if (!!last) {
+                wait(0).then(() => render());
+              }
+            }
+          })
         })
         .catch(function (error) {
           console.error("queueView.fetchWorkFlow", error);
@@ -871,12 +920,20 @@ const QueueView = function(props) {
           index = data[`${entity}s`].findIndex(item => { return item.Id == guid });
           node = data[`${entity}s`][index];
           collection.augment(relation, node);
-          if (_.intersection(_.concat(STATE.PreActive,STATE.Active),[node["State"],node["SimulationState"]]).length > 0) {
-            item["Active"] = true;
-          }
           if (/Experiment/i.test(entity)) {
-            fetchWorkFlowItemStats(relation, last, info => { item["Active"] = info["Active"] });
+            // fetchWorkFlowItemStats(relation, last, info => { item["Active"] = info["Active"] }); /* @TODO: Deprecate */
+            let lastly = last;
+            fetchItemDetail(guid, info => {
+              item["Active"] = _.has(info, "SimulationStateCount") && _.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(info["SimulationStateCount"])).length > 0;
+              if (lastly) {
+                wait(100).then(() => render());
+              }
+            },true);
             last = false;
+          } else {
+            if (_.intersection(_.concat(STATE.PreActive,STATE.Active),[node["State"],node["SimulationState"]]).length > 0) {
+              item["Active"] = true;
+            }
           }
         })
         .catch(function (error) {
@@ -938,14 +995,15 @@ const QueueView = function(props) {
    * fetchItemDetails is a secondary call upon interaction with chart items. 
    * @param {String} guid is the item of interest which has been interacted with (e/g MouseEnter).
    * @param {Function} callback returns the data (pointer) to the collection item (or null if not found). 
+   * @param {Boolean} counts gets simulationcount,simulationstatecount in stats request. 
    */
-  const fetchItemDetail = function (guid, callback) {
+  const fetchItemDetail = function (guid, callback, counts) {
     let item = collection.findItemById(guid);
     if (!!item) {
       let entity = deduceEntityType(item);
       if (entity === "Experiment") {
-        let params = "statsoperations=simulationruntime,simulationusage&format=json"; // ,simulationcount,simulationstatecount
-        let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}&${params}`;
+        let params = !!counts ? "statsoperations=simulationcount,simulationstatecount" : "statsoperations=simulationruntime,simulationusage";
+        let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}&${params}&format=json`;
         getSecure(url)
         .then(data => {
           let updates = 0;
@@ -1082,6 +1140,7 @@ const QueueView = function(props) {
         { name:"MOCK Simulations 1", value: "Simulations/1/" },
         { name:"MOCK Simulations 2", value: "Simulations/2/" },
         { name:"MOCK Simulations 3", value: "Simulations/3/" },
+        { name:"MOCK Simulations 4", value: "Simulations/4/" },
         { name:"", value: "", disabled: true }
       ] 
         :
@@ -1090,6 +1149,7 @@ const QueueView = function(props) {
         { name:"MOCK Work Items 1", value: "WorkItems/1/" },
         { name:"MOCK Work Items 2", value: "WorkItems/2/" },
         { name:"MOCK Work Items 3", value: "WorkItems/3/" },
+        { name:"MOCK Work Items 4", value: "WorkItems/4/" },
         { name:"", value: "", disabled: true }
       ];
     let fragment = document.createDocumentFragment();
@@ -1266,7 +1326,9 @@ const QueueView = function(props) {
 
     status: function () {
       return Object.keys(collection.latest).length;
-    }
+    }, 
+    
+    render: render
   }
 };
 
