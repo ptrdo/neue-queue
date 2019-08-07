@@ -441,15 +441,17 @@ html[data-useragent*="MSIE 10"]
 
 #dashboard .queue.chart legend span
 {
+  display: inline-block;
   margin: 0 0 0 3px;
   padding: 4px;
-  line-height: 2;
+  line-height: 1;
   font-weight: normal;
   vertical-align: middle;
   vertical-align: -webkit-baseline-middle;
   cursor: default;
 }
 
+#dashboard .queue.chart legend span.Orphan,
 #dashboard .queue.chart legend span.Orphaned { color: deepskyblue; }
 
 #dashboard .queue.chart legend span.QueuedForCommission,
@@ -470,13 +472,18 @@ html[data-useragent*="MSIE 10"]
 }
 #dashboard .queue.chart legend span.Succeeded { color: seagreen; }
 #dashboard .queue.chart legend span.Failed { color: red; }
-#dashboard .queue.chart legend span.Canceled { color: hotpink; }
+#dashboard .queue.chart legend span.Canceled,
+#dashboard .queue.chart legend span.Canceling { color: hotpink; }
 #dashboard .queue.chart legend span.Yours {
   padding: 4px 6px;
   border-bottom: 2px solid black;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   color: #004766;
 }
+
+#dashboard .queue.chart.mockable legend span {
+  display: none; 
+} 
 
 #dashboard .queue.chart button.refresh
 {
@@ -948,6 +955,11 @@ ins.arrow b {
   white-space: nowrap;
 }
 
+#dashboard .queue.chart ol > li dfn.tooltip  dl:hover {
+  border-color: darkorange;
+  border-width: 1px 3px 3px 1px;
+}
+
 #dashboard .queue.chart ol > li dfn.tooltip dl dt
 {
   min-width: 12em;
@@ -961,6 +973,11 @@ ins.arrow b {
   border-bottom: 1px solid #A5CDDE;
 }
 
+#dashboard .queue.chart ol > li dfn.tooltip dl dt a:after {
+  content: "\0020\2197";
+  text-decoration: none;
+  white-space: nowrap;
+}
 
 #dashboard .queue.chart ol > li dfn.tooltip  dl:hover dt {
   background: aliceblue;
@@ -1110,10 +1127,14 @@ ins.hoverover
 /* NEUE-QUEUE */
 
 .chart form legend select {
+  display: none;
   margin: 2px 6px 2px 2px;
   color: #0072a2;
   background: whitesmoke;
   vertical-align: top;
+}
+.chart.mockable form legend select {
+  display: inline-block;
 }
 
 #dashboard .queue.chart figure output ol > li:nth-child(even) {

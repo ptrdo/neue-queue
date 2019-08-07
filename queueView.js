@@ -74,8 +74,8 @@ const QueueView = function(props) {
 
   const config = Object.assign({
 
-    auth: function () { return "comps" in window ? window.comps.auth : window.idmauth },
-    entity: MODE.WorkItems,
+    auth: function () { return "comps" in window ? window.comps.auth : "idmauth" in window ? window.idmauth : { getToken: () => "" }},
+    entity: MODE.Simulations,
     scoreSize: 24,
     mocked: false,
     mockRoot: ("comps" in window ? "/app/dashboard/data/" : "mock/"),
@@ -495,7 +495,7 @@ const QueueView = function(props) {
           fetchItemDetail(guid, function (data) {
             if (!!data) {
               if ("Name" in data) {
-                ele.querySelector("dt").innerText = data.Name;
+                ele.querySelector("dt a").innerText = data.Name;
               }
               if ("SimulationRuntime" in data) {
                 appendTooltip(ele, data["SimulationRuntime"], ["-","Min","Median","Max"]);
@@ -558,7 +558,6 @@ const QueueView = function(props) {
             view.figure.classList.add("truncated");
             return true;
           }
-
           if (index == config.truncateMax) {
             return true;
           }
@@ -700,16 +699,26 @@ const QueueView = function(props) {
       let dfn = fragment.querySelector("DFN");
       let dl = document.createElement("DL");
       let dt = document.createElement("DT");
+      let a = document.createElement("A");
+      
+      dt.appendChild(a);
       dl.appendChild(dt);
+      dl.setAttribute("title", "pin/unpin this info");
 
-      if (_.has(info, "SimulationStateCount")) {
-        dt.appendChild(document.createTextNode("Experiment"));
+      if (_.has(info, "ExperimentId")) {
+        a.appendChild(document.createTextNode("Experiment"));
+        a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${info.ExperimentId}`);
+        a.setAttribute("title", "Explore This Experiment");
         ["Owner","ExperimentId","NodeGroup","Elapsed","SimulationCount"].forEach(implement);
       } else if (_.has(info, "Flow")) {
-        dt.appendChild(document.createTextNode("Workflow"));
+        a.appendChild(document.createTextNode("Workflow"));
+        a.setAttribute("href",`/#explore/WorkItems?filters=Id=${info.Id}&related=true`);
+        a.setAttribute("title", `Explore This Workflow`);
         ["Owner","Id","EnvironmentName","Elapsed","RelatedCount"].forEach(implement);
       } else {
-        dt.appendChild(document.createTextNode("Orphan Simulation"));
+        a.appendChild(document.createTextNode("Orphan Simulation"));
+        a.setAttribute("href",`/#explore/Simulations?filters=Owner=${info.Owner}`);
+        a.setAttribute("title", `Explore ${info.Owner}'s Simulations`);
         ["Owner","NodeGroup","Elapsed"].forEach(implement);
       }
 
@@ -729,22 +738,22 @@ const QueueView = function(props) {
     view.chart.addEventListener("click", onClick);
     view.figure.classList.add("process");
     view.figure.classList.remove("truncated");
-
-
-    wait(10)
+    
+    wait(100)
     .then(() => {
       for (let item in PRIORITY) {
         let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
         setQueueItems(bucket, PRIORITY[item].key);
       }
       addSourceSelect();
+      addStateLegend();
       addTruncateToggle();
       if (!!callback && callback instanceof Function) {
         callback(view.element);
       }
     });
     
-    wait(300)
+    wait(200)
     .then(() => view.figure.classList.remove("process"));
   };
 
@@ -1126,14 +1135,52 @@ const QueueView = function(props) {
       render();
     });
   };
+  
+  const addStateLegend = function () {
+
+    const target = view.parent.querySelector("figcaption legend");
+    if (!target || target.querySelector("span")) {
+      return;
+    }
+    
+    const states = _.union(STATE.PreActive,STATE.Active,STATE.PostActive,["Yours"]).map(state => {
+      if (/orphan/i.test(state)) {
+        return { text: "Orphaned", title: "Simulations\nwithout an\nExperiment" };
+      } else if (/creat|commiss|provis|valid/i.test(state)) {
+        return { text: "Commissioning", title: state };
+      } else if (/cancel/i.test(state)) {
+        return { text: "Canceling", title: state };
+      } else if (/resume|retry/i.test(state)) {
+        return { text: "Resuming", title: state };
+      } else {
+        return { text: state, title: state };
+      }
+    });
+        
+    states.forEach(state => {
+      let text = state.text;
+      let title = state.title;
+      let span, prior = target.querySelector(`span.${text}`);
+      if (!!prior) {
+        title = prior.getAttribute("title") + "\n" + title;
+        prior.setAttribute("title", title);
+      } else {
+        span = document.createElement("SPAN");
+        span.classList.add(text);
+        span.setAttribute("title", title);
+        span.appendChild(document.createTextNode(text));
+        target.appendChild(span);
+      }
+    });
+  };
 
   const addSourceSelect = function() {
 
-    if (view.parent.querySelector("figcaption legend select")) {
+    const target = view.parent.querySelector("figcaption legend");
+    if (!target || target.querySelector("figcaption legend select")) {
       return;
     }
 
-    const target = view.parent.querySelector("figcaption legend");
     const options = config.isSimulations ? 
       [
         { name:"API Simulations", value: 0, selected: true },
@@ -1308,6 +1355,25 @@ const QueueView = function(props) {
 
     isMocked: function() {
       return config.isMocked;
+    },
+    
+    toggleMockable: function(force) {
+      let mockable = arguments.length > 0 ? !!force : !view.parent.classList.contains("mockable");
+      view.parent.classList.toggle("mockable", mockable);
+      if (!mockable && config.isMocked) {
+        config.mocked = false;
+        if (config.isSimulations) {
+          try {
+            // proxy for dashboard.refreshMetric(name,interaction);
+            config.api(config.mode,true);
+          } catch (err) {
+            console.error("An API was not established by the instantiator!", err);
+          }
+        } else {
+          destroy(true);
+          fetchWorkItems();
+        }
+      }
     },
 
     setWorkFlowsFilter: function(boo) {

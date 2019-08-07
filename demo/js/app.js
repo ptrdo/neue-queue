@@ -14,6 +14,7 @@ const hello = function () {
 const init = function () {
   element = document.getElementById("dashboard");
   index.render(element);
+  /*
   Auth.init({
     ApplicationName: Config.appName,
     endpoint: Config.endpoint
@@ -23,7 +24,8 @@ const init = function () {
   }
   if (!("demo" in window)) {
     window["demo"] = {};
-  }
+  } 
+  */
 };
 
 document.addEventListener("DOMContentLoaded", init);
