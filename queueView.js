@@ -421,10 +421,10 @@ const QueueView = function(props) {
                   ele.querySelector("dt").innerText = data.Name;
                 }
                 if ("SimulationRuntime" in data) {
-                  appendTooltip(ele, data["SimulationRuntime"], ["-+", "Min", "Median", "Max"]);
+                  appendTooltip(ele, data["SimulationRuntime"], ["-", "Min", "Median", "Max"]);
                 }
                 if ("SimulationUsage" in data) {
-                  appendTooltip(ele, data["SimulationUsage"], ["--", "MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
+                  appendTooltip(ele, data["SimulationUsage"], ["-", "MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
                 }
               }
               ele.classList.add("detailed");
@@ -505,7 +505,7 @@ const QueueView = function(props) {
                 appendTooltip(ele, data["SimulationRuntime"], ["-+","Min","Median","Max"]);
               }
               if ("SimulationUsage" in data) {
-                appendTooltip(ele, data["SimulationUsage"], ["--","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
+                appendTooltip(ele, data["SimulationUsage"], ["-","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
               }
             }
             ele.classList.add("detailed");
@@ -763,9 +763,20 @@ const QueueView = function(props) {
     .then(() => view.figure.classList.remove("process"));
   };
 
+  const appendPins = function (ele) {
+    let on = document.createElement("I");
+    let off = document.createElement("I");
+    on.classList.add("material-icons", "on");
+    on.appendChild(document.createTextNode("location_on"));
+    off.classList.add("material-icons", "off");
+    off.appendChild(document.createTextNode("location_off"));
+    ele.appendChild(on);
+    ele.appendChild(off);
+    ele.classList.add("control");
+  };
+
   /**
    * appendTooltip applies secondary Response data to pre-built tooltip.
-   * NOTE: A plus "+" passed as key will embed an <hr> divider with pin control.
    * NOTE: A hyphen "-" passed as key will embed an <hr> divider.
    * NOTE: Unfound keys are passed-over and will not be appended.
    * 
@@ -779,23 +790,9 @@ const QueueView = function(props) {
       let dd = document.createElement("DD");
       let name = document.createElement("VAR");
       let value = document.createElement("DATA");
-      console.log("key", key, /^--$/.test(key));
-      if (/^--$/.test(key)) {
+      if (/^-$/.test(key)) {
         let divider = document.createElement("HR");
         dd.appendChild(divider);
-        dl.appendChild(dd);
-      } else if (/^-\+$/.test(key)) {
-        let rule = document.createElement("HR");
-        let on = document.createElement("I");
-        let off = document.createElement("I");
-        on.classList.add("material-icons", "on");
-        on.appendChild(document.createTextNode("location_on"));
-        off.classList.add("material-icons", "off");
-        off.appendChild(document.createTextNode("location_off"));
-        dd.appendChild(rule);
-        dd.appendChild(on);
-        dd.appendChild(off);
-        dd.classList.add("control");
         dl.appendChild(dd);
       } else if (key in info) {
         name.appendChild(document.createTextNode(key));
@@ -816,6 +813,10 @@ const QueueView = function(props) {
       }
     };
     keys.forEach(implement);
+    let control = dl.querySelector("hr");
+    if (control) {
+      appendPins(control.closest("dd"));
+    }
   };
 
   /**
