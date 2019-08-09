@@ -1027,6 +1027,42 @@ ins.arrow b {
   margin-bottom: 8px;
 }
 
+#dashboard .queue.chart ol > li dfn.tooltip dl dd.control
+{
+  display: flex;
+  flex-direction: row;
+  overflow: visible;
+  line-height: 1;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl dd.control hr
+{
+  flex-grow: 2;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl dd.control i
+{
+  margin-top: -8px;
+  color: #0072a2;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl:hover dd.control i
+{
+  color: #00b3ff;
+}
+
+#dashboard .queue.chart ol > li.active dfn.tooltip dl dd.control i.on,
+#dashboard .queue.chart ol > li dfn.tooltip dd.control i.off
+{
+  display: inline-block;
+}
+
+#dashboard .queue.chart ol > li.active dfn.tooltip dl dd.control i.off,
+#dashboard .queue.chart ol > li dfn.tooltip dd.control i.on
+{
+  display: none;
+}
+
 #dashboard .queue.chart ol > li dfn.tooltip sup
 {
   font-size: 100%;
@@ -1043,6 +1079,11 @@ ins.arrow b {
 {
   overflow: visible;
   opacity: 1;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.closed dfn.tooltip
+{
+  display: none;
 }
 
 #dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip  dl {
@@ -1184,8 +1225,8 @@ ins.hoverover
   min-width: 20px;
   max-width: 20px;
   height: 2em;
-  background: darkcyan;
-  color: lightblue;
+  background: palegoldenrod;
+  color: thistle;
 }
 
 #dashboard .queue.chart figure output ul > li.more i.material-icons

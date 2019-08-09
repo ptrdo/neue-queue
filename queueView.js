@@ -409,6 +409,10 @@ const QueueView = function(props) {
         let guid = ele.getAttribute("itemid");
         ele.classList.toggle("active");
         ele.querySelector("dfn.tooltip").removeAttribute("style");
+        if (!ele.classList.contains("active")) {
+          ele.classList.add("closed");
+          wait(500).then(() => ele.classList.remove("closed"));
+        }
         if (config.isSimulations && !ele.classList.contains("detailed")) {
           if (isValidGuid(guid)) {
             fetchItemDetail(guid, function (data) {
@@ -417,10 +421,10 @@ const QueueView = function(props) {
                   ele.querySelector("dt").innerText = data.Name;
                 }
                 if ("SimulationRuntime" in data) {
-                  appendTooltip(ele, data["SimulationRuntime"], ["-", "Min", "Median", "Max"]);
+                  appendTooltip(ele, data["SimulationRuntime"], ["-+", "Min", "Median", "Max"]);
                 }
                 if ("SimulationUsage" in data) {
-                  appendTooltip(ele, data["SimulationUsage"], ["-", "MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
+                  appendTooltip(ele, data["SimulationUsage"], ["--", "MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
                 }
               }
               ele.classList.add("detailed");
@@ -498,10 +502,10 @@ const QueueView = function(props) {
                 ele.querySelector("dt a").innerText = data.Name;
               }
               if ("SimulationRuntime" in data) {
-                appendTooltip(ele, data["SimulationRuntime"], ["-","Min","Median","Max"]);
+                appendTooltip(ele, data["SimulationRuntime"], ["-+","Min","Median","Max"]);
               }
               if ("SimulationUsage" in data) {
-                appendTooltip(ele, data["SimulationUsage"], ["-","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
+                appendTooltip(ele, data["SimulationUsage"], ["--","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
               }
             }
             ele.classList.add("detailed");
@@ -729,6 +733,7 @@ const QueueView = function(props) {
     if (!!view.chart) {
       // @TODO: Diff with Collection! 
       console.warn(`${config.chartContainer} was already rendered!`, view.element);
+      console.log(config.chartContainer, "CLEANING");
       destroy();
     }
 
@@ -741,6 +746,7 @@ const QueueView = function(props) {
     
     wait(100)
     .then(() => {
+      console.log(config.chartContainer, "RENDERING");
       for (let item in PRIORITY) {
         let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
         setQueueItems(bucket, PRIORITY[item].key);
@@ -759,6 +765,7 @@ const QueueView = function(props) {
 
   /**
    * appendTooltip applies secondary Response data to pre-built tooltip.
+   * NOTE: A plus "+" passed as key will embed an <hr> divider with pin control.
    * NOTE: A hyphen "-" passed as key will embed an <hr> divider.
    * NOTE: Unfound keys are passed-over and will not be appended.
    * 
@@ -772,9 +779,23 @@ const QueueView = function(props) {
       let dd = document.createElement("DD");
       let name = document.createElement("VAR");
       let value = document.createElement("DATA");
-      if (/^-$/.test(key)) {
+      console.log("key", key, /^--$/.test(key));
+      if (/^--$/.test(key)) {
         let divider = document.createElement("HR");
         dd.appendChild(divider);
+        dl.appendChild(dd);
+      } else if (/^-\+$/.test(key)) {
+        let rule = document.createElement("HR");
+        let on = document.createElement("I");
+        let off = document.createElement("I");
+        on.classList.add("material-icons", "on");
+        on.appendChild(document.createTextNode("location_on"));
+        off.classList.add("material-icons", "off");
+        off.appendChild(document.createTextNode("location_off"));
+        dd.appendChild(rule);
+        dd.appendChild(on);
+        dd.appendChild(off);
+        dd.classList.add("control");
         dl.appendChild(dd);
       } else if (key in info) {
         name.appendChild(document.createTextNode(key));
@@ -831,7 +852,8 @@ const QueueView = function(props) {
    */
   const fetchWorkItems = function (successCallback, failureCallback)  {
     let scope = `,DateCreated%3E=${scopeDate()}`;
-    let url = config.isMocked ? config.mockURL + "WorkItems.json" : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
+    let url = config.isMocked ? config.mockURL + "WorkItems.json"
+        : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
     getSecure(url)
     .then(data => {
       /* @TODO: QUALIFY WORKFLOWS BY PRIORITY! */
@@ -906,6 +928,7 @@ const QueueView = function(props) {
 
       // finish or continue
       // console.log("Fetched ALL Related!");
+      render();
     }
   };
 
@@ -1155,7 +1178,7 @@ const QueueView = function(props) {
       } else {
         return { text: state, title: state };
       }
-    });
+    }).reverse();
         
     states.forEach(state => {
       let text = state.text;
@@ -1169,7 +1192,7 @@ const QueueView = function(props) {
         span.classList.add(text);
         span.setAttribute("title", title);
         span.appendChild(document.createTextNode(text));
-        target.appendChild(span);
+        target.prepend(span);
       }
     });
   };
