@@ -74,7 +74,7 @@ const QueueView = function(props) {
 
   const config = Object.assign({
 
-    auth: function () { return "comps" in window ? window.comps.auth : "idmauth" in window ? window.idmauth : { getToken: () => "" }},
+    auth: function () { return "comps" in window ? window.comps.auth : "idmauth" in window ? window.idmauth : { getToken: () => "", getUserName: () => "" }},
     entity: MODE.Simulations,
     scoreSize: 24,
     mocked: false,
@@ -198,9 +198,9 @@ const QueueView = function(props) {
           }
           basisDate = new Date(Date.parse(basisISOString));
           basisString = basisDate.toLocaleDateString("en-US",{ month: "long", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
-          elapsedHours = ((Date.now() - basisDate)/1000/60/60).toFixed(1);
+          elapsedHours = ((Date.now() - basisDate)/1000/60/60).toFixed(2);
           node["ElapsedHours"] = elapsedHours;
-          node["Elapsed"] = elapsedHours > .1 ? "~" + elapsedHours + " hrs": "moments";
+          node["Elapsed"] = parseFloat(elapsedHours) > .05 ? "~" + elapsedHours + " hrs": "moments";
           node["ElapsedStartString"] = basisString;
         }
       };
@@ -513,6 +513,8 @@ const QueueView = function(props) {
 
   const render = function(callback, caller) {
 
+    let owner = config.auth().getUserName();
+
     const setQueueBucket = function (parent, name) {
       let div = document.createElement("DIV");
       let ol = document.createElement("OL");
@@ -577,6 +579,9 @@ const QueueView = function(props) {
           ul.appendChild(block);
           ul.appendChild(more);
 
+          if ("Owner" in item && !!owner && item.Owner === owner) {
+            ul.classList.add("owner");
+          }
           if (_.has(item, "SimulationStateCount")) {
             li.setAttribute("itemid", item["ExperimentId"]);
             setQueueItemDetails(block, item);

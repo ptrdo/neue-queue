@@ -482,9 +482,10 @@ html[data-useragent*="MSIE 10"]
 #dashboard .queue.chart legend span.Canceled,
 #dashboard .queue.chart legend span.Canceling { color: hotpink; }
 #dashboard .queue.chart legend span.Yours {
-  padding: 4px 6px;
-  border-bottom: 2px solid black;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-bottom: 1px solid black;
+  margin-right: 4px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
   color: #004766;
 }
 
@@ -846,13 +847,13 @@ ins.arrow b {
 #dashboard .queue.chart figure output ul.owner > li:not(.block)
 {
   border-bottom: 2px solid black;
-  box-shadow: 2px 3px 9px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 #dashboard .queue.chart figure output ul.owner ins.arrow b
 {
   border-right: 1px solid black;
-  box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 #dashboard .queue.chart figure output .Validating,
