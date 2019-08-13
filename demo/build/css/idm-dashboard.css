@@ -997,8 +997,8 @@ ins.arrow b {
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip dl dd {
-  min-width: 21em;
-  max-width: 24em;
+  min-width: 17em;
+  max-width: 21em;
   text-overflow: ellipsis;
   overflow: hidden;
 }

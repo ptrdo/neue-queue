@@ -398,6 +398,7 @@ const QueueView = function(props) {
   };
 
   const breakCamelCase = function(value) {
+    if (/^ExperimentId$/.test(value)) { value = "ExpId"; }
     return !!value ? value.split(/(?=[A-Z])/).join(" ") : "";
   };
 
@@ -806,6 +807,7 @@ const QueueView = function(props) {
    * appendTooltip applies secondary Response data to pre-built tooltip.
    * NOTE: A hyphen "-" passed as key will embed an <hr> divider.
    * NOTE: Unfound keys are passed-over and will not be appended.
+   * NOTE: Previous content of the same key will update, not append.
    * 
    * @param {DOMElement} ele is the tooltip element (e/g dfn.tooltip).
    * @param {Array} keys are the properties to be found in the info.
@@ -852,7 +854,12 @@ const QueueView = function(props) {
               referenceNode.classList.add("ignore");
             }
           } else {
-            dl.appendChild(dd);
+            if (dl.querySelector(`[itemprop=${key}] data`)) {
+              // this key was previously rendered, so update it...
+              dl.querySelector(`[itemprop=${key}] data`).innerText = val;
+            } else {
+              dl.appendChild(dd);
+            }
           }
         } else {
           dl.appendChild(dd);
