@@ -359,6 +359,10 @@ const QueueView = function(props) {
       this.output = {};
     },
 
+    get count () {
+      return _.flatMap(Object.values(this.output)).length;
+    },
+
     get latest () {
       return this.output;
     }
@@ -393,6 +397,10 @@ const QueueView = function(props) {
     }
   };
 
+  const breakCamelCase = function(value) {
+    return !!value ? value.split(/(?=[A-Z])/).join(" ") : "";
+  };
+
   /* EVENT-HANDLERS */
 
   /**
@@ -401,7 +409,11 @@ const QueueView = function(props) {
    */
   const onClick = function(event) {
     if (event.target.nodeName == "A") {
-      
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    } else if (event.target.nodeName == "DATA") {
+      event.stopPropagation();
+      event.stopImmediatePropagation();
     } else {
       event.preventDefault();
       let ele = event.target.closest("li[itemid]");
@@ -415,19 +427,8 @@ const QueueView = function(props) {
         }
         if (config.isSimulations && !ele.classList.contains("detailed")) {
           if (isValidGuid(guid)) {
-            fetchItemDetail(guid, function (data) {
-              if (!!data) {
-                if ("Name" in data) {
-                  ele.querySelector("dt").innerText = data.Name;
-                }
-                if ("SimulationRuntime" in data) {
-                  appendTooltip(ele, data["SimulationRuntime"], ["-", "Min", "Median", "Max"]);
-                }
-                if ("SimulationUsage" in data) {
-                  appendTooltip(ele, data["SimulationUsage"], ["-", "MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
-                }
-              }
-              ele.classList.add("detailed");
+            fetchItemDetail(guid, data => {
+              distributeItemDetail(ele, data);
             });
           }
         }
@@ -496,19 +497,8 @@ const QueueView = function(props) {
 
       if (config.isSimulations && !ele.classList.contains("detailed")) {
         if (isValidGuid(guid)) {
-          fetchItemDetail(guid, function (data) {
-            if (!!data) {
-              if ("Name" in data) {
-                ele.querySelector("dt a").innerText = data.Name;
-              }
-              if ("SimulationRuntime" in data) {
-                appendTooltip(ele, data["SimulationRuntime"], ["-+","Min","Median","Max"]);
-              }
-              if ("SimulationUsage" in data) {
-                appendTooltip(ele, data["SimulationUsage"], ["-","MaxCores","MinCores","TotalCoreTimeUsage","TotalDiskUsage"]);
-              }
-            }
-            ele.classList.add("detailed");
+          fetchItemDetail(guid, data => {
+            distributeItemDetail(ele, data);
           });
         }
       }
@@ -519,10 +509,9 @@ const QueueView = function(props) {
     holder.removeEventListener("mouseenter", onMouseEnter);
   };
 
-
   /* VIEW */
 
-  const render = function(callback) {
+  const render = function(callback, caller) {
 
     const setQueueBucket = function (parent, name) {
       let div = document.createElement("DIV");
@@ -559,6 +548,7 @@ const QueueView = function(props) {
         data.some((item,index) => {
 
           if (index == config.truncateMin && !view.figure.classList.contains("untruncated")) {
+            view.figure.querySelectorAll("ins.truncation var").forEach(control => control.innerText = collection.count);
             view.figure.classList.add("truncated");
             return true;
           }
@@ -624,10 +614,10 @@ const QueueView = function(props) {
               li.classList.add("process"); // TODO: consider the stage as className
             }
             if (/Orphan/.test(status)) {
-              a.setAttribute("href",`/#explore/Simulations?filters=Owner=${item.Owner}`);
+              a.setAttribute("href",`/#explore/Simulations?filters=Owner=${item.Owner}&offset=0`);
               a.setAttribute("title", `Explore ${item.Owner}'s Simulations`);
             } else {
-              a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${item.ExperimentId},SimulationState=${status}`);
+              a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${item.ExperimentId},SimulationState=${status}&offset=0`);
               a.setAttribute("title", info[status] > 1 ? `Explore These ${status} Simulations` : `Explore This ${status} Simulation`);
             }
             val.appendChild(document.createTextNode(info[status]));
@@ -670,7 +660,7 @@ const QueueView = function(props) {
           tip.classList.add("arrow");
           val.appendChild(document.createTextNode("Worker" in member ? member.Worker.Name : type));
           a.appendChild(val);
-          a.setAttribute("href",`/#explore/WorkItems?filters=Id=${id}&related=true`);
+          a.setAttribute("href",`/#explore/WorkItems?filters=Id=${id}&related=true&offset=0`);
           a.setAttribute("title", `Explore This Workflow`);
           li.appendChild(a);
           li.appendChild(tip);
@@ -689,16 +679,24 @@ const QueueView = function(props) {
     };
     const setQueueItemDetails = function (fragment, info) {
       /* TODO: coalesce/call appendTooltip(); */
-      let implement = function (key) {
+      let implement = function (key, index, arr, obj) {
         let dd = document.createElement("DD");
         let name = document.createElement("VAR");
         let value = document.createElement("DATA");
-        name.appendChild(document.createTextNode(key));
-        value.appendChild(document.createTextNode(info[key]));
-        dd.setAttribute("itemprop", key);
-        dd.appendChild(name);
-        dd.appendChild(value);
-        dl.appendChild(dd);
+        if (key === Object(key)) {
+          for (let k in key) { implement(k,index,arr,key); }
+        } else if (/^-$/.test(key)) {
+          let divider = document.createElement("HR");
+          dd.appendChild(divider);
+          dl.appendChild(dd);
+        } else {
+          name.appendChild(document.createTextNode(breakCamelCase(key)));
+          value.appendChild(document.createTextNode(!!obj?obj[key]:info[key]));
+          dd.setAttribute("itemprop", key);
+          dd.appendChild(name);
+          dd.appendChild(value);
+          dl.appendChild(dd);
+        }
       };
       let dfn = fragment.querySelector("DFN");
       let dl = document.createElement("DL");
@@ -711,28 +709,42 @@ const QueueView = function(props) {
 
       if (_.has(info, "ExperimentId")) {
         a.appendChild(document.createTextNode("Experiment"));
-        a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${info.ExperimentId}`);
+        a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${info.ExperimentId}&offset=0`);
         a.setAttribute("title", "Explore This Experiment");
-        ["Owner","ExperimentId","NodeGroup","Elapsed","SimulationCount"].forEach(implement);
+        [
+          "Owner","ExperimentId","NodeGroup","Elapsed","SimulationCount",
+          "-",{"Runtime":"Stats as work completes..."},
+          "-",{"Utilization":"Details when available..."}
+        ].forEach(implement);
       } else if (_.has(info, "Flow")) {
-        a.appendChild(document.createTextNode("Workflow"));
-        a.setAttribute("href",`/#explore/WorkItems?filters=Id=${info.Id}&related=true`);
+        a.appendChild(document.createTextNode(info["Name"]||"Workflow"));
+        a.setAttribute("href",`/#explore/WorkItems?filters=Id=${info.Id}&related=true&offset=0`);
         a.setAttribute("title", `Explore This Workflow`);
         ["Owner","Id","EnvironmentName","Elapsed","RelatedCount"].forEach(implement);
+        if (_.has(info.Flow, "Related") && info.Flow.Related.length > 1) {
+          info.Flow.Related.forEach(relation => {
+            implement("-",0,[],relation);
+            implement("ObjectType",0,[],relation);
+            if (_.has(relation, "Worker.Name")) {
+              implement("Worker",0,[],{"Worker":_.get(relation, "Worker.Name")});
+            }
+            implement("Id",0,[],relation);
+          });
+        }
       } else {
         a.appendChild(document.createTextNode("Orphan Simulation"));
-        a.setAttribute("href",`/#explore/Simulations?filters=Owner=${info.Owner}`);
+        a.setAttribute("href",`/#explore/Simulations?filters=Owner=${info.Owner}&offset=0`);
         a.setAttribute("title", `Explore ${info.Owner}'s Simulations`);
         ["Owner","NodeGroup","Elapsed"].forEach(implement);
       }
 
       dfn.classList.add("tooltip");
       dfn.appendChild(dl);
+      appendPin(dl);
     };
 
     if (!!view.chart) {
-      // @TODO: Diff with Collection! 
-      console.warn(`${config.chartContainer} was already rendered!`, view.element);
+      // @TODO: Diff with Collection!
       console.log(config.chartContainer, "CLEANING");
       destroy();
     }
@@ -743,14 +755,16 @@ const QueueView = function(props) {
     view.chart.addEventListener("click", onClick);
     view.figure.classList.add("process");
     view.figure.classList.remove("truncated");
-    
-    wait(100)
+
+    wait(0)
     .then(() => {
-      console.log(config.chartContainer, "RENDERING");
       for (let item in PRIORITY) {
         let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
         setQueueItems(bucket, PRIORITY[item].key);
       }
+    })
+    .finally(() => {
+      console.log(config.chartContainer, "RENDERING");
       addSourceSelect();
       addStateLegend();
       addTruncateToggle();
@@ -759,20 +773,28 @@ const QueueView = function(props) {
       }
     });
     
-    wait(200)
-    .then(() => view.figure.classList.remove("process"));
+    wait(300)
+    .then(() => {
+      view.figure.classList.remove("process");
+    });
   };
 
-  const appendPins = function (ele) {
-    let on = document.createElement("I");
-    let off = document.createElement("I");
-    on.classList.add("material-icons", "on");
-    on.appendChild(document.createTextNode("location_on"));
-    off.classList.add("material-icons", "off");
-    off.appendChild(document.createTextNode("location_off"));
-    ele.appendChild(on);
-    ele.appendChild(off);
-    ele.classList.add("control");
+  const appendPin = function (ele) {
+    let on, off, control = ele.querySelector("hr");
+    if (control) {
+      control = control.closest("dd");
+      if (control && !control.querySelector("i.material-icons")) {
+        on = document.createElement("I");
+        off = document.createElement("I");
+        on.classList.add("material-icons", "on");
+        off.classList.add("material-icons", "off");
+        on.appendChild(document.createTextNode("location_on"));
+        off.appendChild(document.createTextNode("location_off"));
+        control.appendChild(on);
+        control.appendChild(off);
+        control.classList.add("control");
+      }
+    }
   };
 
   /**
@@ -785,7 +807,7 @@ const QueueView = function(props) {
    */
   const appendTooltip = function (ele, info, keys) {
     let dl = ele.querySelector("DL");
-    let implement = function (key) {
+    let implement = function (key, index, source) {
       let val = 0;
       let dd = document.createElement("DD");
       let name = document.createElement("VAR");
@@ -795,7 +817,7 @@ const QueueView = function(props) {
         dd.appendChild(divider);
         dl.appendChild(dd);
       } else if (key in info) {
-        name.appendChild(document.createTextNode(key));
+        name.appendChild(document.createTextNode(breakCamelCase(key)));
         if (/^(Min|Median|Max|TotalCoreTimeUsage)$/i.test(key)) {
           val = parseInt(info[key]);
           val = val < 1000*60*60 ? (val/1000/60).toFixed(2) + " mins" : (val/1000/60/60).toFixed(2) + " hrs"
@@ -809,14 +831,30 @@ const QueueView = function(props) {
         dd.setAttribute("itemprop", key);
         dd.appendChild(name);
         dd.appendChild(value);
-        dl.appendChild(dd);
+        if (/^(Min|Median|Max|MaxCores|MinCores|TotalCoreTimeUsage|TotalDiskUsage)$/.test(key)) {
+          // we are inserting secondary info mid-tooltip...
+          let reference,referenceNode,placeholder = false;
+          if (index < 1) {
+            reference = key == "Min" ? "Runtime" : "Utilization";
+            placeholder = true;
+          } else {
+            reference = source[index-1];
+          }
+          referenceNode = dl.querySelector(`[itemprop=${reference}]`);
+          if (!!referenceNode && referenceNode.parentNode) {
+            referenceNode.parentNode.insertBefore(dd, referenceNode.nextSibling);
+            if (placeholder) {
+              referenceNode.classList.add("ignore");
+            }
+          } else {
+            dl.appendChild(dd);
+          }
+        } else {
+          dl.appendChild(dd);
+        }
       }
     };
     keys.forEach(implement);
-    let control = dl.querySelector("hr");
-    if (control) {
-      appendPins(control.closest("dd"));
-    }
   };
 
   /**
@@ -854,7 +892,7 @@ const QueueView = function(props) {
   const fetchWorkItems = function (successCallback, failureCallback)  {
     let scope = `,DateCreated%3E=${scopeDate()}`;
     let url = config.isMocked ? config.mockURL + "WorkItems.json"
-        : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Created${scope}&orderby=DateCreated%20desc&format=json`;
+        : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Succeeded,State!=Failed${scope}&orderby=DateCreated%20desc&format=json`;
     getSecure(url)
     .then(data => {
       /* @TODO: QUALIFY WORKFLOWS BY PRIORITY! */
@@ -908,9 +946,9 @@ const QueueView = function(props) {
             if ("Related" in node && node["Related"].length > 0) {
               fetchWorkFlowItems(item, 0, last);
             } else {
-              // this is a singular Work Item
+              // this is a last, singular Work Item
               if (!!last) {
-                wait(0).then(() => render());
+                wait(0).then(() => render(null,"fetchWorkFlow.success"));
               }
             }
           })
@@ -929,7 +967,7 @@ const QueueView = function(props) {
 
       // finish or continue
       // console.log("Fetched ALL Related!");
-      render();
+      wait(0).then(() => render(null,"fetchWorkFlow.else"));
     }
   };
 
@@ -959,7 +997,7 @@ const QueueView = function(props) {
             fetchItemDetail(guid, info => {
               item["Active"] = _.has(info, "SimulationStateCount") && _.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(info["SimulationStateCount"])).length > 0;
               if (lastly) {
-                wait(100).then(() => render());
+                wait(0).then(() => render(null,"fetchWorkFlowItems.success"));
               }
             },true);
             last = false;
@@ -983,7 +1021,7 @@ const QueueView = function(props) {
 
       // finish or continue
       if (!!last) {
-        wait(100).then(() => render());
+        wait(0).then(() => render(null,"fetchWorkFlowItems.else"));
       }
     }
   };
@@ -1016,7 +1054,7 @@ const QueueView = function(props) {
     })
     .finally(function () {
       if (!!last) {
-        wait(100).then(() => render());
+        wait(0).then(() => render(null,"fetchWorkFlowItemStats.finally"));
       }
       if (!!callback && callback instanceof Function) {
         callback({ Id: guid, Active: active });
@@ -1072,6 +1110,21 @@ const QueueView = function(props) {
         callback(null);
       }
     }
+  };
+
+  const distributeItemDetail = function (ele, data) {
+    if (!!data) {
+      if ("Name" in data) {
+        ele.querySelector("dt a").innerText = data.Name;
+      }
+      if ("SimulationRuntime" in data) {
+        appendTooltip(ele, data["SimulationRuntime"], ["Min", "Median", "Max"]);
+      }
+      if ("SimulationUsage" in data) {
+        appendTooltip(ele, data["SimulationUsage"], ["MaxCores", "MinCores", "TotalCoreTimeUsage", "TotalDiskUsage"]);
+      }
+    }
+    ele.classList.add("detailed");
   };
 
   const getSecure = function(url) {
@@ -1156,7 +1209,7 @@ const QueueView = function(props) {
       let isTruncated = view.figure.classList.contains("truncated");
       view.figure.classList.toggle("truncated", !isTruncated);
       view.figure.classList.toggle("untruncated", isTruncated);
-      render();
+      render(null,"truncating");
     });
   };
   
@@ -1283,6 +1336,8 @@ const QueueView = function(props) {
     });
   };
 
+  let drawing = false;
+
   return {
 
     /**
@@ -1296,11 +1351,14 @@ const QueueView = function(props) {
      */
     draw: function(overrides, callback) {
 
+      if (drawing) { return; }
+      drawing = true;
+
       if (config.isMocked) {
         if (!!view.chart) {
           collection.advance();
           destroy();
-          render(() => { /* callback */ });
+          render(() => { drawing = false; }, "draw.isMocked");
           return;
         } else {
           if (config.isSimulations) {
@@ -1308,10 +1366,10 @@ const QueueView = function(props) {
           } else {
             fetchWorkItems(
             () => {
-              /* successCallback */
+              drawing = false;
             },
             () => {
-              /* successCallback */
+              drawing = false;
             });
           }
         }
@@ -1322,16 +1380,19 @@ const QueueView = function(props) {
           destroy(true); // TODO: Only if need be.
           collection.update(config.queue);
           collection.merge(config.stats);
-          render(callback);
+          render(callback, "draw.api");
+          wait(0).then(() => drawing = false);
         } else {
           fetchWorkItems(
           () => {
             /* successCallback */
-            () => view.figure.classList.remove("process");
+            view.figure.classList.remove("process");
+            drawing = false;
           },
           () => {
             /* successCallback */
-            () => view.figure.classList.remove("process");
+            view.figure.classList.remove("process");
+            drawing = false;
           });
         }
       }
@@ -1347,6 +1408,10 @@ const QueueView = function(props) {
 
     getCollection: function() {
       return collection.latest;
+    },
+
+    getCollectionCount: function() {
+      return collection.count;
     },
 
     getConfig: function() {
@@ -1366,11 +1431,11 @@ const QueueView = function(props) {
         // @TODO: this.redraw(); // repreps existing data, rerenders.
 
         if (config.isMocked) {
-          fetchMockSimulations(() => { render(); });
+          fetchMockSimulations(() => { render(null,"setScoreSize.mocked"); });
         } else {
           collection.update(config.queue);
           collection.merge(config.stats);
-          render();
+          render(null,"setScoreSize.api");
         }
       } else {
         console.warn("scoreSize requires an integer between 0-100 (default is 24).")

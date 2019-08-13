@@ -177,6 +177,13 @@ html[data-useragent*="Trident"] #dashboard .truss > .chart.halfwidth
   white-space: nowrap;
 }
 
+#dashboard .chart figcaption span cite
+{
+  font-weight: normal;
+  white-space: nowrap;
+  color: #0072a2;
+}
+
 #dashboard .chart figcaption legend
 {
   width: auto;
@@ -989,9 +996,15 @@ ins.arrow b {
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip dl dd {
-  max-width: 16em;
+  min-width: 21em;
+  max-width: 24em;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+#dashboard .queue.chart ol > li dfn.tooltip dl dd:last-of-type
+{
+  margin-bottom: 8px;
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip var
@@ -1010,6 +1023,9 @@ ins.arrow b {
 {
   font-weight: bold;
   color: #0072a2;
+
+  display: inline;
+  cursor: text;
 }
 
 #dashboard .queue.chart ol > li dfn.tooltip data i
@@ -1069,24 +1085,24 @@ ins.arrow b {
   top: -0.15em;
 }
 
-#dashboard [itemid=QueueView].queue.chart ol > li:hover dfn.tooltip
+#dashboard [itemid^=QueueView].queue.chart ol > li:hover dfn.tooltip
 {
   overflow: visible;
   opacity: 1;
 }
 
-#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip
+#dashboard [itemid^=QueueView].queue.chart ol > li.active dfn.tooltip
 {
   overflow: visible;
   opacity: 1;
 }
 
-#dashboard [itemid=QueueView].queue.chart ol > li.closed dfn.tooltip
+#dashboard [itemid^=QueueView].queue.chart ol > li.closed dfn.tooltip
 {
   display: none;
 }
 
-#dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip  dl {
+#dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl {
   margin-left: 16px;
 }
 
@@ -1167,14 +1183,14 @@ ins.hoverover
 
 /* NEUE-QUEUE */
 
-.chart form legend select {
+#dashboard [itemid^=Queue].chart form legend select {
   display: none;
   margin: 2px 6px 2px 2px;
   color: #0072a2;
   background: whitesmoke;
   vertical-align: top;
 }
-.chart.mockable form legend select {
+#dashboard [itemid^=Queue].chart.mockable form legend select {
   display: inline-block;
 }
 
