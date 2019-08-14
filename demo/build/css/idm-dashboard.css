@@ -793,13 +793,13 @@ ins.arrow b {
   margin-right: 4px;
   line-height: 2;
   color: white;
-  font-weight: bold;
+  font-weight: normal;
   z-index: 1;
   cursor: pointer;
 
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 6em;
+  max-width: 7em;
   display: inline-block;
 }
 
@@ -941,7 +941,7 @@ ins.arrow b {
   color: black !important;
 }
 
-#dashboard .queue.chart ol > li:hover dfn.tooltip
+#dashboard [itemid=Queue].queue.chart ol > li:hover dfn.tooltip
 {
   overflow: visible;
   opacity: 1;
@@ -1086,7 +1086,7 @@ ins.arrow b {
   top: -0.15em;
 }
 
-#dashboard [itemid^=QueueView].queue.chart ol > li:hover dfn.tooltip
+body:not(.touch) #dashboard [itemid^=QueueView].queue.chart ol > li:hover dfn.tooltip
 {
   overflow: visible;
   opacity: 1;
@@ -1100,11 +1100,17 @@ ins.arrow b {
 
 #dashboard [itemid^=QueueView].queue.chart ol > li.closed dfn.tooltip
 {
+  overflow: hidden;
+  opacity: 0;
   display: none;
 }
 
 #dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl {
-  margin-left: 16px;
+   margin-left: 16px;
+ }
+
+body.touch #dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl {
+  margin-left: 24px;
 }
 
 
@@ -1271,6 +1277,11 @@ ins.hoverover
 {
   background: #006666;
   color: cyan;
+}
+
+body.touch #dashboard .queue.chart figure output ul > li.more {
+  width: 30px; 
+  max-width: 30px;
 }
 
 

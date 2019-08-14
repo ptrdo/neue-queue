@@ -70,11 +70,38 @@ const QueueView = function(props) {
     ]
   };
 
+  /**
+   * nullAuth supplants COMPS-UI-Auth when unavailable (e/g when dev without access to private repositories).
+   * @see this.config.auth
+   * @property {Function} getToken
+   * @property {Function} getUserNane
+   * @property {Function} tokenIsWaning
+   * @property {Funtion} refreshCredentials
+   */
+  const nullAuth = { 
+    getToken: () => "", 
+    getUserName: () => "",
+    tokenIsWaning: () => false,
+    refreshCredentials: function(token, successHandler, failureHandler) {
+      if (!!successHandler && successHandler instanceof Function) {
+        successHandler();
+      }
+    }
+  };
+
   /* CONFIG */
 
   const config = Object.assign({
 
-    auth: function () { return "comps" in window ? window.comps.auth : "idmauth" in window ? window.idmauth : { getToken: () => "", getUserName: () => "" }},
+    auth: function () { return "comps" in window ? window.comps.auth : "idmauth" in window ? window.idmauth : nullAuth},
+    cacheToken: "",
+    recycleToken: function(erase) {
+      this.cacheToken = erase ? "" : this.auth().getToken();
+    },
+    get token () {
+      return this.cacheToken;
+    },
+    
     entity: MODE.Simulations,
     scoreSize: 24,
     mocked: false,
@@ -100,7 +127,6 @@ const QueueView = function(props) {
     get activeWorkFlowsOnly () {
       return this.workFlowsActiveOnly;
     },
-
     set modeEntity (val) {
       this.entity = /work/i.test(val) ? MODE.WorkItems : MODE.Simulations;
     },
@@ -415,8 +441,21 @@ const QueueView = function(props) {
     } else if (event.target.nodeName == "DATA") {
       event.stopPropagation();
       event.stopImmediatePropagation();
+      if (window.getSelection && document.createRange) {
+        let range, selection = window.getSelection();
+        if (selection.toString().length < 1) { 
+          window.setTimeout(function(){
+            range = document.createRange();
+            range.selectNodeContents(event.target);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          },1);
+        }
+      }
     } else {
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       let ele = event.target.closest("li[itemid]");
       if (!!ele && !ele.classList.contains("block")) {
         let guid = ele.getAttribute("itemid");
@@ -428,7 +467,7 @@ const QueueView = function(props) {
         }
         if (config.isSimulations && !ele.classList.contains("detailed")) {
           if (isValidGuid(guid)) {
-            fetchItemDetail(guid, data => {
+            fetchItemDetail(guid, false, data => {
               distributeItemDetail(ele, data);
             });
           }
@@ -496,9 +535,9 @@ const QueueView = function(props) {
       // let top = parseInt(ele.closest("output").getBoundingClientRect().top);
       // marginTop: !!ff ? 0 : -top /* FF-specific adjustment (due to scrollTop) */
 
-      if (config.isSimulations && !ele.classList.contains("detailed")) {
+      if (!ele.classList.contains("detailed")) {
         if (isValidGuid(guid)) {
-          fetchItemDetail(guid, data => {
+          fetchItemDetail(guid, false, data => {
             distributeItemDetail(ele, data);
           });
         }
@@ -512,7 +551,7 @@ const QueueView = function(props) {
 
   /* VIEW */
 
-  const render = function(callback, caller) {
+  const render = function(callback) {
 
     let owner = config.auth().getUserName();
 
@@ -551,7 +590,6 @@ const QueueView = function(props) {
         data.some((item,index) => {
 
           if (index == config.truncateMin && !view.figure.classList.contains("untruncated")) {
-            view.figure.querySelectorAll("ins.truncation var").forEach(control => control.innerText = collection.count);
             view.figure.classList.add("truncated");
             return true;
           }
@@ -656,9 +694,9 @@ const QueueView = function(props) {
           if ("SimulationStateCount" in member) {
             setQueueItemSegments(fragment, member);
           } else {
-            fetchItemDetail(id, function(){
+            fetchItemDetail(id, true,function(){
               setQueueItemSegments(fragment, member);
-            }, true);
+            });
           }
           fragment.querySelector("li:last-of-type").style.marginRight = "22px";
         } else {
@@ -743,7 +781,6 @@ const QueueView = function(props) {
         a.setAttribute("title", `Explore ${info.Owner}'s Simulations`);
         ["Owner","NodeGroup","Elapsed"].forEach(implement);
       }
-
       dfn.classList.add("tooltip");
       dfn.appendChild(dl);
       appendPin(dl);
@@ -751,7 +788,6 @@ const QueueView = function(props) {
 
     if (!!view.chart) {
       // @TODO: Diff with Collection!
-      console.log(config.chartContainer, "CLEANING");
       destroy();
     }
 
@@ -770,10 +806,10 @@ const QueueView = function(props) {
       }
     })
     .finally(() => {
-      console.log(config.chartContainer, "RENDERING");
       addSourceSelect();
       addStateLegend();
       addTruncateToggle();
+      updateTruncateToggle();
       if (!!callback && callback instanceof Function) {
         callback(view.element);
       }
@@ -848,8 +884,12 @@ const QueueView = function(props) {
             reference = source[index-1];
           }
           referenceNode = dl.querySelector(`[itemprop=${reference}]`);
-          if (!!referenceNode && referenceNode.parentNode) {
-            referenceNode.parentNode.insertBefore(dd, referenceNode.nextSibling);
+          if (!!referenceNode && referenceNode.parentNode && !referenceNode.classList.contains("ignore")) {
+            if (dl.querySelector(`[itemprop=${key}] data`)) {
+              dl.querySelector(`[itemprop=${key}] data`).innerText = val;
+            } else {
+              referenceNode.parentNode.insertBefore(dd, referenceNode.nextSibling);
+            }
             if (placeholder) {
               referenceNode.classList.add("ignore");
             }
@@ -960,7 +1000,7 @@ const QueueView = function(props) {
             } else {
               // this is a last, singular Work Item
               if (!!last) {
-                wait(0).then(() => render(null,"fetchWorkFlow.success"));
+                wait(0).then(() => render());
               }
             }
           })
@@ -979,7 +1019,7 @@ const QueueView = function(props) {
 
       // finish or continue
       // console.log("Fetched ALL Related!");
-      wait(0).then(() => render(null,"fetchWorkFlow.else"));
+      wait(0).then(() => render());
     }
   };
 
@@ -1004,14 +1044,13 @@ const QueueView = function(props) {
           node = data[`${entity}s`][index];
           collection.augment(relation, node);
           if (/Experiment/i.test(entity)) {
-            // fetchWorkFlowItemStats(relation, last, info => { item["Active"] = info["Active"] }); /* @TODO: Deprecate */
             let lastly = last;
-            fetchItemDetail(guid, info => {
+            fetchItemDetail(guid, true, info => {
               item["Active"] = _.has(info, "SimulationStateCount") && _.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(info["SimulationStateCount"])).length > 0;
               if (lastly) {
-                wait(0).then(() => render(null,"fetchWorkFlowItems.success"));
+                wait(0).then(() => render());
               }
-            },true);
+            });
             last = false;
           } else {
             if (_.intersection(_.concat(STATE.PreActive,STATE.Active),[node["State"],node["SimulationState"]]).length > 0) {
@@ -1033,54 +1072,18 @@ const QueueView = function(props) {
 
       // finish or continue
       if (!!last) {
-        wait(0).then(() => render(null,"fetchWorkFlowItems.else"));
+        wait(0).then(() => render());
       }
     }
   };
 
   /**
-   * fetchWorkFlowItemStats is a secondary call upon every Experiment in the Response of fetchWorkFlow();
-   * @param {Object} item is the Collection node to be augmented.
-   * @param {Boolean} last is true when this is the final workflow to populate.
-   * @param {Function} callback 
-   */
-  const fetchWorkFlowItemStats = function (item, last, callback) {
-    let active = false;
-    let guid = _.get(item, "Id");
-    let entity = deduceEntityType(item);
-    let params = "Stats?statsoperations=simulationcount,simulationstatecount&format=json";
-    let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s/${guid}/${params}`;
-    getSecure(url)
-    .then(data => {
-      if (_.has(data, ["Stats", item.Id])) {
-        collection.augment(item, data.Stats[item.Id]);
-        if (_.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(data.Stats[item.Id]["SimulationStateCount"])).length > 0) {
-          active = true;
-        }
-      } else {
-        console.error("queueView.fetchWorkFlowItemStats", "Unexpected Mock Data", data);
-      }
-    })
-    .catch(function (error) {
-      ("queueView.fetchWorkFlowItemStats", error);
-    })
-    .finally(function () {
-      if (!!last) {
-        wait(0).then(() => render(null,"fetchWorkFlowItemStats.finally"));
-      }
-      if (!!callback && callback instanceof Function) {
-        callback({ Id: guid, Active: active });
-      }
-    });
-  };
-
-  /**
-   * fetchItemDetails is a secondary call upon interaction with chart items. 
+   * fetchItemDetail is a secondary call upon interaction with chart items. 
    * @param {String} guid is the item of interest which has been interacted with (e/g MouseEnter).
-   * @param {Function} callback returns the data (pointer) to the collection item (or null if not found). 
-   * @param {Boolean} counts gets simulationcount,simulationstatecount in stats request. 
+   * @param {Boolean} counts gets simulationcount,simulationstatecount in stats request.
+   * @param {Function} callback returns the data (pointer) to the collection item (or null if not found).
    */
-  const fetchItemDetail = function (guid, callback, counts) {
+  const fetchItemDetail = function (guid, counts, callback) {
     let item = collection.findItemById(guid);
     if (!!item) {
       let entity = deduceEntityType(item);
@@ -1144,7 +1147,7 @@ const QueueView = function(props) {
       method: "GET",
       cache: "no-cache",
       headers: {
-        "X-COMPS-Token": config.auth().getToken()
+        "X-COMPS-Token": config.token
       }
     }).then(response => response.json());
   };
@@ -1154,7 +1157,7 @@ const QueueView = function(props) {
       method: "GET",
       cache: "no-cache",
       headers: {
-        "X-COMPS-Token": config.auth().getToken()
+        "X-COMPS-Token": config.token
       },
       body: JSON.stringify(payload)
     }).then(response => response.json());
@@ -1221,7 +1224,16 @@ const QueueView = function(props) {
       let isTruncated = view.figure.classList.contains("truncated");
       view.figure.classList.toggle("truncated", !isTruncated);
       view.figure.classList.toggle("untruncated", isTruncated);
-      render(null,"truncating");
+      render();
+    });
+  };
+  
+  const updateTruncateToggle = function() {
+    if (!view.figure.querySelector("ins.truncation")) {
+      addTruncateToggle();
+    }
+    view.figure.querySelectorAll("ins.truncation var").forEach(toggle => {
+      toggle.innerText = collection.count;
     });
   };
   
@@ -1316,13 +1328,7 @@ const QueueView = function(props) {
         if (config.isSimulations) {
           fetchMockSimulations(render, recoup);
         } else {
-          fetchWorkItems(
-          () => {
-            /* successCallback */
-          },
-          () => {
-            /* successCallback */
-          });
+          fetchWorkItems();
         }
       } else {
         config.mocked = false;
@@ -1336,19 +1342,11 @@ const QueueView = function(props) {
           }
         } else {
           destroy(true);
-          fetchWorkItems(
-          () => {
-            /* successCallback */
-          },
-          () => {
-            /* successCallback */
-          });
+          fetchWorkItems();
         }
       }
     });
   };
-
-  let drawing = false;
 
   return {
 
@@ -1362,50 +1360,63 @@ const QueueView = function(props) {
      * @return null
      */
     draw: function(overrides, callback) {
-
-      if (drawing) { return; }
-      drawing = true;
+      
+      config.recycleToken();
 
       if (config.isMocked) {
         if (!!view.chart) {
           collection.advance();
           destroy();
-          render(() => { drawing = false; }, "draw.isMocked");
+          render();
           return;
         } else {
           if (config.isSimulations) {
             fetchMockSimulations(render, recoup);
           } else {
-            fetchWorkItems(
-            () => {
-              drawing = false;
-            },
-            () => {
-              drawing = false;
-            });
+            fetchWorkItems();
           }
         }
       } else {
         if (config.isSimulations) {
-          // dangerous, but insulated by view and module.
+
+          // Sim Queue originates at module, which maintains Auth
           Object.assign(config, (overrides || {}));
           destroy(true); // TODO: Only if need be.
           collection.update(config.queue);
           collection.merge(config.stats);
-          render(callback, "draw.api");
-          wait(0).then(() => drawing = false);
+          render(callback);
+          
         } else {
-          fetchWorkItems(
-          () => {
-            /* successCallback */
-            view.figure.classList.remove("process");
-            drawing = false;
-          },
-          () => {
-            /* successCallback */
-            view.figure.classList.remove("process");
-            drawing = false;
-          });
+          
+          const doWorkItems = function() {
+            fetchWorkItems(
+            () => {
+              /* successCallback */
+              view.figure.classList.remove("process");
+            },
+            () => {
+              /* successCallback */
+              view.figure.classList.remove("process");
+            });
+            if (!!callback && callback instanceof Function) {
+              callback();
+            }
+          };
+          if (config.auth().tokenIsWaning()) {
+            config.auth().refreshCredentials(
+                null, 
+                doWorkItems,
+                function(statusText, xhr) {
+                if (_.has(window, "comps.notifier")) {
+                  _.invoke(window, "comps.notifier.notify", statusText, { level: "error" });
+                } else { 
+                  alert(statusText);
+                }
+              }
+            );
+          } else {
+            doWorkItems();
+          }
         }
       }
     },
@@ -1443,11 +1454,11 @@ const QueueView = function(props) {
         // @TODO: this.redraw(); // repreps existing data, rerenders.
 
         if (config.isMocked) {
-          fetchMockSimulations(() => { render(null,"setScoreSize.mocked"); });
+          fetchMockSimulations(() => { render(); });
         } else {
           collection.update(config.queue);
           collection.merge(config.stats);
-          render(null,"setScoreSize.api");
+          render();
         }
       } else {
         console.warn("scoreSize requires an integer between 0-100 (default is 24).")

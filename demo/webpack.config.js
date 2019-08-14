@@ -46,6 +46,6 @@ module.exports = {
   },
   devServer: {
     contentBase: "./build",
-    port: 8081
+    port: 8084
   }
 };
