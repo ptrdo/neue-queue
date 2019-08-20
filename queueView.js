@@ -109,7 +109,7 @@ const QueueView = function(props) {
     mockPath: "",
     endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps-dev.idmod.org/api/")),
 
-    workFlowScopeInDays: 1,
+    workFlowScopeInDays: 0,
     workFlowsActiveOnly: true,
 
     truncateMin: 6,
@@ -384,7 +384,7 @@ const QueueView = function(props) {
     reset: function () {
       this.output = {};
     },
-
+    
     get count () {
       return _.flatMap(Object.values(this.output)).length;
     },
@@ -398,9 +398,14 @@ const QueueView = function(props) {
 
   const wait = time => new Promise((resolve) => setTimeout(resolve, time));
 
-  const scopeDate = function () {
-    let hours = 24 * config.daysOfWorkFlows;
-    return new Date(Date.now()-Math.floor(1000*60*60*hours)).toISOString();
+  const scopeDateFilter = function () {
+    let iso,hours = 24 * config.daysOfWorkFlows;
+    if (hours > 0) {
+      iso = new Date(Date.now()-Math.floor(1000*60*60*hours)).toISOString();
+      return `,DateCreated%3E=${iso}`;
+    } else {
+      return "";
+    }
   };
   
   const deduceEntityType = function (obj) {
@@ -422,7 +427,7 @@ const QueueView = function(props) {
       return false; 
     }
   };
-
+  
   const breakCamelCase = function(value) {
     if (/^ExperimentId$/.test(value)) { value = "ExpId"; }
     return !!value ? value.split(/(?=[A-Z])/).join(" ") : "";
@@ -467,7 +472,7 @@ const QueueView = function(props) {
         }
         if (config.isSimulations && !ele.classList.contains("detailed")) {
           if (isValidGuid(guid)) {
-            fetchItemDetail(guid, false, data => {
+            fetchItemDetail(guid, 2, data => {
               distributeItemDetail(ele, data);
             });
           }
@@ -537,7 +542,10 @@ const QueueView = function(props) {
 
       if (!ele.classList.contains("detailed")) {
         if (isValidGuid(guid)) {
-          fetchItemDetail(guid, false, data => {
+          fetchItemDetail(guid, 0, data => {
+            distributeItemDetail(ele, data);
+          });
+          fetchItemDetail(guid, 2, data => {
             distributeItemDetail(ele, data);
           });
         }
@@ -655,7 +663,7 @@ const QueueView = function(props) {
             li.classList.add(status);
             li.style.flexGrow = info[status];
             if (stage == "Active") {
-              li.classList.add("process"); // TODO: consider the stage as className
+              li.classList.add("process"); /* @TODO: consider the stage as className */
             }
             if (/Orphan/.test(status)) {
               a.setAttribute("href",`/#explore/Simulations?filters=Owner=${item.Owner}&offset=0`);
@@ -689,12 +697,12 @@ const QueueView = function(props) {
         let li = document.createElement("LI");
         let val = document.createElement("VAR");
         let tip = document.createElement("INS");
-        let type = member.ObjectType;
+        let type = member.ObjectType || "WorkItem";
         if (/^Experiment$/i.test(type)) {
           if ("SimulationStateCount" in member) {
             setQueueItemSegments(fragment, member);
           } else {
-            fetchItemDetail(id, true,function(){
+            fetchItemDetail(id, 1,function(){
               setQueueItemSegments(fragment, member);
             });
           }
@@ -713,7 +721,7 @@ const QueueView = function(props) {
           if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
             li.classList.add("process");
           }
-          li.style.flexGrow = /^Work/i.test(type) ? 1 : 10;
+          li.style.flexGrow = /work/i.test(type) ? 1 : 10;
           li.style.marginRight = "22px";
           fragment.appendChild(li);
           li.addEventListener("mouseenter", onMouseEnter);
@@ -765,7 +773,7 @@ const QueueView = function(props) {
         a.setAttribute("href",`/#explore/WorkItems?filters=Id=${info.Id}&related=true&offset=0`);
         a.setAttribute("title", `Explore This Workflow`);
         ["Owner","Id","EnvironmentName","Elapsed","RelatedCount"].forEach(implement);
-        if (_.has(info.Flow, "Related") && info.Flow.Related.length > 1) {
+        if (_.has(info.Flow, "Related") && info.Flow.Related.length > 0) {
           info.Flow.Related.forEach(relation => {
             implement("-",0,[],relation);
             implement("ObjectType",0,[],relation);
@@ -785,20 +793,17 @@ const QueueView = function(props) {
       dfn.appendChild(dl);
       appendPin(dl);
     };
-
-    if (!!view.chart) {
-      // @TODO: Diff with Collection!
-      destroy();
-    }
-
-    view.parent = document.querySelector(config.selector);
-    view.chart = view.parent.querySelector(config.chartContainer);
-    view.chart.addEventListener("scroll", onScroll);
-    view.chart.addEventListener("click", onClick);
-    view.figure.classList.add("process");
-    view.figure.classList.remove("truncated");
-
+        
     wait(0)
+    .then(() => destroy())
+    .then(() => {
+      view.parent = document.querySelector(config.selector);
+      view.chart = view.parent.querySelector(config.chartContainer);
+      view.chart.addEventListener("scroll", onScroll);
+      view.chart.addEventListener("click", onClick);
+      view.figure.classList.add("process");
+      view.figure.classList.remove("truncated");
+    })
     .then(() => {
       for (let item in PRIORITY) {
         let bucket = setQueueBucket(view.chart, PRIORITY[item].name);
@@ -918,6 +923,7 @@ const QueueView = function(props) {
 
   /**
    * destroy removes view and resets caches
+   * @param {Boolean} reset? clean data collection too
    */
   const destroy = function (reset) {
     if (!!view.chart) {
@@ -942,9 +948,9 @@ const QueueView = function(props) {
    * @param failureCallback
    */
   const fetchWorkItems = function (successCallback, failureCallback)  {
-    let scope = `,DateCreated%3E=${scopeDate()}`;
+    let scope = scopeDateFilter();
     let url = config.isMocked ? config.mockURL + "WorkItems.json"
-        : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Canceled,State!=Succeeded,State!=Failed${scope}&orderby=DateCreated%20desc&format=json`;
+        : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Created,State!=Canceled,State!=Succeeded,State!=Failed${scope}&orderby=DateCreated%20desc&format=json`;
     getSecure(url)
     .then(data => {
       /* @TODO: QUALIFY WORKFLOWS BY PRIORITY! */
@@ -976,30 +982,33 @@ const QueueView = function(props) {
    * @param {Integer} cursor is the position within the TopLevel items within the scope of concern.
    */
   const fetchWorkFlow = function (cursor) {
-    let item, guid, url, count, last;
+    let item, guid, asAncestor, url, count, last;
     let source = collection.latest.Normal;
     if (-1 < cursor && cursor < source.length) {
       last = cursor == source.length-1;
       item = source[cursor];
       guid = _.get(item, "Id");
       if (!!item && !!guid) {
+        asAncestor = Object.assign({ Relationship:"Ancestor" }, _.clone(item));
         url = config.isMocked ? config.mockURL + "Related.json" : `${config.endpoint}WorkItems/${guid}/Related?format=json`;
         getSecure(url)
         .then(data => {
           if (_.has(data, "Related")) {
             data = [data];
           }
-          data.forEach(node => {
+          data.filter(info => info.Id == item.Id).forEach(node => {
             if (_.has(node, "Related")) {
-              node["Ancestors"].unshift(Object.assign({ Relationship:"Ancestor" }, _.clone(item)));
+              node["Ancestors"].unshift(asAncestor);
               count = node["Related"].filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
             }
-            collection.augment(item,{ Flow: node, RelatedCount: count }, true);
+            collection.augment(item,{ Flow: _.clone(node), RelatedCount: count }, true);
             if ("Related" in node && node["Related"].length > 0) {
               fetchWorkFlowItems(item, 0, last);
             } else {
-              // this is a last, singular Work Item
+              // this is a singular Work Item.
+              collection.augment(item,{ Flow: { Ancestors: [ asAncestor ], Related: [] }, RelatedCount: 0 }, true);
               if (!!last) {
+                // if there are no Related, then this is the end of the line.
                 wait(0).then(() => render());
               }
             }
@@ -1045,7 +1054,7 @@ const QueueView = function(props) {
           collection.augment(relation, node);
           if (/Experiment/i.test(entity)) {
             let lastly = last;
-            fetchItemDetail(guid, true, info => {
+            fetchItemDetail(guid, 1, info => {
               item["Active"] = _.has(info, "SimulationStateCount") && _.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(info["SimulationStateCount"])).length > 0;
               if (lastly) {
                 wait(0).then(() => render());
@@ -1067,9 +1076,7 @@ const QueueView = function(props) {
       } else {
         fetchWorkFlowItems(item,cursor+1, last);
       }
-
     } else {
-
       // finish or continue
       if (!!last) {
         wait(0).then(() => render());
@@ -1080,16 +1087,16 @@ const QueueView = function(props) {
   /**
    * fetchItemDetail is a secondary call upon interaction with chart items. 
    * @param {String} guid is the item of interest which has been interacted with (e/g MouseEnter).
-   * @param {Boolean} counts gets simulationcount,simulationstatecount in stats request.
+   * @param {Integer} depth of 0|null is entity only, 1 is basic detail (e/g counts), 2 is deep (e/g simulationruntime).
    * @param {Function} callback returns the data (pointer) to the collection item (or null if not found).
    */
-  const fetchItemDetail = function (guid, counts, callback) {
+  const fetchItemDetail = function (guid, depth, callback) {
     let item = collection.findItemById(guid);
     if (!!item) {
       let entity = deduceEntityType(item);
       if (entity === "Experiment") {
-        let params = !!counts ? "statsoperations=simulationcount,simulationstatecount" : "statsoperations=simulationruntime,simulationusage";
-        let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}&${params}&format=json`;
+        let params = !depth ? "" : depth == 1 ? "&statsoperations=simulationcount,simulationstatecount,simulationusage" : "&statsoperations=simulationruntime";
+        let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}${params}&format=json`;
         getSecure(url)
         .then(data => {
           let updates = 0;
@@ -1126,7 +1133,7 @@ const QueueView = function(props) {
       }
     }
   };
-
+  
   const distributeItemDetail = function (ele, data) {
     if (!!data) {
       if ("Name" in data) {
@@ -1275,6 +1282,7 @@ const QueueView = function(props) {
     });
   };
 
+  let sourceSelectTrigger;
   const addSourceSelect = function() {
 
     const target = view.parent.querySelector("figcaption legend");
@@ -1293,7 +1301,7 @@ const QueueView = function(props) {
       ] 
         :
       [
-        { name:"API Work Items", value: 1, selected: true },
+        { name:"API Work Items", value: 0, selected: true },
         { name:"MOCK Work Items 1", value: "WorkItems/1/" },
         { name:"MOCK Work Items 2", value: "WorkItems/2/" },
         { name:"MOCK Work Items 3", value: "WorkItems/3/" },
@@ -1349,17 +1357,15 @@ const QueueView = function(props) {
   };
 
   return {
-
-    /**
-     * draw is the backwards-compatible interface called from dashboard/view.
-     * @TODO: Auth expiry can spur subsequent draws.
-     *
-     * @public called upon initial render and subsequent refresh (click).
-     * @param {Object} overrides (optional) modification since instantiation.
-     * @param {Function} callback (optional) code to execute upon render (at dashboard/view).
-     * @return null
-     */
+    
     draw: function(overrides, callback) {
+      /**
+       * draw is the backwards-compatible interface called from dashboard/view.
+       * @public called upon initial render and subsequent refresh (click).
+       * @param {Object} overrides (optional) modification since instantiation.
+       * @param {Function} callback (optional) code to execute upon render (at dashboard/view).
+       * @return null;
+       */
       
       config.recycleToken();
 
@@ -1422,37 +1428,40 @@ const QueueView = function(props) {
     },
 
     redraw: function(overrides) {
+      /** @deprecated legacy method, unused. */
       console.log("redraw!", overrides);
     },
 
     getView: function() {
+      /** @returns {Object} accessor for DOM elements associated with the Queue chart. */
       return view;
     },
 
     getCollection: function() {
+      /** @returns {Collection} the current Array of Objects currently within Queue. */
       return collection.latest;
     },
-
+    
     getCollectionCount: function() {
+      /** @returns {Integer} the number of items currently within Queue. */
       return collection.count;
     },
 
     getConfig: function() {
+      /** @returns {Object} the current configuration settings. */
       return config;
     },
 
     getMode: function() {
+      /** @returns {String} "Simulations" or "WorkItems". */
       return config.mode;
     },
 
     setScoreSize: function(value) {
+      /** @param {Integer} value (required) is scaling range within 0-100% (default is 24). */
       if (/^[1-9][0-9]$|[1-9]$/.test(value)) {
-
         config.scoreSize = parseInt(value);
         destroy(true);
-
-        // @TODO: this.redraw(); // repreps existing data, rerenders.
-
         if (config.isMocked) {
           fetchMockSimulations(() => { render(); });
         } else {
@@ -1466,10 +1475,12 @@ const QueueView = function(props) {
     },
 
     isMocked: function() {
+      /** @returns {Boolean} true when data currently shown is mocked, otherwise API (not mock). */
       return config.isMocked;
     },
     
-    toggleMockable: function(force) {
+    toggleMockSelect: function(force) {
+      /** @param {Boolean} force when true|false shows|hides data-source select-option. Otherwise toggle. */
       let mockable = arguments.length > 0 ? !!force : !view.parent.classList.contains("mockable");
       view.parent.classList.toggle("mockable", mockable);
       if (!mockable && config.isMocked) {
@@ -1487,23 +1498,45 @@ const QueueView = function(props) {
         }
       }
     },
+    
+    setMock: function(index) {
+      /** @param {Integer} index is the numbered mock to select. 0 (default) is API, not mock. */
+      let select = view.figure.querySelector("select");
+      let count = Array.prototype.filter.call(select.options, opt => /^0$|[a-zA-z]+/.test(opt.value)).length; 
+      if (sourceSelectTrigger === undefined) {
+        sourceSelectTrigger = document.createEvent("HTMLEvents");
+        sourceSelectTrigger.initEvent("change", false, true);
+      }
+      select.selectedIndex = /^\d+$/.test(index) ? Math.max(0, Math.min(count-1, parseInt(index))) : 1;
+      select.dispatchEvent(sourceSelectTrigger);
+      console.log(`The Queue chart has been set to option ${select.selectedIndex} of the possible values, 0-${count-1}.`);
+    },
 
     setWorkFlowsFilter: function(boo) {
-      // @param {Boolean} true shows only active workflows, false shows all within scope (API only).
-      config.workFlowsActive = boo;
-      let message = config.activeWorkFlowsOnly ? "ONLY ACTIVE" : "ALL";
-      console.log(`The Workflow Queue will now show ${message} items found within scope!`);
+      /** @param {Boolean} true (default) shows only active workflows, false shows all within scope (@see setWorkFlowsScope). */
+      if (config.isWorkItems) {
+        config.workFlowsActive = /1|true/i.test(boo) ? true : false;
+        let message = config.activeWorkFlowsOnly ? "ONLY ACTIVE" : "ALL";
+        console.log(`The Workflow Queue will now show ${message} items found within scope!`);
+      } else {
+        console.warn("Workflow filter only applies to a Queue chart displaying Work Items!");
+      }
     },
 
     setWorkFlowsScope: function(days) {
-      // @param {Number} days to go back from now in collecting Top-Level Work Items (API only). 
-      config.workFlowScope = days;
-      let message = 1 >= config.daysOfWorkFlows ? " day!" : " days!";
-      console.log(`The Workflow Queue will now show items within the past ${config.daysOfWorkFlows+message}`);
+      /** @param {Number} days before now from which to limit search of Top-Level Work Items. 0 (default) searches all. */ 
+      if (config.isWorkItems) {
+        config.workFlowScope = days;
+        let message = 1 >= config.daysOfWorkFlows ? " day!" : " days!";
+        console.log(`The Workflow Queue will now show items within the past ${config.daysOfWorkFlows+message}`);
+      } else {
+        console.warn("Workflow scope only applies to a Queue chart displaying Work Items!");
+      }
     },
 
-    status: function () {
-      return Object.keys(collection.latest).length;
+    initialized: function () {
+      /** @returns {Boolean} true when initialized with data, false when not. */
+      return !!Object.keys(collection.latest).length;
     }, 
     
     render: render

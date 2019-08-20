@@ -7,7 +7,7 @@
     "Owner": "bressler",
     "DateCreated": "2019-07-01T20:34:57.4800000Z",
     "LastModified": "2019-07-01T20:40:10.0930000Z",
-    "State": "Succeeded",
+    "State": "Waiting",
     "Worker": {
       "Name": "VisTools",
       "Version": "1.0.0.0_BKR"
@@ -16,17 +16,6 @@
     "HostName": "IDMPPWKS121",
     "WorkerInstanceId": "b1d6e5bf-b8f5-493b-b0bc-a7f1d1f373a4",
     "WorkingDirectory": "\\\\internal.idm.ctr\\IDM-Test\\home\\bressler\\workitems\\f4e\\437\\b03\\f4e437b0-3f9c-e911-a2bb-f0921c167866",
-    "WorkingDirectorySize": 0,
-    "Tags": {
-      "SimulationId": "1372877d-e199-e911-a2bb-f0921c167866"
-    },
-    "Files": [{
-      "Description": "Worker work order file",
-      "FileType": "workOrder",
-      "MD5Checksum": "0100fe41-6388-9ff1-89fb-154daeed786e",
-      "FileName": "workOrder.json",
-      "Length": 134,
-      "Uri": "https://comps-dev.idmod.org:443/asset/download/SWjG6iI7Y8tCdTjhqWTp2tXd3BQozARhfsEyaSxekb0_/UmVzZXJ2ZWRGb3JGdXR1cmVVc2U_/XFxpbnRlcm5hbC5pZG0uY3RyXElETS1UZXN0XENPTVBTXHN0b3JhZ2VcQXNzZXRzXDAxMFwwZmVcNDE2XDAxMDBmZTQxLTYzODgtOWZmMS04OWZiLTE1NGRhZWVkNzg2ZQ__/workOrder.json"
-    }]
+    "WorkingDirectorySize": 0
   }]
 }

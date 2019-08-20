@@ -4,7 +4,7 @@
       "WorkItemId": "f4e437b0-3f9c-e911-a2bb-f0921c167866",
       "Worker": "VisTools",
       "Owner": "bressler",
-      "StateName": "Succeeded",
+      "StateName": "Waiting",
       "NumberOfWorkItemsInThisGrouping": 1,
       "SimulationsCount": 1,
       "SuitesCount": 0,

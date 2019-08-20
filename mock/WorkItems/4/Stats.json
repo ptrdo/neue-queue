@@ -2,18 +2,31 @@
   "API": "/api/Experiments/Stats?statsoperations=simulationruntime,simulationusage,simulationcount,simulationstatecount&format=json",
   "Stats": {
     "7f8a723d-5f54-e911-a2c0-c4346bcb1554": {
-      "SimulationCount": 4400,
+      "SimulationCount": 1400,
       "SimulationStateCount": {
         "Commissioned": 400,
-        "Running": 1000,
-        "Succeeded": 3400
+        "Running": 800,
+        "Succeeded": 200
+      },
+      "SimulationRuntime": {
+        "Min": 20423,
+        "Q1": 26453,
+        "Median": 26964,
+        "Q3": 27868.5,
+        "Max": 29736
+      },
+      "SimulationUsage": {
+        "MinCores": 1,
+        "MaxCores": 1,
+        "TotalCoreTimeUsage": 2674819,
+        "TotalDiskUsage": 1157565700
       }
     },
     "aeb59903-d254-e911-a2c0-c4346bcb1554": {
-      "SimulationCount": 4400,
+      "SimulationCount": 1400,
       "SimulationStateCount": {
         "Running": 400,
-        "Succeeded": 4000
+        "Succeeded": 1000
       },
       "SimulationRuntime": {
         "Min": 20423,

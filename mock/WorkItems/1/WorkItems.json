@@ -7,7 +7,7 @@
     "Owner": "psylwester",
     "DateCreated": "2019-07-01T21:36:30.6970000Z",
     "LastModified": "2019-07-01T21:39:16.6630000Z",
-    "State": "Succeeded",
+    "State": "Waiting",
     "Worker": {
       "Name": "InputDataWorker",
       "Version": "1.0.0.0_RELEASE"

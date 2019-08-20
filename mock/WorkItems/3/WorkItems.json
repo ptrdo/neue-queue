@@ -6,7 +6,7 @@
       "Owner": "pselvaraj",
       "DateCreated": "2019-07-02T04:40:29.8630000Z",
       "LastModified": "2019-07-02T04:43:34.8300000Z",
-      "State": "Succeeded",
+      "State": "Waiting",
       "Worker": {
         "Name": "DockerWorker",
         "Version": "1.0.0.0_RELEASE"
