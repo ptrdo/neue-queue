@@ -154,6 +154,14 @@ const QueueView = function(props) {
     },
     get mode () {
       return this.entity;
+    },
+
+    debug: false,
+    set logging (boo) {
+      this.debug = !!boo;
+    },
+    get debugging () {
+      return this.debug;
     }
 
   }, (props||{}));
@@ -817,6 +825,9 @@ const QueueView = function(props) {
       updateTruncateToggle();
       if (!!callback && callback instanceof Function) {
         callback(view.element);
+      }
+      if (config.debugging) {
+        console.log(config.chartContainer, "Rendered data:", JSON.stringify(collection.latest));
       }
     });
     
@@ -1539,7 +1550,18 @@ const QueueView = function(props) {
       return !!Object.keys(collection.latest).length;
     }, 
     
-    render: render
+    render: render,
+
+    toggleDebug: function(force) {
+      /** @param {Boolean} force, when true will spill verbose logging to console. */
+      config.logging = force !== undefined ? !!force : !config.debugging;
+      if (config.debugging) {
+        console.warn(config.chartContainer, "Verbose logging enabled!");
+        console.log(config.chartContainer, "Last Rendered data:", JSON.stringify(collection.latest));
+      } else {
+        console.log(config.chartContainer, "Verbose logging disabled.");
+      }
+    }
   }
 };
 

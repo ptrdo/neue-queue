@@ -14,16 +14,30 @@
   <link rel="stylesheet" href="css/idm-dashboard.css">
   <script src="bundle.js"></script>
   <style>
-    /* TEMPORARY */
-    .chart form legend select {
-      margin: 2px 6px 2px 2px;
-      color: #0072a2;
-      background: whitesmoke;
-      vertical-align: top;
+    #dashboard fieldset {
+      text-align: center;
+    }
+    #dashboard fieldset > button {
+      display: none;
+      min-width: 5em;
+      margin: 0 auto;
+      padding: 0.5em 1em;
+    }
+    #dashboard fieldset > button[name=reset],
+    body.ready #dashboard fieldset > button[name=source],
+    body.ready #dashboard fieldset > button[name=modes] {
+      display: inline-block;
+    }
+    body #dashboard fieldset > button[name=reset] span {
+      display: none;
+    }
+    body.ready #dashboard fieldset > button[name=reset] span:last-of-type,
+    body:not(.ready) #dashboard fieldset > button[name=reset] span:first-of-type{
+      display: inline;
     }
   </style>
 </head>
-<body class="ready dashboard">
+<body class="dashboard">
   <main role="main" id="main">
     <header id="header">
       <aside class="truss"></aside>

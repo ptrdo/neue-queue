@@ -19,56 +19,119 @@ class Index {
 
   render(rootElement=document) {
 
-    templater.render(
-      rootElement.querySelector("#dashboard [itemscope]"),
-      {
+    const config = {
+      Simulations: {
         name: "QueueView",
-        type: "arrow",
-        title: "Simulations Currently in Queue for Processing",
+        title: "Simulations Currently in Queue",
         description: "On the Belegost Environment",
         css: "chart queue fullwidth",
-        enabled: true
+        enabled: true,
+        type: "arrow",
+        selector: "[itemid=QueueView]",
+        chartContainer:"#QueueView",
+        useMockData: true,
+        mockPath: "Simulations/1/",
+        modeEntity: "Simulations",
+        api: function(mode,refresh) {
+          if (!!mode) {
+            this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
+          }
+          if (!!refresh) {
+            // refreshMetric("QueueView", true);
+            alert("There is no controller to GET this data!");
+          }
+        }
+      },
+      WorkItems: {
+        name: "QueueViewFlows",
+        title: "Workflows Currently Processing",
+        description: "On Environments Available to You",
+        css: "chart queue fullwidth",
+        enabled: true,
+        type: "arrow",
+        selector: "[itemid=QueueViewFlows]",
+        chartContainer:"#QueueViewFlows",
+        useMockData: true,
+        mockPath: "WorkItems/1/",
+        modeEntity: "WorkItems",
+        api: function(mode,refresh) {
+          if (!!mode) {
+            this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
+          }
+          if (!!refresh) {
+            // refreshMetric("QueueViewFlows", true);
+            alert("There is no controller to GET this data!");
+          }
+        }
       }
-    );
+    };
 
-    let queue = new Queue({
-      type: "arrow",
-      selector: "[itemid=QueueView]",
-      chartContainer:"#QueueView",
-      useMockData: true,
-      mockPath: "Simulations/1/", /* default */
-      modeEntity: "Simulations",
-      api: function(mode,refresh) {
-        if (!!mode) {
-          this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
-        }
-        if (!!refresh) {
-          // refreshMetric("QueueView", true);
-          alert("There is no controller to GET this data!");
-        }
-      }
-    });
-    window["queue"] = queue;
+    const subset = (obj, ...keys) => keys.reduce((a, c) => ({ ...a, [c]: obj[c] }), {});
+
+    let mode = ["Simulations","WorkItems"];
+    const init = function () {
+      let ele = rootElement.querySelector("#dashboard [itemscope]");
+      templater.clear(ele);
+      templater.render(
+        ele,
+        subset(config[mode[0]], "name","type","title","description","css","enabled")
+      );
+
+      let queue = new Queue(subset(config[mode[0]], "type","selector","chartContainer","useMockData","mockPath","modeEntity","api"));
+      window["queue"] = queue;
+    };
+
+    init();
 
     let refresh = rootElement.querySelector("[itemid=QueueView] button.refresh");
     refresh.addEventListener("click", function(event) {
       event.preventDefault();
       queue.draw();
     });
+
+    let fieldset = document.createElement("FIELDSET");
+    rootElement.querySelector(".wrap").appendChild(fieldset);
     
-    let button = document.createElement("BUTTON");
-    button.appendChild(document.createTextNode("Do It!"));
-    button.setAttribute("style", "display:block;margin:0 auto;padding: 0.5em 1em;")
-    button.addEventListener("click", function (event) {
+    let reset = document.createElement("BUTTON");
+    reset.setAttribute("name","reset");
+    ["Do It!", "Reset"].forEach(term => {
+      let span = document.createElement("SPAN");
+      span.appendChild(document.createTextNode(term));
+      reset.appendChild(span);
+    });
+    reset.addEventListener("click", function (event) {
       event.preventDefault();
-      if (queue.status()) {
+      if (queue.initialized()) {
         window.location.reload();
       } else {
         queue.draw();
-        this.innerText = "Reset";
+        document.body.classList.add("ready");
       }
     });
-    rootElement.appendChild(button);
+    fieldset.appendChild(reset);
+
+    let source = document.createElement("BUTTON");
+    source.setAttribute("name","source");
+    source.appendChild(document.createTextNode("Sources"));
+    source.addEventListener("click", function (event) {
+      event.preventDefault();
+      queue.toggleMockSelect();
+      if (!queue.initialized()) {
+        reset.click();
+      }
+    });
+    fieldset.appendChild(source);
+
+    let modes = document.createElement("BUTTON");
+    modes.setAttribute("name","modes");
+    modes.appendChild(document.createTextNode("Modes"));
+    modes.addEventListener("click", function (event) {
+      event.preventDefault();
+      mode.reverse();
+      init();
+      document.body.classList.remove("ready");
+    });
+    fieldset.appendChild(modes);
 
     let authMenu = document.querySelector("a.nav-account");
     authMenu.addEventListener("click", function (event) {
@@ -83,7 +146,7 @@ class Index {
     authToggle.addEventListener("click", function (event) {
       let menu = event.target;
       while (!menu.classList.contains("active")) {
-        menu = menu.parentElement;s
+        menu = menu.parentElement;
       }
       menu.classList.remove("active");
       Auth.signout(Config.appName);
