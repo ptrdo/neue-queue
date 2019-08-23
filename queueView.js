@@ -1,12 +1,13 @@
 import _ from "lodash";
-import Config from "config";
+import Config from "config"; // COMPS: disable this import
+import * as repro from "./demo/data/repro.json"; // COMPS: "../data/repro.json"
 
 /**
  * QueueView
  * Dashboard visualiser of cluster traffic
  *
  * @author psylwester(at)idmod(dot)org
- * @version 2.00, 2019/08/01
+ * @version 2.6.0, 2019/08/22
  * @requires ES6, lodash
  *
  */
@@ -18,6 +19,16 @@ const QueueView = function(props) {
   const MODE = {
     Simulations: "Simulations",
     WorkItems: "WorkItems"
+  };
+
+  const REPRO = {
+    enabled: false,
+    mode: MODE.Simulations,
+    data: _.get(repro, "default", { Highest:[],AboveNormal:[],Normal:[],BelowNormal:[],Lowest:[] }),
+    toggle: function(mode) {
+      this.mode = mode; 
+      this.enabled = !this.enabled
+    }
   };
 
   const PRIORITY = {
@@ -91,6 +102,25 @@ const QueueView = function(props) {
 
   /* CONFIG */
 
+  /**
+   * config are application settings, populated/overriden as necessary upon instantiation.
+   * NOTE: Setters here will process incoming values of the same key as the setter name.
+   *
+   * @private
+   * @property {Function} auth() will call whatever auth exists for project, or nullAuth when none.
+   * @property {String} cacheToken (and set/get) stores Token for looping fetches.
+   * @property {String} entity (and set/get) is the entity type being charted.
+   * @property {Integer} scoreSize (and set/get) is differentiating scale factor (range:0-100, default:24).
+   * @property {Boolean} mocked (and set/get) is flag for diverting from API to mocked Response data (default:false).
+   * @property {String} mockRoot is variable path to the mocked Response resources.
+   * @property {String} mockPath is the directory path of the current mocked resource.
+   * @property {String} endpoint is the relative or absolute path to API.
+   * @property {Float} workFlowScopeInDays (and get/set) is DateCreated ago to search for Work Items (default:0).
+   * @property {Boolean} workFlowsActiveOnly (and get/set) filters Work Items to active or all (default:false).
+   * @property {Integer} truncateMin is the number of items viewable in any Priority Bucket prior to truncation.
+   * @property {Integer} truncateMax is the maximum number of items total to be shown in a queue.
+   * @property {Boolean} debug (and get/set) when true, traces JSON.stringify(collection.last) per render.
+   */
   const config = Object.assign({
 
     auth: function () { return "comps" in window ? window.comps.auth : "idmauth" in window ? window.idmauth : nullAuth},
@@ -105,7 +135,7 @@ const QueueView = function(props) {
     entity: MODE.Simulations,
     scoreSize: 24,
     mocked: false,
-    mockRoot: ("comps" in window ? "/app/dashboard/data/" : "mock/"),
+    mockRoot: ("comps" in window ? "/app/dashboard/data/" : "/data/"),
     mockPath: "",
     endpoint: ("comps" in window ? "/api/" : _.get(Config,  "endpoint", "https://comps-dev.idmod.org/api/")),
 
@@ -155,7 +185,7 @@ const QueueView = function(props) {
     get mode () {
       return this.entity;
     },
-
+    
     debug: false,
     set logging (boo) {
       this.debug = !!boo;
@@ -166,6 +196,15 @@ const QueueView = function(props) {
 
   }, (props||{}));
 
+  /**
+   * view is the resource of DOM elements of concern here.
+   *
+   * @private
+   * @property {HTMLElement} root (get/set parent) is the templated element.
+   * @property {HTMLElement} output (get/set chart) is the chart container.
+   * @property {HTMLElement} figure (getter) is the intermediate element.
+   *
+   */
   const view = {
 
     root: document.querySelector("[itemid=QueueView]"),
@@ -280,7 +319,7 @@ const QueueView = function(props) {
           let scores = counts.filter((v,i) => counts.indexOf(v) === i).sort((a,b)=>a-b).reverse();
           let sizes = scoreSizes(scores.length);
           data[bucket.key].forEach(function(item) {
-            item.size = sizes[scores.indexOf(item["SimulationCount"])];
+            item.ViewSize = sizes[scores.indexOf(item["SimulationCount"])];
           });
         } else {
           // Response data won't have empty buckets.
@@ -397,15 +436,37 @@ const QueueView = function(props) {
       return _.flatMap(Object.values(this.output)).length;
     },
 
+    /**
+     * latest provides the currently assembled data of queue.
+     * NOTE: Can by hijacked by REPRO settings to render repro.json.
+     * @returns {Collection} the Object of Arrays of Objects.
+     */
     get latest () {
+      if (REPRO.enabled) {
+        if (REPRO.mode === MODE.Simulations && config.isSimulations) {
+          return REPRO.data;
+        } else if (REPRO.mode === MODE.WorkItems && config.isWorkItems) {
+          return REPRO.data;
+        }
+      }
       return this.output;
     }
   };
 
   /* UTILITIES */
 
+  /**
+   * wait is essentially a setTimeout Promise.
+   * @usage wait(200).then(() => { doSomething(); });
+   * @param {Integer} time (required) is milliseconds of wait.
+   * @returns {Promise}
+   */
   const wait = time => new Promise((resolve) => setTimeout(resolve, time));
 
+  /**
+   * scopeDateFilter supplies URL-compliant parameter for search filter.
+   * @returns {String} assumed to be a comma-delineated component of "?filters=" argument.
+   */
   const scopeDateFilter = function () {
     let iso,hours = 24 * config.daysOfWorkFlows;
     if (hours > 0) {
@@ -415,7 +476,12 @@ const QueueView = function(props) {
       return "";
     }
   };
-  
+
+  /**
+   * deduceEntityType is a convenience standard for determining entity from expected properties.
+   * @param {Object} obj (required) is the data node containing expected properties.
+   * @returns {String} the entity type.
+   */
   const deduceEntityType = function (obj) {
     if ("ExperimentId" in obj) {
       return "Experiment";
@@ -428,6 +494,11 @@ const QueueView = function(props) {
     }
   };
 
+  /**
+   * isValidGuid determines validity of GUID string.
+   * @param {String} candidate (required) is the GUID to test.
+   * @returns {Boolean} true when valid.
+   */
   const isValidGuid = function (candidate) {
     if (arguments.length > 0) {
       return /[a-fA-F0-9]{8}(?:-[a-fA-F0-9]{4}){3}-[a-fA-F0-9]{12}/.test(candidate);
@@ -435,7 +506,12 @@ const QueueView = function(props) {
       return false; 
     }
   };
-  
+
+  /**
+   * breakCamelCase improves human-legibility of property keys.
+   * @param {String} value (required) is the property key to parse.
+   * @return {String} the human-legible term.
+   */
   const breakCamelCase = function(value) {
     if (/^ExperimentId$/.test(value)) { value = "ExpId"; }
     return !!value ? value.split(/(?=[A-Z])/).join(" ") : "";
@@ -495,13 +571,17 @@ const QueueView = function(props) {
   };
 
   /**
-   * unClick removes listeners to view's interaction.
-   * @todo manage listeners
+   * unClick removes the onClick listener.
+   * @param {HTMLElement} holder (required) is the element with listener attached.
    */
   const unClick = function(holder) {
     holder.removeEventListener("click", onClick);
   };
 
+  /**
+   * onScroll (and global scrolling interval) flags scrolling elements as they scroll.
+   * @param {Event} the scroll event.
+   */
   let scrolling = 0;
   const onScroll = function (event) {
     if (!scrolling) {
@@ -518,11 +598,19 @@ const QueueView = function(props) {
       scrolling = 0;
     }, 500);
   };
-  
+
+  /**
+   * unScroll removes the onScroll listener.
+   * @param {HTMLElement} holder (required) is the element with listener attached.
+   */
   const unScroll = function (holder) {
     holder.removeEventListener("scroll", onScroll);
   };
 
+  /**
+   * onMouseEnter is the primary trigger for engagement with charted items.
+   * @param {Event} the mouseenter event.
+   */
   const onMouseEnter = function (event) {
 
     let ele = event.target.closest("li[itemid]");
@@ -561,12 +649,20 @@ const QueueView = function(props) {
     }
   };
 
+  /**
+   * unMouseEnter removes the onMouseEnter listener.
+   * @param {HTMLElement} holder (required) is the element with listener attached.
+   */
   const unMouseEnter = function (holder) {
     holder.removeEventListener("mouseenter", onMouseEnter);
   };
 
   /* VIEW */
 
+  /**
+   * render executes all DOM-related mutations.
+   * @callback is passed the rendered view's container element.
+   */
   const render = function(callback) {
 
     let owner = config.auth().getUserName();
@@ -627,7 +723,7 @@ const QueueView = function(props) {
 
           block.appendChild(document.createElement("DFN"));
           block.classList.add("block");
-          block.style.width = `${item.size}%`;
+          block.style.width = `${item.ViewSize}%`;
 
           doc.appendChild(li);
           li.appendChild(ul);
@@ -824,19 +920,23 @@ const QueueView = function(props) {
       addTruncateToggle();
       updateTruncateToggle();
       if (!!callback && callback instanceof Function) {
-        callback(view.element);
+        callback(view.parent);
       }
       if (config.debugging) {
         console.log(config.chartContainer, "Rendered data:", JSON.stringify(collection.latest));
       }
     });
     
-    wait(300)
+    wait(400)
     .then(() => {
       view.figure.classList.remove("process");
     });
   };
 
+  /**
+   * appendPin does standard attachment of the "pin" indicator icon.
+   * @param {HTMLElement} ele (required) is assumed to be the tooltip's DL element.
+    */
   const appendPin = function (ele) {
     let on, off, control = ele.querySelector("hr");
     if (control) {
@@ -926,7 +1026,8 @@ const QueueView = function(props) {
   };
 
   /**
-   * recoup recovers gracefully from data access failure
+   * recoup recovers gracefully from data access failure (unused).
+   * @TODO
    */
   const recoup = function () {
 
@@ -934,7 +1035,7 @@ const QueueView = function(props) {
 
   /**
    * destroy removes view and resets caches
-   * @param {Boolean} reset? clean data collection too
+   * @param {Boolean} reset, when true will initialize data collection too.
    */
   const destroy = function (reset) {
     if (!!view.chart) {
@@ -954,28 +1055,83 @@ const QueueView = function(props) {
   /* WORKFLOWS */
 
   /**
+   * fetchTally is the companion store for tallyFetch();
+   * @property {Array} fetchMethods tuple of [Requests,Responses].
+   * @property {Function} reset will zero-out this store to defaults.
+   * @property {Function} complete deduces when all Requests have corresponding Response (as finally).
+   * @property {Function} print logs the current status of fetchMethods
+   */
+  let fetchTally = {
+    fetchWorkItems: [0,0],
+    fetchWorkFlow: [0,0],
+    fetchWorkFlowItems: [0,0],
+    fetchItemDetail: [0,0],
+    reset: function() {
+      for (let name in this) {
+        if (Array.isArray(this[name])) {
+          this[name] = [0,0];
+        }
+      }
+    },
+    complete: function() {
+      let result = "";
+      for (let name in this) {
+        if (Array.isArray(this[name])) {
+          result += this[name][0]+this[name][1];
+        }
+      }
+      return result === "0000";
+    },
+    print: function() {
+      console.log(this.fetchWorkItems.join("|"),this.fetchWorkFlow.join("|"),this.fetchWorkFlowItems.join("|"),this.fetchItemDetail.join("|"));
+    }
+  };
+
+  /**
+   * tallyFetch accounts for matching every Request to every Response.
+   * @param {String} method is the fetch sending Requests and expecting Responses. 
+   * @param {Integer} tally, when positive is a Request, when negative is a Response (a finally).
+   */
+  const tallyFetch = function (method, tally) {
+    let count = /^-?\d+$/.test(tally) ? parseInt(tally) : 0;
+    if (!!method && method in fetchTally) {
+      if (count > 0) {
+        if (method == "fetchWorkItems") { fetchTally.reset(); }
+        fetchTally[method][0] += count;
+      } else if (count < 0) {
+        fetchTally[method][1] += count;
+      }
+    }
+    // fetchTally.print();
+    if (fetchTally.complete()) {
+      // console.error("COMPLETE!");
+      wait(0).then(() => render());
+    }
+  };
+
+  /**
    * fetchWorkItems is initial call to get TopLevel items within the scope of concern.
    * @param successCallback
    * @param failureCallback
    */
   const fetchWorkItems = function (successCallback, failureCallback)  {
     let scope = scopeDateFilter();
+    let count = 0;
     let url = config.isMocked ? config.mockURL + "WorkItems.json"
         : `${config.endpoint}WorkItems?filters=isTopLevel=1,State!=Created,State!=Canceled,State!=Succeeded,State!=Failed${scope}&orderby=DateCreated%20desc&format=json`;
+    tallyFetch("fetchWorkItems",1);
     getSecure(url)
     .then(data => {
       /* @TODO: QUALIFY WORKFLOWS BY PRIORITY! */
-      collection.update({ "Normal": data.WorkItems });
-      fetchWorkFlow(0);
-    })
-    .then(update => new Promise(function(resolve) {
+      if (_.has(data, "WorkItems")) {
+        collection.update({ "Normal": data.WorkItems });
+        tallyFetch("fetchWorkFlow", data.WorkItems.length);
+        fetchWorkFlow(0);
+      }
       if (successCallback && successCallback instanceof Function) {
         successCallback();
       }
-      setTimeout(function () {
-        resolve(update);
-      }, 0);
-    }))
+    })
     .catch(function (error) {
       if (failureCallback && failureCallback instanceof Function) {
         failureCallback(error);
@@ -985,6 +1141,7 @@ const QueueView = function(props) {
     })
     .finally(function () {
       // console.log("Fetched ALL Work Items!");
+      tallyFetch("fetchWorkItems",-1);
     });
   };
 
@@ -993,10 +1150,9 @@ const QueueView = function(props) {
    * @param {Integer} cursor is the position within the TopLevel items within the scope of concern.
    */
   const fetchWorkFlow = function (cursor) {
-    let item, guid, asAncestor, url, count, last;
+    let item, guid, asAncestor, url, count = 0;
     let source = collection.latest.Normal;
     if (-1 < cursor && cursor < source.length) {
-      last = cursor == source.length-1;
       item = source[cursor];
       guid = _.get(item, "Id");
       if (!!item && !!guid) {
@@ -1005,23 +1161,22 @@ const QueueView = function(props) {
         getSecure(url)
         .then(data => {
           if (_.has(data, "Related")) {
+            // Mocked data can be a collection, 
+            // so make the singular API Response the same.
             data = [data];
           }
           data.filter(info => info.Id == item.Id).forEach(node => {
-            if (_.has(node, "Related")) {
+            
+            if (_.has(node, "Related") && node.Related.length > 0) {
               node["Ancestors"].unshift(asAncestor);
-              count = node["Related"].filter(item => _.get(item, "ObjectType") != "AssetCollection").length;
-            }
-            collection.augment(item,{ Flow: _.clone(node), RelatedCount: count }, true);
-            if ("Related" in node && node["Related"].length > 0) {
-              fetchWorkFlowItems(item, 0, last);
+              count = node["Related"].filter(item => /Simulation|Experiment|WorkItem/i.test(_.get(item, "ObjectType"))).length;
+              collection.augment(item,{ Flow: _.clone(node), RelatedCount: count }, true);
+              tallyFetch("fetchWorkFlowItems", count);
+              fetchWorkFlowItems(item, 0);
+            
             } else {
               // this is a singular Work Item.
               collection.augment(item,{ Flow: { Ancestors: [ asAncestor ], Related: [] }, RelatedCount: 0 }, true);
-              if (!!last) {
-                // if there are no Related, then this is the end of the line.
-                wait(0).then(() => render());
-              }
             }
           })
         })
@@ -1030,16 +1185,15 @@ const QueueView = function(props) {
         })
         .finally(function () {
           fetchWorkFlow(cursor+1); // goto next
+          tallyFetch("fetchWorkFlow", -1);
         });
       } else {
         fetchWorkFlow(cursor+1); // goto next
       }
 
     } else {
-
       // finish or continue
       // console.log("Fetched ALL Related!");
-      wait(0).then(() => render());
     }
   };
 
@@ -1047,9 +1201,8 @@ const QueueView = function(props) {
    * fetchWorkFlowItems is an iterative call upon every item in the Response of fetchWorkFlow();
    * @param {Object} item is the Collection node to be augmented.
    * @param {Integer} cursor is the position within the target node's collection of "Related" items.
-   * @param {Boolean} last is true when this is the final workflow to populate.
    */
-  const fetchWorkFlowItems = function (item, cursor, last) {
+  const fetchWorkFlowItems = function (item, cursor) {
     let relation, entity, guid, url, index, node;
     let flow = _.get(item, "Flow");
     if (!!flow && "Related" in flow && -1 < cursor && cursor < flow["Related"].length) {
@@ -1064,14 +1217,11 @@ const QueueView = function(props) {
           node = data[`${entity}s`][index];
           collection.augment(relation, node);
           if (/Experiment/i.test(entity)) {
-            let lastly = last;
+            tallyFetch("fetchItemDetail", 1);
             fetchItemDetail(guid, 1, info => {
+              tallyFetch("fetchItemDetail", -1);
               item["Active"] = _.has(info, "SimulationStateCount") && _.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(info["SimulationStateCount"])).length > 0;
-              if (lastly) {
-                wait(0).then(() => render());
-              }
             });
-            last = false;
           } else {
             if (_.intersection(_.concat(STATE.PreActive,STATE.Active),[node["State"],node["SimulationState"]]).length > 0) {
               item["Active"] = true;
@@ -1082,15 +1232,11 @@ const QueueView = function(props) {
           console.error("queueView.fetchWorkFlowItems", error);
         })
         .finally(function () {
-          fetchWorkFlowItems(item,cursor+1, last); // goto next
+          fetchWorkFlowItems(item,cursor+1); // goto next
+          tallyFetch("fetchWorkFlowItems", -1);
         });
       } else {
-        fetchWorkFlowItems(item,cursor+1, last);
-      }
-    } else {
-      // finish or continue
-      if (!!last) {
-        wait(0).then(() => render());
+        fetchWorkFlowItems(item,cursor+1);
       }
     }
   };
@@ -1110,17 +1256,11 @@ const QueueView = function(props) {
         let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}${params}&format=json`;
         getSecure(url)
         .then(data => {
-          let updates = 0;
           if (_.has(data, "Experiments") && Array.isArray(data.Experiments)) {
-            ++updates;
             collection.augment(item, data.Experiments.filter(item => item.Id === guid)[0]||{});
           }
           if (_.has(data, ["Stats", guid])) {
-            ++updates;
             collection.augment(item, data["Stats"][guid]);
-          }
-          if (updates < 2) {
-            // console.warn("queueView.fetchItemDetail", "Unexpected Response Data!", data);
           }
         })
         .catch(function (error) {
@@ -1144,7 +1284,12 @@ const QueueView = function(props) {
       }
     }
   };
-  
+
+  /**
+   * distributeItemDetail diverts resolution of secondary call to proper rendering.
+   * @param {HTMLElement} ele is assumed to be the charted queue item's LI[itemid] element.
+   * @param {Object} data is the salient data node (Response) for render.
+   */
   const distributeItemDetail = function (ele, data) {
     if (!!data) {
       if ("Name" in data) {
@@ -1160,6 +1305,11 @@ const QueueView = function(props) {
     ele.classList.add("detailed");
   };
 
+  /**
+   * getSecure is a convenience stub to standardize REST header and Response parse.
+   * @param {String} url
+   * @return {Promise}
+   */
   const getSecure = function(url) {
     return fetch(url, {
       method: "GET",
@@ -1170,6 +1320,11 @@ const QueueView = function(props) {
     }).then(response => response.json());
   };
 
+  /**
+   * postSecure is a convenience stub to standardize REST header and Response parse.
+   * @param {String} url
+   * @return {Promise}
+   */
   const postSecure = function(url, payload={}) {
     return fetch(url, {
       method: "GET",
@@ -1183,6 +1338,11 @@ const QueueView = function(props) {
 
   /* MOCK SIMULATIONS */
 
+  /**
+   * fetchMockSimulations is the alternative routine for getting local mocked data.
+   * @callback successCallback
+   * @callback failureCallback
+   */
   const fetchMockSimulations = function (successCallback, failureCallback)  {
     let primary = config.mockURL + "Queue.json";
     let secondary = config.mockURL + "Stats.json";
@@ -1212,6 +1372,9 @@ const QueueView = function(props) {
     });
   };
 
+  /**
+   * addTruncateToggle standardizes appending of truncation-related DOM elements.
+   */
   const addTruncateToggle = function() {
 
     if (view.figure.querySelector("ins.truncation")) {
@@ -1245,7 +1408,10 @@ const QueueView = function(props) {
       render();
     });
   };
-  
+
+  /**
+   * updateTruncateToggle applies current collection count to truncation toggle.
+   */
   const updateTruncateToggle = function() {
     if (!view.figure.querySelector("ins.truncation")) {
       addTruncateToggle();
@@ -1254,7 +1420,10 @@ const QueueView = function(props) {
       toggle.innerText = collection.count;
     });
   };
-  
+
+  /**
+   * addStateLegend standardizes appending of legend of queue states.
+   */
   const addStateLegend = function () {
 
     const target = view.parent.querySelector("figcaption legend");
@@ -1293,6 +1462,10 @@ const QueueView = function(props) {
     });
   };
 
+  /**
+   * addSourceSelect standardizes the appending of select-option input for source select.
+   * sourceSelectTrigger is the dispatchEvent for triggering this change event remotely.
+   */
   let sourceSelectTrigger;
   const addSourceSelect = function() {
 
@@ -1301,6 +1474,7 @@ const QueueView = function(props) {
       return;
     }
 
+    /* @TODO abstract and externalize. */
     const options = config.isSimulations ? 
       [
         { name:"API Simulations", value: 0, selected: true },
@@ -1394,6 +1568,7 @@ const QueueView = function(props) {
           }
         }
       } else {
+        
         if (config.isSimulations) {
 
           // Sim Queue originates at module, which maintains Auth
@@ -1551,7 +1726,7 @@ const QueueView = function(props) {
     }, 
     
     render: render,
-
+    
     toggleDebug: function(force) {
       /** @param {Boolean} force, when true will spill verbose logging to console. */
       config.logging = force !== undefined ? !!force : !config.debugging;
@@ -1561,6 +1736,12 @@ const QueueView = function(props) {
       } else {
         console.log(config.chartContainer, "Verbose logging disabled.");
       }
+    }, 
+    
+    toggleRepro: function(queue) {
+      /** @param {String} queue (optional) is the entity type of queue's charted items. **/
+      REPRO.toggle(config.isWorkItems ? MODE.WorkItems : MODE.Simulations);
+      render();
     }
   }
 };

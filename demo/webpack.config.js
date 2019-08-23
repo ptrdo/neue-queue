@@ -30,8 +30,8 @@ module.exports = {
     new CopyWebpackPlugin(
       [
         {
-          from: "../mock",
-          to: "mock/[path][name].[ext]"
+          from: "data",
+          to: "data/[path][name].[ext]"
         }
       ],
       {

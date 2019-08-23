@@ -45,7 +45,7 @@ class Index {
       WorkItems: {
         name: "QueueViewFlows",
         title: "Workflows Currently Processing",
-        description: "On Environments Available to You",
+        description: "On All Environments Available to You",
         css: "chart queue fullwidth",
         enabled: true,
         type: "arrow",
