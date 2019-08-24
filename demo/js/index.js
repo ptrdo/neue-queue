@@ -94,6 +94,7 @@ class Index {
     
     let reset = document.createElement("BUTTON");
     reset.setAttribute("name","reset");
+    reset.setAttribute("title","render/reset this application");
     ["Do It!", "Reset"].forEach(term => {
       let span = document.createElement("SPAN");
       span.appendChild(document.createTextNode(term));
@@ -112,6 +113,7 @@ class Index {
 
     let source = document.createElement("BUTTON");
     source.setAttribute("name","source");
+    source.setAttribute("title","toggle select-option for sources");
     source.appendChild(document.createTextNode("Sources"));
     source.addEventListener("click", function (event) {
       event.preventDefault();
@@ -124,6 +126,7 @@ class Index {
 
     let modes = document.createElement("BUTTON");
     modes.setAttribute("name","modes");
+    modes.setAttribute("title","toggle between Simulations and Work Items");
     modes.appendChild(document.createTextNode("Modes"));
     modes.addEventListener("click", function (event) {
       event.preventDefault();

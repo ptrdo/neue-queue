@@ -1,4 +1,6 @@
 /**
+ * THIS IS THE ESSENTIAL STRUCTURE
+ *
  * queue-chart
  * Dashboard visualiser of cluster traffic
  *

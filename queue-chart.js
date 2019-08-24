@@ -2,6 +2,8 @@ import templater from "microdata-template";
 import _ from "lodash";
 
 /**
+ *  THIS IS A PRELIMINARY PROTOTYPE
+ *
  * queue-chart
  * Means to Monitor Progress of Work Processing on HPC Cluster
  *

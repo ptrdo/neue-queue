@@ -1,6 +1,6 @@
 {
   "name": "comps-ui-dashboard",
-  "version": "v0.1.2",
+  "version": "v2.6.0",
   "description": "A client view for visualizing the progress of work processing on a high performance computing cluster.",
   "homepage": "https://github.com/ptrdo/neue-queue#readme",
   "main": "queue-chart.js",
@@ -28,7 +28,7 @@
     "hpc"
   ],
   "dependencies": {
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "microdata-template": "^2.1.0"
   }
 }
