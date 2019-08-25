@@ -33,7 +33,9 @@ This is the same code implemented in the COMPS Web Client. Included within this 
             </button>
           </legend>
         </figcaption>
-        <output title="The Title of My Chart" id="myQueueView"></output>
+        <output title="The Title of My Chart" id="myQueueView">
+          <!-- CHART RENDERS HERE -->
+        </output>
       </figure>
     </form>
   </div>
@@ -45,7 +47,7 @@ import Queue from "path/to/queueView.js";
 
 // instantiate the chart...
 const queue = new Queue({
-  selector: "[itemid=myQueueView]",
+  selector: "[itemid=myQueueView]", /* root of entire assembly */
   chartContainer:"#myQueueView"
 });
 
@@ -53,7 +55,7 @@ const queue = new Queue({
 queue.draw();
 ```
 
-**3:** By default, the QueueView chart is configured to chart the Simulations of an Experiment executing in a COMPS environment. However, the data which supplies this mode of the QueueView chart are expected to be supplied by routines external to this code. This data is assumed to be the normal Response of the two COMPS API calls, [/api/Metrics/Queue](https://comps.idmod.org/api/json/metadata?op=MetricsQueueGetRequest) and [/api/Experiments/Stats](https://comps.idmod.org/api/json/metadata?op=ExperimentGetStatsRequest), and can be delivered via the instantiating config options or parameters of the draw method. So, as an alternative to the above: 
+**3:** By default, the QueueView chart is configured to chart the Simulations of an Experiment executing in a COMPS environment. However, the data which supplies this mode of the QueueView chart are expected to be supplied by routines external to this code. This data is assumed to be the normal Response of the two COMPS API calls, [/api/Metrics/Queue](https://comps.idmod.org/api/json/metadata?op=MetricsQueueGetRequest) and [/api/Experiments/Stats](https://comps.idmod.org/api/json/metadata?op=ExperimentGetStatsRequest), and can be delivered via the instantiating configuration options or the option object parameter of the draw method. So, as an alternative to the above: 
 ```javascript
 import Queue from "path/to/queueView.js";
 
@@ -88,7 +90,7 @@ const queue = new Queue({
 queue.draw();
 ```
 
-**5:** The QueueView chart can also chart [mock data](demo/data) in either the Simulations or Work Items mode. The mocked data is essentially the expected Response JSON of each of the requisite Requests. Using mocked data can facilitate development and testing of the code since a wide variety of scenarios can be mocked without actually running the corresponding work in COMPS. The QueueView has mechanisms internal to the code and an externalized API to navigate the mock data. These are the required configuration changes for implementing mock data: 
+**5:** The QueueView chart can also chart [mock data](demo/data) or [repro capture](demo/data/repro.json) in either the Simulations or Work Items mode. The mocked data is essentially the expected Response JSON of each of the requisite Requests. The repro data can be captured from a running implementation for investigating any scenario that might occur. Using static data like these can facilitate development and testing of the code since a wide variety of scenarios can be tweaked into static data without actually running the corresponding work in COMPS. The QueueView has mechanisms internal to the code and an externalized API to navigate these sources. The required configuration changes for implementing mock data: 
 ```javascript
 import Queue from "path/to/queueView.js";
 
