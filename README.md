@@ -79,7 +79,7 @@ queue.draw({
 ```javascript
 import Queue from "path/to/queueView.js";
 
-// instantiate the chart...
+// instantiate the chart (for Work Items)...
 const queue = new Queue({
   selector: "[itemid=myQueueView]",
   chartContainer:"#myQueueView",
@@ -94,7 +94,7 @@ queue.draw();
 ```javascript
 import Queue from "path/to/queueView.js";
 
-// instantiate the chart...
+// instantiate the chart (for mock data)...
 const queue = new Queue({
   selector: "[itemid=myQueueView]",
   chartContainer:"#myQueueView",
@@ -110,9 +110,68 @@ const queue = new Queue({
 queue.draw();
 ```
 
+***
+
 ### Installation
-While it is possible to simply clone or download this repository and drag the code into a project, it is recommended to use a package manager to maintain version control and facilitate keeping dependent projects current with the latest changes. This is critical software that should be expected to change, and the most-current version is the only version guaranteed to work with the COMPS system.
+This code is not intended as a standalone component which can simply be imported into a project. Some manual integration is necessary, especially the loading of expected CSS styes, HTML structures, and a JavaScript controller to supply Request-Response for Simulations (at least). However, it is possible to download this repository and run [the demo](/demo) to learn and better understand its mechanics. As well, this repository is intended for future development or could be forked as a starting place for alternative development. 
 
-[NodeJS](https://nodejs.org/en/download/) is a technology which can execute scripts on a computer. In this application, NodeJS fasciliates the Webpack framework in assembling the various ingredients of the Client code, preparing them for deployment from a server to a browser. It is recommended to install NodeJS to add this code to another project or run the enclosed demonstration.
+See [the demo](/demo) for instructions about running this application standalone. 
 
-The Node Package Manager ([NPM](https://www.npmjs.com/get-npm)) is installed as a component of NodeJS and is a popular means for executing the `package.json` of a project.
+***
+
+### Configuration Options
+When instantiating this code, a configuration object is passed to the initializing method:
+```javascript
+import Queue from "path/to/queueView.js";
+
+// instantiate the chart...
+const queue = new Queue({
+  selector: "[itemid=myQueueView]", /* root of entire assembly */
+  chartContainer:"#myQueueView"
+});
+```
+This supplies the code with any customizing parameters necessary for the particular implementation. It is not necessary to provide properties which are expected to assume the default. At runtime, these values can be gotten by the web client via the instance's [public API method](#public-methods-api), getConfig();
+
+Most configurations have [public API method](#public-methods-api) for runtime adjustment.
+
+| Property | Data Type | Default | Options |
+|----------|-----------|---------|---------|
+| `selector` | *String* | `"[itemid=QueueView]"` | **Required** A CSS-compliant selector of the encompassing root element of markup. |
+| `chartContainer` | *String* | `#QueueView` | **Required** A CSS-compliant selector of a child of the root element. |
+| `scoreSize` | *Integer* | `24` | Percentage between 0-100 within which arrow widths are scaled to show disparity. |
+| `auth` | *Function* | `window.idmauth` | Returns an Auth instance, or internal NOP (nullifying calls). |
+| `modeEntity` | *String* | `"Simulations"` | Also accepts "WorkItems". |
+| `workFlowScope` | *Float* | `0` | Default disables, any float searches Work Items from that many days ago. |
+| `workFlowsActive` | *Boolean* | `true` | False shows all Work Items, regardless of the state of Related items. |
+| `useMockData` | *Boolean* | `false` | True expects mock data to supply the chart (not REST Request-Response). |
+| `mockChoice` | *String* | `""` | A path relative to built code where default mock data resides. |
+| `logging` | *Boolean* | `false` | True prints data collection to JavaScript console upon every render. |
+
+***
+### Public Methods (API)
+
+Once instantiated in the web client code (see [Basic Usage](#basic-usage)), the local logic can be addressed via a variety of public methods, getters, and setters. These methods can be addressed within the scope of the instantiation, or via the browser's JavaScript console (when the instance is exposed to the window namespace).
+
+```javascript
+import Queue from "path/to/queueView.js";
+
+// instantiate the chart...
+const queue = new Queue({
+  selector: "[itemid=myQueueView]", /* root of entire assembly */
+  chartContainer:"#myQueueView"
+});
+
+queue.render();
+
+// To expose the instance to the global namespace for access from browser's Dev Tools: 
+if (!("queue" in window)) { window["queue"] = queue; }
+window.queue.toggleDebug(true);
+
+```
+
+See the [Configuration Options](#configuration-options) for more explanation and additional public methods.
+
+| Method Name | Argument(s) | Description |
+|-------------|-------------|-------------|
+| `setScoreSize` | *Integer* | Percentage between 0-100 within which arrow widths are scaled to show disparity. |
+ 
