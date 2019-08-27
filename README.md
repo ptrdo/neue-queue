@@ -173,5 +173,19 @@ See the [Configuration Options](#configuration-options) for more explanation and
 
 | Method Name | Argument(s) | Description |
 |-------------|-------------|-------------|
+| `draw` | *Config,Callback* | The fundamental render call. See [Configuration Options](#configuration-options). |
+| `render` | *none* | Renders the current chart with current configuration and data. |
+| `getCollection` | *none* | Returns the merged and transformed data that drew the current chart. |
+| `getCollectionCount` | *none* | Returns the total number of items in Collection (drawn and not drawn). |
+| `getConfig` | *none* | Returns all the current settings, by default or overridden. | 
 | `setScoreSize` | *Integer* | Percentage between 0-100 within which arrow widths are scaled to show disparity. |
+| `toggleMockSelect` | *Boolean* | Exchanges legend with select-option for mock data sources. True forces this. |
+| `setMock` | *Integer* | Sets final numerical directory found at mockPath, e/g `built/mockpath/1/...` |
+| `setWorkFlowsScope` | *Float* | Sets number of days ago to search for non/active Top-Level Work Items. 0 disables (active only). |
+| `initialized` | *none* | Returns true whenever chart has been drawn with data (even if empty). |
+| `toggleDebug` | *Boolean* | Switches between logging Collection data upon render and not. True forces log. | 
+| `toggleRepro` | *none* | Switches between mode/API and rendering the static repro.json. |
+
+
+
  
