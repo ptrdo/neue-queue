@@ -41,9 +41,9 @@ The Node Package Manager ([NPM](https://www.npmjs.com/get-npm)) is installed as 
 ***
 ### Disabling Auth
 
-Since this demonstration can run with mock data, it is not required to install the [IDM-COMPS-Auth](https://github.com/InstituteforDiseaseModeling/COMPS-UI-Auth) component for access to [COMPS services](https://comps.idmod.org/api/metadata). If access to the Auth library failed (#3 above) or if mock data is sufficient for demonstration, then the Auth can be removed with the following steps. 
+Since this demonstration can run with mock data, it is not required to install the [COMPS-UI-Auth](https://github.com/InstituteforDiseaseModeling/COMPS-UI-Auth) component for access to [COMPS services](https://comps.idmod.org/api/metadata). If access to the Auth library failed (#3 above) or if mock data is sufficient for demonstration, then the Auth can be removed with the following steps. 
 
-**1:** Remove the idm-comps-auth dependency from the [demo/package.json](package.json):
+**1:** Remove the comps-ui-auth dependency from the [demo/package.json](package.json):
 ```javascript
 
 "dependencies": {
@@ -73,5 +73,17 @@ if (!("idmauth" in window)) {
 */
 
 ```
-**3:** The demostration should now run with mock data when [configuration](../README.md#configuration-options) is set appropriately. 
+
+**3:** Rerun the dependency installation (per #3 above) if that previously failed.
+```sh
+> cd demo
+> npm 
+```
+**4:** From a command prompt, run the NPM `start` command which has been configured in the `webpack.config.js` to instruct Webpack to survey the dependencies prescribed in the project code and then compile the bundled JavaScript.
+```sh
+> npm start
+```
+**5:** Open a browser and navigate to `http://localhost:8081` to view the deployed code. Note: If this does not work, there may be a conflict with other processes, so the `8081` port can be changed by [configuring the devServer](https://webpack.js.org/configuration/dev-server/).
+
+**6:** The demostration should now be running with mock data when [configuration](../README.md#configuration-options) is set appropriately. 
 
