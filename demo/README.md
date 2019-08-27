@@ -47,7 +47,7 @@ Since this demonstration can run with mock data, it is not required to install t
 ```javascript
 
 "dependencies": {
-~~"comps-ui-auth": "^1.4.1",~~
+ █"comps-ui-auth": "^1.4.1",█
   "microdata-template": "^2.1.0",
   "postette": "^0.4.0",
   "highcharts": "^6.1.1",
@@ -56,7 +56,7 @@ Since this demonstration can run with mock data, it is not required to install t
 
 ``` 
 
-**2:** Remove the import reference and instantiation in [demo/js/app.js](js/app.js): 
+**2:** Remove or comment-out the import reference and instantiation in [demo/js/app.js](js/app.js): 
 ```javascript
 import "jquery";
 import Config from "config";
