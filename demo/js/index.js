@@ -1,5 +1,5 @@
 import Config from "config";
-import Auth from "comps-ui-auth";
+// import Auth from "comps-ui-auth";
 import Postette from "../node_modules/postette/postette.js";
 import templater from "microdata-template";
 import Queue from "../../queueView.js";
@@ -152,7 +152,7 @@ class Index {
         menu = menu.parentElement;
       }
       menu.classList.remove("active");
-      Auth.signout(Config.appName);
+      // Auth.signout(Config.appName);
     });
 
     setTimeout(function () {

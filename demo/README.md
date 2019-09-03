@@ -1,5 +1,5 @@
 ###### This is pre-release software. Please **[log issues](/issues)** found.
-# Demo of queue-chart.js
+# Demonstration of queueView.js
 Sample implementation of Dashboard module(s) intended for monitoring work within the Institute for Disease Modeling's **Computational Modeling Platform Service** (COMPS)
 
 >**Warning. This code is the real deal.** Authentication into the COMPS system provides for useful interactions, but also the potential disruption of actual research and destructive transactions from which there is no recourse. Any implementation of this code **must** be done with the advice, consent, and review of COMPS engineers! Otherwise, access to the system and/or this code may be suspended or revoked.
@@ -9,8 +9,6 @@ Run this demonstration in a web browser. A web server (or localhost) is required
 ***
 ### Running this Demo
 This example demonstrates integration into a minimal [ES6-compliant](http://es6-features.org/) project bundled by the [Webpack](https://webpack.js.org/) library. An enclosed `package.json` designates all dependencies required for running the demonstration. Note: This example may not work as expected in the Internet Explorer browser.
-
->*This is the current methodology of COMPS and the Quick Start web clients.*
 
 [NodeJS](https://nodejs.org/en/download/) is a technology which can execute scripts on a computer. In this application, NodeJS fasciliates the Webpack framework in assembling the various ingredients of the Client code, preparing them for deployment to a browser. It will be necessary to install NodeJS to run these examples.
 
@@ -39,3 +37,71 @@ The Node Package Manager ([NPM](https://www.npmjs.com/get-npm)) is installed as 
 > npm start
 ```
 **6:** Open a browser and navigate to `http://localhost:8081` to view the deployed code. Note: If this does not work, there may be a conflict with other processes, so the `8081` port can be changed by [configuring the devServer](https://webpack.js.org/configuration/dev-server/).
+
+***
+### Disabling Auth (as configured here)
+
+Since this demonstration can run with mock data, it is not required to install the [COMPS-UI-Auth](https://github.com/InstituteforDiseaseModeling/COMPS-UI-Auth) component for access to [COMPS services](https://comps.idmod.org/api/metadata). If access to the Auth library failed (#3 above) or if mock data is sufficient for demonstration, then the Auth can be removed with the following steps. 
+
+**1:** Remove the comps-ui-auth dependency from the [demo/package.json](package.json):
+```javascript
+
+"dependencies": {
+ █"comps-ui-auth": "^1.4.1",█
+  "microdata-template": "^2.1.0",
+  "postette": "^0.4.0",
+  "highcharts": "^6.1.1",
+  "jquery": "^3.4.1"
+}
+
+``` 
+
+**2:** Remove or comment-out the import reference and instantiation in [demo/js/app.js](js/app.js): 
+```javascript
+import "jquery";
+import Config from "config";
+// import Auth from "comps-ui-auth";
+
+/*
+Auth.init({
+  ApplicationName: Config.appName,
+  endpoint: Config.endpoint
+});
+if (!("idmauth" in window)) {
+  window["idmauth"] = Auth;
+}
+*/
+
+```
+**3:** Remove or comment-out the import reference and method call in [demo/js/index.js](js/index.js):
+```javascript
+// import Auth from "comps-ui-auth";
+
+authToggle.addEventListener("click", function (event) {
+  let menu = event.target;
+  while (!menu.classList.contains("active")) {
+    menu = menu.parentElement;
+  }
+  menu.classList.remove("active");
+  // Auth.signout(Config.appName);
+});
+```
+
+**4:** Rerun the dependency installation (per #3 above) if that previously failed.
+```sh
+> cd demo
+> npm install
+```
+**5:** From a command prompt, run the NPM `start` command which has been configured in the `webpack.config.js` to instruct Webpack to survey the dependencies prescribed in the project code and then compile the bundled JavaScript.
+```sh
+> npm start
+```
+**6:** Open a browser and navigate to `http://localhost:8081` to view the deployed code. Note: If this does not work, there may be a conflict with other processes, so the `8081` port can be changed by [configuring the devServer](https://webpack.js.org/configuration/dev-server/).
+
+**7:** The demostration should now be running with mock data when [configuration](../README.md#configuration-options) is set appropriately. 
+
+***
+
+### Using Mock or Repro Data 
+
+See the project documentation for instructions about using [mock data](../README.md#using-mock-data) or [repro data](../README.md#using-the-repro-data).

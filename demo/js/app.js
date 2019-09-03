@@ -1,6 +1,6 @@
 import "jquery";
 import Config from "config";
-import Auth from "comps-ui-auth";
+// import Auth from "comps-ui-auth";
 
 import Index from "./index.js";
 
@@ -14,6 +14,7 @@ const hello = function () {
 const init = function () {
   element = document.getElementById("dashboard");
   index.render(element);
+  /*
   Auth.init({
     ApplicationName: Config.appName,
     endpoint: Config.endpoint
@@ -21,6 +22,7 @@ const init = function () {
   if (!("idmauth" in window)) {
     window["idmauth"] = Auth;
   }
+  */
   if (!("demo" in window)) {
     window["demo"] = {};
   }

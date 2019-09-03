@@ -32,7 +32,6 @@
     "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
-    "comps-ui-auth": "^1.4.1",
     "microdata-template": "^2.1.0",
     "postette": "^0.4.0",
     "highcharts": "^6.1.1",

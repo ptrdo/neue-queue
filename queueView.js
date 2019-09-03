@@ -87,7 +87,7 @@ const QueueView = function(props) {
    * @property {Function} getToken
    * @property {Function} getUserNane
    * @property {Function} tokenIsWaning
-   * @property {Funtion} refreshCredentials
+   * @property {Function} refreshCredentials
    */
   const nullAuth = { 
     getToken: () => "", 
@@ -373,6 +373,29 @@ const QueueView = function(props) {
         }
       }
       return found; 
+    },
+
+    /**
+     * findItemsById is a deep search for node(s) containing the given GUID.
+     * @param {String} guid is the identifier to search for.
+     * @returns {Collection} an Array of node(s) found, or [] if none.
+     */
+    findItemsById: function(guid) {
+      let found = [];
+      for (let bucket in this.output) {
+        this.output[bucket].forEach(item => {
+          if (guid === item.Id || guid === item.ExperimentId) {
+            found.push(item);
+          } else if (_.has(item, "Flow.Related")) {
+            item.Flow.Related.forEach(relation => {
+              if (guid === relation.Id || guid === relation.ExperimentId) {
+                found.push(relation);
+              }
+            });
+          }
+        });
+      }
+      return found;
     },
 
     /**
@@ -686,10 +709,10 @@ const QueueView = function(props) {
         data = data.filter(item => {
           if (!config.activeWorkFlowsOnly) {
             return true;
-          } else if (_.has(item, "Active")) {
-            return item.Active; 
           } else {
-            return _.has(item, "State") && _.intersection(_.concat(STATE.PreActive,STATE.Active),[item.State]).length > 0;
+            let thisActive = _.has(item, "State") && _.intersection(_.concat(STATE.PreActive,STATE.Active),[item.State]).length > 0;
+            let relatedActive = _.has(item, "Active") && item.Active;
+            return thisActive || relatedActive;
           }
         });         
       }
@@ -1083,7 +1106,7 @@ const QueueView = function(props) {
       return result === "0000";
     },
     print: function() {
-      console.log(this.fetchWorkItems.join("|"),this.fetchWorkFlow.join("|"),this.fetchWorkFlowItems.join("|"),this.fetchItemDetail.join("|"));
+      console.log("queue.fetchTally:",this.fetchWorkItems.join("|"),this.fetchWorkFlow.join("|"),this.fetchWorkFlowItems.join("|"),this.fetchItemDetail.join("|"));
     }
   };
 
@@ -1104,8 +1127,13 @@ const QueueView = function(props) {
     }
     // fetchTally.print();
     if (fetchTally.complete()) {
-      // console.error("COMPLETE!");
-      wait(0).then(() => render());
+      // console.error("Rendering!");
+      // Multiple fetchItemDetail's could be virtually concurrent. 
+      // Result could be first-to-resolved beating last-to-request.
+      // For these scenarios, supply 200ms to cover potential disparity. 
+      // This should be sufficient allowance without being evident. 
+      // Note: Disparity is only the difference in latency of concurrent calls.
+      wait(200).then(() => render());
     }
   };
 
@@ -1219,8 +1247,8 @@ const QueueView = function(props) {
           if (/Experiment/i.test(entity)) {
             tallyFetch("fetchItemDetail", 1);
             fetchItemDetail(guid, 1, info => {
-              tallyFetch("fetchItemDetail", -1);
               item["Active"] = _.has(info, "SimulationStateCount") && _.intersection(_.concat(STATE.PreActive,STATE.Active),Object.keys(info["SimulationStateCount"])).length > 0;
+              tallyFetch("fetchItemDetail", -1);
             });
           } else {
             if (_.intersection(_.concat(STATE.PreActive,STATE.Active),[node["State"],node["SimulationState"]]).length > 0) {
@@ -1243,12 +1271,13 @@ const QueueView = function(props) {
 
   /**
    * fetchItemDetail is a secondary call upon interaction with chart items. 
+   * @TODO Multiple workflows could contain the same Experiment so multiple detail calls could be avoided. 
    * @param {String} guid is the item of interest which has been interacted with (e/g MouseEnter).
    * @param {Integer} depth of 0|null is entity only, 1 is basic detail (e/g counts), 2 is deep (e/g simulationruntime).
    * @param {Function} callback returns the data (pointer) to the collection item (or null if not found).
    */
   const fetchItemDetail = function (guid, depth, callback) {
-    let item = collection.findItemById(guid);
+    let items, item = collection.findItemById(guid);
     if (!!item) {
       let entity = deduceEntityType(item);
       if (entity === "Experiment") {
@@ -1256,11 +1285,16 @@ const QueueView = function(props) {
         let url = config.isMocked ? config.mockURL + `Stats.json` : `${config.endpoint}${entity}s?Id=${guid}${params}&format=json`;
         getSecure(url)
         .then(data => {
+          items = collection.findItemsById(guid);
           if (_.has(data, "Experiments") && Array.isArray(data.Experiments)) {
-            collection.augment(item, data.Experiments.filter(item => item.Id === guid)[0]||{});
+            items.forEach(instance => {
+              collection.augment(instance, data.Experiments.filter(exp => exp.Id === guid)[0]||{});
+            });
           }
           if (_.has(data, ["Stats", guid])) {
-            collection.augment(item, data["Stats"][guid]);
+            items.forEach(instance => {
+              collection.augment(instance, data["Stats"][guid]);
+            });
           }
         })
         .catch(function (error) {
@@ -1419,6 +1453,12 @@ const QueueView = function(props) {
     view.figure.querySelectorAll("ins.truncation var").forEach(toggle => {
       toggle.innerText = collection.count;
     });
+    let most = 0;
+    let buckets = view.chart.querySelectorAll(".queue-bucket");
+    buckets.forEach(bucket => most = Math.max(most, bucket.querySelectorAll("li[itemid]").length));
+    if (most <= config.truncateMin) {
+      view.figure.classList.remove("untruncated");
+    }
   };
 
   /**

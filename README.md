@@ -6,12 +6,24 @@ This JavaScript module, [queueView.js](/queueView.js), should allow a web client
 
 This is the same code implemented in the COMPS Web Client. Included within this repository is the required JavaScript, interface template (HTML), and styling (CSS). A simple demonstration is provided (see [the demo](/demo)). An illustration of this design: 
 
-***
 ![A prototype.](demo/illustration.png)
-***
+
+### Gist 
+
+This is a chart which illustrates the progress of running processes. Each "arrow" represents either an Experiment of Simulations (when in "Simulations" mode) or a Workflow of Related items (when in "WorkItems" mode). The arrows are grouped into "buckets" of relative priority, and then stacked from top-to-bottom according to the time they entered the queue (earliest-to-queue is on top for Simulations, and latest-to-queue is on top for Workflows).
+
+Work runs through a variety of "states" which are represented with colors. 
+
+1. Pre-Active states include Created, QueuedForCommission, CommissionRequested, Commissioned, Provisioning, and Validating.
+2. Active states are denoted with animated striping and include Running, Waiting, QueuedForResume, ResumeRequested, Resumed, and Retry.
+3. Post-Active (or "terminal") states include CancelRequested, Canceling, Canceled, Failed, and Succeeded.
+
+When all of the components of an Experiment or Workflow have reached a terminal state, that arrow loses relevance in the queue and is dropped from the API Response data and therefore the chart. An exception to this is the option to show all Workflows of a certain scope regardless of state (see `workFlowScope` and `workFlowsActive` in [Configuration Options](#configuration-options) below).
+
+Ultimately, this chart should inform decisions about where, when, and how to submit work the system, then validate that submitted work is indeed running, and then illustrate its progress, failure, or success. 
 
 ### Basic Usage
-**1:** In an HTML document, simply attach the CSS and provide for an expected page structure (the code leverages this structure to append other elements at runtime):
+**1:** In an HTML document, simply attach [the CSS](demo/build/css/idm-dashboard.css) and provide for an expected page structure (the code leverages this structure to append other elements at runtime):
 ```html
 <head>
   <link rel="stylesheet" href="path/to/idm-dashboard.css">
@@ -165,6 +177,8 @@ queue.render();
 
 // To expose the instance to the global namespace for access from browser's Dev Tools: 
 if (!("queue" in window)) { window["queue"] = queue; }
+
+// To call public methods from the JavaScript console of a browser's Dev Tools: 
 window.queue.toggleDebug(true);
 
 ```
@@ -173,5 +187,83 @@ See the [Configuration Options](#configuration-options) for more explanation and
 
 | Method Name | Argument(s) | Description |
 |-------------|-------------|-------------|
-| `setScoreSize` | *Integer* | Percentage between 0-100 within which arrow widths are scaled to show disparity. |
- 
+| `draw` | *Config,Callback* | The fundamental render call. See [Configuration Options](#configuration-options). |
+| `render` | *none* | Renders the current chart with current configuration and data. |
+| `getCollection` | *none* | Returns the merged and transformed data that drew the current chart. |
+| `getCollectionCount` | *none* | Returns the total number of items in Collection (drawn and not drawn). |
+| `getConfig` | *none* | Returns all the current settings, by default or overridden. | 
+| `setScoreSize` | *Integer* | Percentage between 0-100 within which arrow widths are scaled to show disparity. Rerenders upon reset. |
+| `toggleMockSelect` | *Boolean* | Exchanges legend with select-option for mock data sources. True forces select-option control. |
+| `setMock` | *Integer* | Sets final numerical directory found at `config.mockPath`, e/g `built/mockpath/1/...` |
+| `setWorkFlowsScope` | *Float* | Sets number of days ago to search for non/terminal Top-Level Work Items. `0` disables (searching for only non-terminal Work Items). |
+| `initialized` | *none* | Returns true whenever chart has been drawn with data (even if empty). |
+| `toggleDebug` | *Boolean* | Switches between logging Collection data upon render and not. True forces log. | 
+| `toggleRepro` | *none* | Switches between mode/API and rendering the static `repro.json`. |
+
+*** 
+
+### Using Mock Data
+
+Since it can be inconvenient and difficult to run the many scenarios of work in the system which may be charted by this code, mechanisms have been integrated to allow the use of static JSON data as an alternative to API Response data. This can facilitate demonstration and development of the chart as well as test and verify proper implementation. 
+
+The mock data for this library is found in the [demo/data](demo/data) path, but during the build process these must be copied into the build path so they are accessible at runtime within the deploy environment (or localhost). This copy can be stipulated in the [webpack.config](demo/webpack.config.js) of the project: 
+
+```javascript
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+module.exports = {
+  plugins: [
+    new CopyWebpackPlugin(
+      [
+        {
+          from: "data",
+          to: "data/[path][name].[ext]"
+        }
+      ],
+      {
+        copyUnmodified: true,
+      }
+    )
+  ]
+};
+```
+The directory structure found within the data/ path is assumed by the code's methods without deviation. Also, there are no internal systems assure the validity of the mock data, so it must be valid JSON or errors will occur. Future work could certainly make this more accommodating and dynamic, but at the risk of complicating the more important functionality of interfacing with the API. 
+
+For "**Simulations**" mode, each JSON file represents the Response data of the API call corresponding with the file's name: 
+
+1. [Queue.json](demo/data/Simulations/1/Queue.json) is the mock GET Response of [/api/Metrics/Queue](https://comps.idmod.org/api/json/metadata?op=MetricsQueueGetRequest).
+2. [Stats.json](demo/data/Simulations/1/Stats.json) is the mock POST Response of [/api/Experiments/Stats](https://comps.idmod.org/api/json/metadata?op=ExperimentGetStatsRequest).
+3. The ExperimentIds in the Queue data must also be found in the Stats data. 
+
+For "**WorkItems**" mode, there are potentially four subsequent API calls to be made, from the originating search for Work Items, to then getting the items related to each of those, and then getting those items and the details of each of them. Therefore, these data can be an aggregate of several calls to the same API (but with differing Response data): 
+
+1. [WorkItems.json](demo/data/WorkItems/1/WorkItems.json) is the mock GET Response of [/api/WorkItems](https://comps.idmod.org/api/json/metadata?op=WorkItemGetRequest).
+2. [Related.json](demo/data/WorkItems/1/Related.json) is the mock GET Response of [/api/WorkItems/{Id}/Related](https://comps.idmod.org/api/json/metadata?op=WorkItemRelatedGetRequest).
+3. [Entities.json](demo/data/WorkItems/1/Entities.json) is an aggregate of GET Responses of [/api/WorkItems](https://comps.idmod.org/api/json/metadata?op=WorkItemGetRequest), [/api/Experiments](https://comps.idmod.org/api/json/metadata?op=ExperimentGetRequest), and/or [/api/Simulations](https://comps.idmod.org/api/json/metadata?op=SimulationGetRequest).
+4. Each of these data must have corresponding Ids, though the Entities data can be incomplete (which is accommodated).
+
+*** 
+
+### Using the Repro Data
+
+When testing this system with runtime API Response data, it can be helpful to capture a state of the application so that it can be studied or debugged. For this purpose, the code can chart captured data to reproduce the runtime scenario in a development environment. 
+
+At any time, the current collection of internalized data can be gotten from the chart via a command into the JavaScript console of a browser's Dev Tools (*f12*):
+```javascript
+// to peruse the data in its native object structure:
+window.queue.getCollection(); 
+
+// to capture the data as a string for transfer to repro.json:
+JSON.stringify(window.queue.getCollection());
+
+// to automatically print collection data to the Dev Tool's console upon every rendering: 
+window.queue.toggleDebug(true);
+```
+See [public API method](#public-methods-api) for how to expose the chart instance to access from the browser's Dev Tools (*f12*).
+
+The [data/repro.js](demo/data/repro.json) is expected to be at the root of the data/ path and will therefore be copied into the appropriate location at build time. This file must be valid JSON, so anything captured via JSON.stringify() should be stripped of the outermost quotation marks (which would make the contents a string rather than object). Copy-and-paste the captured data into this file or save the capture, place it at this location, and name it "repro.json".
+
+Finally, when running the application with the newly-built repro data, set the chart to render it: 
+```javascript
+window.queue.toggleRepro();
+```
+It is important to toggle this state off when expecting normal functionality from the charting system. 
