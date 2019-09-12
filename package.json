@@ -1,11 +1,14 @@
 {
-  "name": "comps-ui-dashboard",
-  "version": "v2.6.0",
+  "name": "queueView",
+  "version": "v2.6.1",
   "description": "A client view for visualizing the progress of work processing on a high performance computing cluster.",
   "homepage": "https://github.com/ptrdo/neue-queue#readme",
-  "main": "queue-chart.js",
+  "author": "psylwester@idmod.org",
+  "license": "CC-BY-NC-SA-4.0",
+  "main": "queueView.js",
   "files": [
-    "/queue-chart.js"
+    "/queueView.js",
+    "/demo/build/css/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

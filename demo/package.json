@@ -1,21 +1,21 @@
 {
-  "name": "COMPS-UI-Dashboard-demo",
-  "version": "2.6.0",
+  "name": "queueView",
+  "version": "2.6.1",
   "description": "Demonstration of Means to Monitor Progress of Work Processing on HPC Cluster",
-  "homepage": "https://github.com/InstituteforDiseaseModeling/COMPS-UI-Dashboard#readme",
+  "homepage": "https://github.com/ptrdo/neue-queue#readme",
   "author": "psylwester@idmod.org",
   "license": "CC-BY-NC-SA-4.0",
-  "main": "index.js",
+  "main": "/js/app.js",
   "scripts": {
     "start": "webpack-dev-server --progress --colors --config ./webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/InstituteforDiseaseModeling/COMPS-UI-Dashboard.git"
+    "url": "git+https://github.com/ptrdo/neue-queue.git"
   },
   "bugs": {
-    "url": "https://github.com/InstituteforDiseaseModeling/COMPS-UI-Dashboard/issues"
+    "url": "https://github.com/ptrdo/neue-queue/issues"
   },
   "keywords": [
     "javascript",

@@ -6,7 +6,7 @@ This JavaScript module, [queueView.js](/queueView.js), should allow a web client
 
 This is the same code implemented in the COMPS Web Client. Included within this repository is the required JavaScript, interface template (HTML), and styling (CSS). A simple demonstration is provided (see [the demo](/demo)). An illustration of this design: 
 
-![A prototype.](demo/illustration.png)
+![The released design.](demo/illustration.png)
 
 ### Gist 
 
@@ -14,13 +14,13 @@ This is a chart which illustrates the progress of running processes. Each "arrow
 
 Work runs through a variety of "states" which are represented with colors. 
 
-1. Pre-Active states include Created, QueuedForCommission, CommissionRequested, Commissioned, Provisioning, and Validating.
-2. Active states are denoted with animated striping and include Running, Waiting, QueuedForResume, ResumeRequested, Resumed, and Retry.
-3. Post-Active (or "terminal") states include CancelRequested, Canceling, Canceled, Failed, and Succeeded.
+1. **Pre-Active** states include Created, QueuedForCommission, CommissionRequested, Commissioned, Provisioning, and Validating.
+2. **Active** states are denoted with animated striping and include Running, Waiting, QueuedForResume, ResumeRequested, Resumed, and Retry.
+3. **Post-Active** (or *terminal*) states include CancelRequested, Canceling, Canceled, Failed, and Succeeded.
 
 When all of the components of an Experiment or Workflow have reached a terminal state, that arrow loses relevance in the queue and is dropped from the API Response data and therefore the chart. An exception to this is the option to show all Workflows of a certain scope regardless of state (see `workFlowScope` and `workFlowsActive` in [Configuration Options](#configuration-options) below).
 
-Ultimately, this chart should inform decisions about where, when, and how to submit work the system, then validate that submitted work is indeed running, and then illustrate its progress, failure, or success. 
+Ultimately, this chart should inform decisions about where, when, and how to submit work to the system, then validate that submitted work is indeed running, and then illustrate its progress, failure, or success. 
 
 ### Basic Usage
 **1:** In an HTML document, simply attach [the CSS](demo/build/css/idm-dashboard.css) and provide for an expected page structure (the code leverages this structure to append other elements at runtime):
@@ -180,6 +180,9 @@ if (!("queue" in window)) { window["queue"] = queue; }
 
 // To call public methods from the JavaScript console of a browser's Dev Tools: 
 window.queue.toggleDebug(true);
+
+// The COMPS implementation exposes the "WorkItems" chart as "queueFlows", so: 
+window.queueFlows.toggleDebug(true); // addresses "WorkItems" chart.
 
 ```
 

@@ -1,4 +1,4 @@
-###### This is pre-release software. Please **[log issues](/issues)** found.
+###### This is pre-release software. Please **[log issues](https://github.com/ptrdo/neue-queue/issues)** found.
 # Demonstration of queueView.js
 Sample implementation of Dashboard module(s) intended for monitoring work within the Institute for Disease Modeling's **Computational Modeling Platform Service** (COMPS)
 
@@ -6,7 +6,8 @@ Sample implementation of Dashboard module(s) intended for monitoring work within
 
 Run this demonstration in a web browser. A web server (or localhost) is required for demonstrating complete functionality. The code here references dependencies via a relative path, so it is recommended to run this entire repository intact.
 
-***
+![The demo.](illustration-demo.png)
+
 ### Running this Demo
 This example demonstrates integration into a minimal [ES6-compliant](http://es6-features.org/) project bundled by the [Webpack](https://webpack.js.org/) library. An enclosed `package.json` designates all dependencies required for running the demonstration. Note: This example may not work as expected in the Internet Explorer browser.
 
