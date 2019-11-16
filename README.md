@@ -179,7 +179,7 @@ queue.render();
 if (!("queue" in window)) { window["queue"] = queue; }
 
 // To call public methods from the JavaScript console of a browser's Dev Tools: 
-window.queue.toggleDebug(true);
+window.queueLegacy.toggleDebug(true);
 
 // The COMPS implementation exposes the "WorkItems" chart as "queueFlows", so: 
 window.queueFlows.toggleDebug(true); // addresses "WorkItems" chart.
@@ -253,13 +253,13 @@ When testing this system with runtime API Response data, it can be helpful to ca
 At any time, the current collection of internalized data can be gotten from the chart via a command into the JavaScript console of a browser's Dev Tools (*f12*):
 ```javascript
 // to peruse the data in its native object structure:
-window.queue.getCollection(); 
+window.queueLegacy.getCollection(); 
 
 // to capture the data as a string for transfer to repro.json:
-JSON.stringify(window.queue.getCollection());
+JSON.stringify(window.queueLegacy.getCollection());
 
 // to automatically print collection data to the Dev Tool's console upon every rendering: 
-window.queue.toggleDebug(true);
+window.queueLegacy.toggleDebug(true);
 ```
 See [public API method](#public-methods-api) for how to expose the chart instance to access from the browser's Dev Tools (*f12*).
 
@@ -267,6 +267,6 @@ The [data/repro.js](demo/data/repro.json) is expected to be at the root of the d
 
 Finally, when running the application with the newly-built repro data, set the chart to render it: 
 ```javascript
-window.queue.toggleRepro();
+window.queueLegacy.toggleRepro();
 ```
 It is important to toggle this state off when expecting normal functionality from the charting system. 

@@ -24,17 +24,17 @@
     "hpc"
   ],
   "devDependencies": {
-    "@babel/core": "^7.5.5",
+    "@babel/core": "^7.7.2",
     "babel-loader": "^8.0.6",
-    "copy-webpack-plugin": "^5.0.4",
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7",
-    "webpack-dev-server": "^3.8.0"
+    "copy-webpack-plugin": "^5.0.5",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "microdata-template": "^2.1.0",
+    "microdata-template": "^2.2.2",
     "postette": "^0.4.0",
-    "highcharts": "^6.1.1",
+    "highcharts": "^6.2.0",
     "jquery": "^3.4.1"
   }
 }

@@ -436,6 +436,13 @@ html[data-useragent*="MSIE 10"]
   cursor: pointer;
 }
 
+#dashboard .userMetric .highcharts-legend-item.highcharts-series-0 > span
+{
+/* emphasize the current Owner's name */
+  font-weight: bold !important;
+  color: black !important;
+}
+
 
 /* VISUALIZATION-QUEUE */
 #dashboard .queue {
@@ -1116,14 +1123,57 @@ body:not(.touch) #dashboard [itemid^=QueueView].queue.chart ol > li:hover dfn.to
   display: none;
 }
 
-#dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl {
-   margin-left: 16px;
- }
+#dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl
+{
+  margin-left: 16px;
+}
 
-body.touch #dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl {
+body.touch #dashboard [itemid^=QueueView].queue.chart ol > li dfn.tooltip  dl
+{
   margin-left: 24px;
 }
 
+/* TOOLTIP ACTION */
+
+#dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip dl dd[itemprop=Action]
+{
+  height: 0;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li dfn.tooltip dl dd[itemprop=Action] button
+{
+  display: none;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip dl dd[itemprop=Action]
+{
+  height: auto;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip dl dd[itemprop=Action] button
+{
+  display: inline-block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 5px 0 7px 0;
+  border: none;
+  background: hotpink;
+  border: 1px solid deeppink;
+  color: white;
+  font-variant: all-small-caps;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip dl dd[itemprop=Action] button:hover
+{
+  background: #ff8fc7;
+}
+
+#dashboard [itemid=QueueView].queue.chart ol > li.active dfn.tooltip dl dd[itemprop=Action] button:active
+{
+  background: deeppink;
+}
 
 /* DISABLED */
 

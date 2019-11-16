@@ -7,7 +7,7 @@ import * as repro from "./demo/data/repro.json"; // COMPS: "../data/repro.json"
  * Dashboard visualiser of cluster traffic
  *
  * @author psylwester(at)idmod(dot)org
- * @version 2.6.0, 2019/08/22
+ * @version 2.7.1, 2019/10/23
  * @requires ES6, lodash
  *
  */
@@ -85,13 +85,13 @@ const QueueView = function(props) {
    * nullAuth supplants COMPS-UI-Auth when unavailable (e/g when dev without access to private repositories).
    * @see this.config.auth
    * @property {Function} getToken
-   * @property {Function} getUserNane
+   * @property {Function} getUserName // add username here to demo
    * @property {Function} tokenIsWaning
    * @property {Function} refreshCredentials
    */
   const nullAuth = { 
     getToken: () => "", 
-    getUserName: () => "",
+    getUserName: () => "psylwester",
     tokenIsWaning: () => false,
     refreshCredentials: function(token, successHandler, failureHandler) {
       if (!!successHandler && successHandler instanceof Function) {
@@ -109,6 +109,7 @@ const QueueView = function(props) {
    * @private
    * @property {Function} auth() will call whatever auth exists for project, or nullAuth when none.
    * @property {String} cacheToken (and set/get) stores Token for looping fetches.
+   * @property {Function} api will call the instantiator with an intent and argument(s) (e/g intent:"refresh").
    * @property {String} entity (and set/get) is the entity type being charted.
    * @property {Integer} scoreSize (and set/get) is differentiating scale factor (range:0-100, default:24).
    * @property {Boolean} mocked (and set/get) is flag for diverting from API to mocked Response data (default:false).
@@ -120,6 +121,7 @@ const QueueView = function(props) {
    * @property {Integer} truncateMin is the number of items viewable in any Priority Bucket prior to truncation.
    * @property {Integer} truncateMax is the maximum number of items total to be shown in a queue.
    * @property {Boolean} debug (and get/set) when true, traces JSON.stringify(collection.last) per render.
+   * @property {Boolean} cancelable (and getter) when true, allows state change (to CancelRequested) of active items.
    */
   const config = Object.assign({
 
@@ -132,6 +134,11 @@ const QueueView = function(props) {
       return this.cacheToken;
     },
     
+    api: function(intent,...args) {
+      console.error("An API was not established by the instantiator for this intent:", intent, ...args);
+      return false;
+    },
+
     entity: MODE.Simulations,
     scoreSize: 24,
     mocked: false,
@@ -185,7 +192,15 @@ const QueueView = function(props) {
     get mode () {
       return this.entity;
     },
-    
+
+    cancelable: false,
+    set isCancelable (boo) {
+      this.cancelable = !!boo;
+    },
+    get isCancelable () {
+      return this.cancelable;
+    },
+
     debug: false,
     set logging (boo) {
       this.debug = !!boo;
@@ -259,7 +274,7 @@ const QueueView = function(props) {
       };
       const dateTransform = function (node) {
         /* preprocess dates from service-supplied GMT to ui-conducive Local */
-        let basisDate, basisString, elapsedHours;
+        let basisDate, basisString, elapsedTime;
         let basisISOString = _.get(node, "LastCreateTime", _.get(node, "DateCreated", null));
         if (_.has(node, "Related")) {
           basisISOString = _.get(_.first(node.Related), "DateCreated", null);
@@ -270,11 +285,10 @@ const QueueView = function(props) {
             basisISOString = vitalizeMockDate(basisISOString);
           }
           basisDate = new Date(Date.parse(basisISOString));
-          basisString = basisDate.toLocaleDateString("en-US",{ month: "long", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
-          elapsedHours = ((Date.now() - basisDate)/1000/60/60).toFixed(2);
-          node["ElapsedHours"] = elapsedHours;
-          node["Elapsed"] = parseFloat(elapsedHours) > .05 ? "~" + elapsedHours + " hrs": "moments";
-          node["ElapsedStartString"] = basisString;
+          basisString = basisDate.toLocaleDateString("en-US",{ month: "short", day: "numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+          elapsedTime = Date.now() - basisDate;
+          node["Elapsed"] = abbreviateTimeSpan(elapsedTime);
+          node["ElapsedTitle"] = "since: " + basisString;
         }
       };
       if ("LastCreateTime" in data || "DateCreated" in data) {
@@ -487,6 +501,30 @@ const QueueView = function(props) {
   const wait = time => new Promise((resolve) => setTimeout(resolve, time));
 
   /**
+   * abbreviateTimeSpan makes human-legible time-span in units of mins, hrs, or days (as appropriate).
+   * NOTE: >48 hrs is in "days", >90 mins is in "hrs", >60 secs is in "mins", else "secs".
+   * @param {Integer} ms (required) is the time-span in milliseconds.
+   * @param {String} unit (optional) will force the given unit (e/g "days","hrs","mins","secs").
+   * @returns {String}
+   * }
+   */
+  const abbreviateTimeSpan = function (ms, unit) {
+    let lingo = "unknown";
+    let forced = /^(sec|min|hr|day)/i.test(unit);
+    let secs = Math.round(Math.max(parseInt(ms||1),1000)/1000);
+    if ((secs > 60*60*48 && !forced) || /^day/i.test(unit)) {
+      lingo = (secs/60/60/24).toFixed(2) + " days";
+    } else if ((secs > 60*90 && !forced) || /^hr/i.test(unit)) {
+      lingo = (secs/60/60).toFixed(2) + " hrs";
+    } else if ((secs > 60 && !forced) || /^min/i.test(unit)) {
+      lingo = (secs/60).toFixed(2) + " mins";
+    } else if ((secs > 0 && !forced) || /^sec/i.test(unit)) {
+      lingo = secs + " secs";
+    }
+    return lingo;
+  };
+
+  /**
    * scopeDateFilter supplies URL-compliant parameter for search filter.
    * @returns {String} assumed to be a comma-delineated component of "?filters=" argument.
    */
@@ -555,13 +593,27 @@ const QueueView = function(props) {
       event.stopImmediatePropagation();
       if (window.getSelection && document.createRange) {
         let range, selection = window.getSelection();
-        if (selection.toString().length < 1) { 
-          window.setTimeout(function(){
+        if (selection.toString().length < 1) {
+          window.setTimeout(function () {
             range = document.createRange();
             range.selectNodeContents(event.target);
             selection.removeAllRanges();
             selection.addRange(range);
-          },1);
+          }, 1);
+        }
+      }
+    } else if (event.target.nodeName == "BUTTON") {
+      event.stopPropagation();
+      event.preventDefault();
+      let guid, item, state, ele = event.target.closest("[itemid]");
+      if (!!ele) {
+        guid = ele.getAttribute("itemid");
+        item = collection.findItemById(guid);
+        state = event.target.getAttribute("data-state");
+        if (!!item && !!state) {
+          config.api("cancel", state, item);
+        } else {
+          config.api("notify", "Sorry, but that action could not be performed.", { level:"error" });
         }
       }
     } else {
@@ -739,7 +791,7 @@ const QueueView = function(props) {
           let icon = document.createElement("I");
 
           icon.classList.add("material-icons");
-          icon.setAttribute("title", "Pin/Unpin Details");
+          // icon.setAttribute("title", "Pin/Unpin Details");
           icon.appendChild(document.createTextNode("more_vert"));
           more.appendChild(icon);
           more.classList.add("more");
@@ -786,7 +838,7 @@ const QueueView = function(props) {
             let a = document.createElement("A");
             let li = document.createElement("LI");
             let val = document.createElement("VAR");
-            li.setAttribute("title", status);
+            // li.setAttribute("title", status);
             li.classList.add(status);
             li.style.flexGrow = info[status];
             if (stage == "Active") {
@@ -794,10 +846,10 @@ const QueueView = function(props) {
             }
             if (/Orphan/.test(status)) {
               a.setAttribute("href",`/#explore/Simulations?filters=Owner=${item.Owner}&offset=0`);
-              a.setAttribute("title", `Explore ${item.Owner}'s Simulations`);
+              // a.setAttribute("title", `Explore ${item.Owner}'s Simulations`);
             } else {
               a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${item.ExperimentId},SimulationState=${status}&offset=0`);
-              a.setAttribute("title", info[status] > 1 ? `Explore These ${status} Simulations` : `Explore This ${status} Simulation`);
+              // a.setAttribute("title", info[status] > 1 ? `Explore These ${status} Simulations` : `Explore This ${status} Simulation`);
             }
             val.appendChild(document.createTextNode(info[status]));
             a.appendChild(val);
@@ -840,10 +892,10 @@ const QueueView = function(props) {
           val.appendChild(document.createTextNode("Worker" in member ? member.Worker.Name : type));
           a.appendChild(val);
           a.setAttribute("href",`/#explore/WorkItems?filters=Id=${id}&related=true&offset=0`);
-          a.setAttribute("title", `Explore This Workflow`);
+          // a.setAttribute("title", `Explore This Workflow`);
           li.appendChild(a);
           li.appendChild(tip);
-          li.setAttribute("title", member.Name);
+          // li.setAttribute("title", member.Name);
           li.classList.add(member["State"]||member["SimulationState"]||"DefaultState", type);
           if (_.intersection(STATE.Active,li.classList.value.split(" ")).length > 0) {
             li.classList.add("process");
@@ -858,7 +910,7 @@ const QueueView = function(props) {
     };
     const setQueueItemDetails = function (fragment, info) {
       /* TODO: coalesce/call appendTooltip(); */
-      let implement = function (key, index, arr, obj) {
+      const implement = function (key, index, arr, obj) {
         let dd = document.createElement("DD");
         let name = document.createElement("VAR");
         let value = document.createElement("DATA");
@@ -871,11 +923,26 @@ const QueueView = function(props) {
         } else {
           name.appendChild(document.createTextNode(breakCamelCase(key)));
           value.appendChild(document.createTextNode(!!obj?obj[key]:info[key]));
+          if (key+"Title" in (obj||info)) {
+            dd.setAttribute("title", (obj||info)[key+"Title"]);
+          }
           dd.setAttribute("itemprop", key);
           dd.appendChild(name);
           dd.appendChild(value);
           dl.appendChild(dd);
         }
+      };
+      const implementAction = function () {
+        let dd = document.createElement("DD");
+        let button = document.createElement("BUTTON");
+        button.appendChild(document.createTextNode("Option to Cancel..."));
+        button.setAttribute("title", "Stop Processing...");
+        button.setAttribute("aria-label", "Cancel");
+        button.setAttribute("data-state", "CancelRequested");
+        button.classList.add("Stoppable");
+        dd.setAttribute("itemprop", "Action");
+        dd.appendChild(button);
+        dl.appendChild(dd);
       };
       let dfn = fragment.querySelector("DFN");
       let dl = document.createElement("DL");
@@ -884,21 +951,24 @@ const QueueView = function(props) {
       
       dt.appendChild(a);
       dl.appendChild(dt);
-      dl.setAttribute("title", "pin/unpin this info");
+      // dl.setAttribute("title", "pin/unpin this info");
 
       if (_.has(info, "ExperimentId")) {
         a.appendChild(document.createTextNode("Experiment"));
         a.setAttribute("href",`/#explore/Simulations?filters=ExperimentId=${info.ExperimentId}&offset=0`);
-        a.setAttribute("title", "Explore This Experiment");
+        // a.setAttribute("title", "Explore This Experiment");
         [
           "Owner","ExperimentId","NodeGroup","Elapsed","SimulationCount",
           "-",{"Runtime":"Stats as work completes..."},
           "-",{"Utilization":"Details when available..."}
         ].forEach(implement);
+        if (config.isCancelable && "Owner" in info && !!owner && info.Owner === owner) {
+          implementAction();
+        }
       } else if (_.has(info, "Flow")) {
         a.appendChild(document.createTextNode(info["Name"]||"Workflow"));
         a.setAttribute("href",`/#explore/WorkItems?filters=Id=${info.Id}&related=true&offset=0`);
-        a.setAttribute("title", `Explore This Workflow`);
+        // a.setAttribute("title", `Explore This Workflow`);
         ["Owner","Id","EnvironmentName","Elapsed","RelatedCount"].forEach(implement);
         if (_.has(info.Flow, "Related") && info.Flow.Related.length > 0) {
           info.Flow.Related.forEach(relation => {
@@ -913,7 +983,7 @@ const QueueView = function(props) {
       } else {
         a.appendChild(document.createTextNode("Orphan Simulation"));
         a.setAttribute("href",`/#explore/Simulations?filters=Owner=${info.Owner}&offset=0`);
-        a.setAttribute("title", `Explore ${info.Owner}'s Simulations`);
+        // a.setAttribute("title", `Explore ${info.Owner}'s Simulations`);
         ["Owner","NodeGroup","Elapsed"].forEach(implement);
       }
       dfn.classList.add("tooltip");
@@ -983,13 +1053,16 @@ const QueueView = function(props) {
    * NOTE: A hyphen "-" passed as key will embed an <hr> divider.
    * NOTE: Unfound keys are passed-over and will not be appended.
    * NOTE: Previous content of the same key will update, not append.
-   * 
+   * NOTE: Property with "Title" suffix is assumed to be title attribute of that prefix key.
+   * Example: ElapsedTitle is the title attribute of Elapsed.
+   *
    * @param {DOMElement} ele is the tooltip element (e/g dfn.tooltip).
+   * @param {Object} info is the source of data being rendered.
    * @param {Array} keys are the properties to be found in the info.
    */
   const appendTooltip = function (ele, info, keys) {
-    let dl = ele.querySelector("DL");
-    let implement = function (key, index, source) {
+    const dl = ele.querySelector("DL");
+    const implement = function (key, index, source) {
       let val = 0;
       let dd = document.createElement("DD");
       let name = document.createElement("VAR");
@@ -1002,7 +1075,7 @@ const QueueView = function(props) {
         name.appendChild(document.createTextNode(breakCamelCase(key)));
         if (/^(Min|Median|Max|TotalCoreTimeUsage)$/i.test(key)) {
           val = parseInt(info[key]);
-          val = val < 1000*60*60 ? (val/1000/60).toFixed(2) + " mins" : (val/1000/60/60).toFixed(2) + " hrs"
+          val = abbreviateTimeSpan(val);
         } else if (/TotalDiskUsage/i.test(key)) {
           val = parseInt(info[key]);
           val = (Math.round(val / 10485.76) / 100).toFixed(2).toLocaleString() + " MiB";
@@ -1013,6 +1086,9 @@ const QueueView = function(props) {
         dd.setAttribute("itemprop", key);
         dd.appendChild(name);
         dd.appendChild(value);
+        if (key+"Title" in info) {
+          dd.setAttribute("title", info[key+"Title"]);
+        }
         if (/^(Min|Median|Max|MaxCores|MinCores|TotalCoreTimeUsage|TotalDiskUsage)$/.test(key)) {
           // we are inserting secondary info mid-tooltip...
           let reference,referenceNode,placeholder = false;
@@ -1567,11 +1643,19 @@ const QueueView = function(props) {
         config.mocked = false;
         config.modeEntity = event.target.value > 0 ? MODE.WorkItems : MODE.Simulations;
         if (config.isSimulations) {
-          try {
+          if (config.api("refresh")) {
             // proxy for dashboard.refreshMetric(name,interaction);
-            config.api(config.mode,true);
-          } catch (err) {
-            console.error("An API was not established by the instantiator!", err);
+          } else {
+            // select first viable value...
+            let select = event.target.closest("SELECT");
+            for (let i = 0; i < select.options.length; i++) {
+              if (!/^[0-9]$/.test(select.options[i].value)) {
+                select.options[i].selected = true;
+                break;
+              }
+            }
+            let evt = new Event("change");
+            select.dispatchEvent(evt);
           }
         } else {
           destroy(true);
@@ -1639,11 +1723,7 @@ const QueueView = function(props) {
                 null, 
                 doWorkItems,
                 function(statusText, xhr) {
-                if (_.has(window, "comps.notifier")) {
-                  _.invoke(window, "comps.notifier.notify", statusText, { level: "error" });
-                } else { 
-                  alert(statusText);
-                }
+                  config.api("notify", statusText, { level: "error" })
               }
             );
           } else {
@@ -1667,7 +1747,12 @@ const QueueView = function(props) {
       /** @returns {Collection} the current Array of Objects currently within Queue. */
       return collection.latest;
     },
-    
+
+    query: function() {
+      /** @returns {Collection} the current Array of Objects currently within Queue (backwards compatible). */
+      return collection.latest;
+    },
+
     getCollectionCount: function() {
       /** @returns {Integer} the number of items currently within Queue. */
       return collection.count;
@@ -1712,11 +1797,10 @@ const QueueView = function(props) {
       if (!mockable && config.isMocked) {
         config.mocked = false;
         if (config.isSimulations) {
-          try {
+          if (config.api("refresh")) {
             // proxy for dashboard.refreshMetric(name,interaction);
-            config.api(config.mode,true);
-          } catch (err) {
-            console.error("An API was not established by the instantiator!", err);
+          } else {
+            // the interface did not refresh
           }
         } else {
           destroy(true);

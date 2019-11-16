@@ -32,13 +32,28 @@ class Index {
         useMockData: true,
         mockPath: "Simulations/1/",
         modeEntity: "Simulations",
-        api: function(mode,refresh) {
-          if (!!mode) {
-            this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
-          }
-          if (!!refresh) {
-            // refreshMetric("QueueView", true);
-            alert("There is no controller to GET this data!");
+        isCancelable: true,
+        api: function(intent,...args) {
+          switch (intent) {
+            case "mode":
+              this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
+              return true;
+            case "refresh":
+              alert("There is no controller to GET this data!");
+              return true;
+            case "cancel":
+              // applyItemAction(...args);
+              confirm(...args);
+              return true;
+            case "notify":
+              if (Postette) {
+                _.invoke(Postette, "notifier.notify", ...args);
+              } else {
+                alert(...args);
+              }
+              return true;
+            default:
+              return false;
           }
         }
       },
@@ -54,13 +69,24 @@ class Index {
         useMockData: true,
         mockPath: "WorkItems/1/",
         modeEntity: "WorkItems",
-        api: function(mode,refresh) {
-          if (!!mode) {
-            this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
-          }
-          if (!!refresh) {
-            // refreshMetric("QueueViewFlows", true);
-            alert("There is no controller to GET this data!");
+        isCancelable: false,
+        api: function(intent,...args) {
+          switch (intent) {
+            case "mode":
+              this.modeEntity = /sim/i.test(mode) ? "Simulations" : "WorkItems";
+              return true;
+            case "refresh":
+              alert("There is no controller to GET this data!");
+              return true;
+            case "notify":
+              if (Postette) {
+                _.invoke(Postette, "notifier.notify", ...args);
+              } else {
+                alert(...args);
+              }
+              return true;
+            default:
+              return false;
           }
         }
       }

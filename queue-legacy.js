@@ -9,7 +9,7 @@
      */
 
 
-var queue = function (instantiations) {
+var queueLegacy = function (instantiations) {
 
       var instance = function (settings) {
 
@@ -1739,4 +1739,4 @@ var queue = function (instantiations) {
     };
 
 
-export default queue;
+export default queueLegacy;
